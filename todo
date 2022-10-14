@@ -1,0 +1,25 @@
+make it a gem
+tests
+show table structure with indexes
+collapse query
+override max?
+show errors 
+parameterized queries
+add progress spinner
+copy to clipboard
+autocomplete
+include codemirror in html file to avoid having to serve js and css files
+handle very large errors
+fix table header maybe by using flex, right now words are wrapped for no good reason
+pagination?
+maybe move the submit button out of the status and under the editor
+make chart type configurable
+maybe highlight the current file in the saved tab
+always query structure and saved on startup
+include app name and environment in startup response
+show app name and environment in header and as title
+move all js into one file
+prevent races when using the network
+update controller to rescue all errors and return a message
+stringify server errors in console
+disable app if metadata fails to load
