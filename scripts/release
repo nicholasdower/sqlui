@@ -93,9 +93,9 @@ puts "Release version: #{new_version}"
 
 # Bundle install and run specs.
 puts
-#puts "Running specs"
+puts "Running specs"
 execute('bundle install')
-#execute('bundle exec rspec')
+execute('bundle exec rspec')
 
 # Update the version in .version
 puts 'Updating .version'

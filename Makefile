@@ -1,6 +1,7 @@
 .PHONY: install
 install:
 	npm install
+	bundle install
 
 .PHONY: build
 build:

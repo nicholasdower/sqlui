@@ -12,11 +12,11 @@ class SQLUI
   end
 
   def html
-    @html ||= File.read(File.join(@resources_dir, 'sqlui.html')
+    @html ||= File.read(File.join(@resources_dir, 'sqlui.html'))
   end
 
   def javascript
-    @javascript ||= File.read(File.join(@resources_dir, 'sqlui.js')
+    @javascript ||= File.read(File.join(@resources_dir, 'sqlui.js'))
   end
 
   def query(params)
@@ -54,7 +54,7 @@ class SQLUI
       SQL
     )
     result = {
-      server:  name,
+      server:  @name,
       schemas: {},
       saved:   Dir.glob("#{@saved_path}/*.sql").sort.map do |path|
         {

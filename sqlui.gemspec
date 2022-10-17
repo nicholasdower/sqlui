@@ -8,4 +8,8 @@ Gem::Specification.new do |s|
   s.homepage      = 'https://github.com/nicholasdower/sqlui'
   s.files         = ['lib/sqlui.rb', 'resources/sqlui.js', 'resources/sqlui.html']
   s.require_paths = [ 'lib' ]
+
+  s.add_development_dependency 'rspec-core', '~> 3.11'
+  s.add_development_dependency 'rspec-expectations', '~> 3.11'
+  s.add_development_dependency 'rspec-mocks', '~> 3.11'
 end
