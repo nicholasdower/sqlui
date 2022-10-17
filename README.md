@@ -1,5 +1,9 @@
 # SQLUI
 
+## Setup
+
+1. `nvm install node`
+
 ## Building
 
 1. `nvm use`

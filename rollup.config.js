@@ -1,11 +1,11 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default {
-  input: 'src/editor.js',
+  input: 'src/sqlui.js',
   output: {
-    file: 'build/editor.bundle.js',
+    file: 'resources/sqlui.js',
     format: 'iife',
-    name: 'editor'
+    name: 'sqlui'
   },
   plugins: [nodeResolve()]
 };

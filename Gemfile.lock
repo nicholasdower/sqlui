@@ -1,0 +1,17 @@
+PATH
+  remote: .
+  specs:
+    sqlui (0.0.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+
+PLATFORMS
+  x86_64-darwin-20
+
+DEPENDENCIES
+  sqlui!
+
+BUNDLED WITH
+   2.3.22

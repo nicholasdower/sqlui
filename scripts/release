@@ -1,0 +1,169 @@
+#!/usr/bin/env ruby
+
+require 'cgi'
+
+def fail(msg)
+  STDERR.puts("Fatal: #{msg}");
+  exit(1)
+end
+
+def execute(command)
+  result = `#{command} 2> /dev/null`.strip
+  fail("#{command} failed") unless $?.success?
+  result
+end
+
+class Version
+  include Comparable
+
+  attr_reader :major, :minor, :patch
+
+  def initialize(major, minor, patch)
+    @major = major
+    @minor = minor
+    @patch = patch
+  end
+
+  def self.parse(version)
+    parts = version.split('.')
+    raise ArgumentError.new("invalid version: #{version}") unless parts.size == 3
+
+    major = Integer(parts[0])
+    minor = Integer(parts[1])
+    patch = Integer(parts[2])
+
+    Version.new(major, minor, patch)
+  end
+
+  def <=>(other)
+    if (self.major <=> other.major) != 0
+      self.major <=> other.major
+    elsif (self.minor <=> other.minor) != 0
+      self.minor <=> other.minor
+    else
+      self.patch <=> other.patch
+    end
+  end
+
+  def to_s
+    "#{major}.#{minor}.#{patch}"
+  end
+end
+
+old_version = File.read('.version')
+
+# Parse version argument.
+fail("you must specify the version to be released, the previous version was #{old_version}") if ARGV.length != 1
+begin
+  new_version = Version.parse(ARGV[0])
+rescue ArgumentError
+  fail("invalid version: #{ARGV[0]}")
+end
+
+# Compare new version to previous version.
+previous_version = Version.parse(old_version)
+fail("new version (#{new_version}) must be greater than previous version (#{previous_version})") unless new_version > previous_version
+
+# Check whether there are any local changes.
+#fail("stage or commit your changes") unless execute('git status --porcelain').empty?
+
+# Get current branch.
+execute('git fetch')
+branch = execute('git branch --show-current')
+fail('cannot determine current branch') if branch.empty?
+
+# Get repo default branch.
+default_branch = execute('git symbolic-ref refs/remotes/origin/HEAD')
+unless default_branch.match?(/^refs\/remotes\/origin\/[^\/]+$/)
+ fail('cannot determine default branch')
+end
+default_branch = default_branch.gsub(/^refs\/remotes\/origin\//, '')
+
+# Ensure we are on the repo's default branch. We don't want to release from a feature branch.
+fail("you must release from the #{default_branch} branch") unless branch == default_branch
+
+# Ensure we are on the latest remote commit.
+local_commit = execute("git rev-parse #{branch}")
+remote_commit = execute("git rev-parse origin/#{branch}")
+fail("#{default_branch} is behind, you must pull") unless local_commit == remote_commit
+
+# Print versions as a sanity check.
+puts "Previous version: #{previous_version}"
+puts "Release version: #{new_version}"
+
+# Bundle install and run specs.
+puts
+#puts "Running specs"
+execute('bundle install')
+#execute('bundle exec rspec')
+
+# Update the version in .version
+puts 'Updating .version'
+File.write('.version', new_version)
+
+# Build gem.
+gem_file = "sqlui-#{new_version}.gem"
+File.delete(gem_file) if File.exist?(gem_file)
+puts "Building #{gem_file}"
+execute('gem build')
+fail("Gem file not found: #{gem_file}") unless File.exist?(gem_file)
+
+# Bundle install so that Gemfile.lock contains the new version.
+execute('bundle install')
+
+# Prompt to confirm we want to release.
+puts
+puts "Ready to release version #{new_version}"
+STDERR.print('Proceed? ')
+begin
+  unless  %w[y yes ja yep].include?(STDIN.gets.chomp.downcase)
+    puts 'Aborting'
+    execute('git co .version Gemfile.lock')
+    exit
+  end
+rescue Interrupt
+  puts
+  puts 'Aborting'
+  execute('git co .version Gemfile.lock')
+  exit
+end
+
+# Relase the gem.
+puts
+puts "Releasing version #{new_version}"
+execute("gem push --host=https://gems.localproxy.sc:42042 #{gem_file}")
+
+# Commit the changes (version.rb and Gemfile.lock)
+puts "Pushing release commit"
+execute("git commit -a -m 'v#{new_version} release'")
+execute('git push')
+
+# Build GitHub release URL.
+target_commit = execute('git rev-parse HEAD')
+release_body = <<~EOF
+  <!--
+    List any noteworthy new features and bug fixes below.
+    Before publishing, please add #{gem_file} as a file attachment.
+  -->
+  ### Features & Bug Fixes
+   -
+EOF
+git_url = "https://github.com/nicholasdower/sqlui/releases/new?" +
+  "title=v#{new_version}%20Release" +
+  '&' +
+  "tag=v#{new_version}" +
+  '&' +
+  "target=#{target_commit}" +
+  '&' +
+  "body=#{CGI.escape(release_body)}"
+
+# Print success and GitHub instructions.
+puts
+puts "Version #{new_version} successfully released"
+puts "Please publish a GitHub release in your browser"
+puts git_url
+
+# If on a Mac, open the browser.
+if system('which open 1> /dev/null 2> /dev/null')
+  execute("open \"#{git_url}\"")
+end

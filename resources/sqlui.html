@@ -2,7 +2,7 @@
 
   <title>SQLUI</title>
 
-  <script src="editor.bundle.js"></script>
+  <script src="sqlui.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
@@ -429,9 +429,9 @@
         loadQueryOrGraphTab(loadGraphResult);
       });
 
-      const cursor = editor.getCursor();
-      editor.focus();
-      editor.setCursor(cursor);
+      const cursor = sqlui.getCursor();
+      sqlui.focus();
+      sqlui.setCursor(cursor);
     }
 
     function selectQueryTab() {
@@ -439,9 +439,9 @@
         selected.style.display = "flex";
       });
 
-      const cursor = editor.getCursor();
-      editor.focus();
-      editor.setCursor(cursor);
+      const cursor = sqlui.getCursor();
+      sqlui.focus();
+      sqlui.setCursor(cursor);
 
       loadQueryOrGraphTab(loadQueryResult);
     }
@@ -492,9 +492,9 @@
 
     function submit() {
       const url = new URL(window.location);
-      url.searchParams.set("cursor", editor.getCursor());
+      url.searchParams.set("cursor", sqlui.getCursor());
 
-      let sql = editor.getValue().trim();
+      let sql = sqlui.getValue().trim();
       sql = sql === "" ? null : sql;
 
       if (url.searchParams.has("file")) {
@@ -616,7 +616,7 @@
         const sql = params.get("sql");
         const cursor = params.has("cursor") ? params.get("cursor") : 0;
         if (!window.result || sql !== window.result["query"] || cursor !== window.result["cursor"]) {
-          editor.setValue(sql);
+          sqlui.setValue(sql);
           const cursor = params.has("cursor") ? params.get("cursor") : 0;
           fetchSql(params.get("sql"), cursor, function(result) {
             window.result = result;
@@ -626,19 +626,19 @@
       } else if (params.has("file")) {
         const file = params.get("file");
         if (!window.result || file !== window.result["file"]) {
-          editor.setValue("");
+          sqlui.setValue("");
           fetchFile(file, function(result) {
             window.result = result;
             if (window.result["query"]) {
-              editor.setValue(result["query"]);
+              sqlui.setValue(result["query"]);
             }
             callback();
           });
         }
       }
       if (params.has("cursor")) {
-        editor.focus();
-        editor.setCursor(params.get("cursor"));
+        sqlui.focus();
+        sqlui.setCursor(params.get("cursor"));
       }
     }
 
@@ -799,7 +799,7 @@
         const params = new URLSearchParams(window.location.search)
         const queryElement = document.getElementById("query");
 
-        editor.init(queryElement, function() {
+        sqlui.init(queryElement, function() {
           submit();
         });
         route();
