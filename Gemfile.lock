@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqlui (0.0.0)
+    sqlui (0.0.1)
 
 GEM
   remote: http://rubygems.org/
