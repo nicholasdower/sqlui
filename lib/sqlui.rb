@@ -39,6 +39,12 @@ class SQLUI
   end
 
   def metadata
+    @metadata ||= load_metadata
+  end
+
+  private
+
+  def load_metadata
     stats_result = @queryer.call(
       <<~SQL.squish
         select
@@ -133,8 +139,6 @@ class SQLUI
 
     result
   end
-
-  private
 
   def execute_query(sql)
     result = @queryer.call(sql)
