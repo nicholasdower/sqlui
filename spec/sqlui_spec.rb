@@ -2,9 +2,7 @@ require 'sqlui'
 
 describe SQLUI do
   let(:sqlui) do
-    SQLUI.new(name: 'test', saved_path: 'path') do |sql|
-      'result'
-    end
+    SQLUI.new(client: nil, name: 'test', saved_path: 'path')
   end
 
   it 'can be loaded' do

@@ -5,11 +5,11 @@ require 'set'
 class SQLUI
   MAX_ROWS = 1_000
 
-  def initialize(name:, saved_path:, max_rows: MAX_ROWS, &block)
+  def initialize(client:, name:, saved_path:, max_rows: MAX_ROWS)
+    @client = client
     @name = name
     @saved_path = saved_path
     @max_rows = max_rows
-    @queryer = block
     @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'resources')
   end
 
@@ -77,7 +77,7 @@ class SQLUI
   end
 
   def load_metadata
-    stats_result = @queryer.call(
+    stats_result = @client.query(
       <<~SQL
         select
           table_schema,
@@ -131,7 +131,7 @@ class SQLUI
       column[:column_name] = row['column_name']
     end
 
-    column_result = @queryer.call(
+    column_result = @client.query(
       <<~SQL
         select
           table_schema,
@@ -173,7 +173,7 @@ class SQLUI
   end
 
   def execute_query(sql)
-    result = @queryer.call(sql)
+    result = @client.query(sql)
     rows = result.map { |row| row.values }
     columns = result.first&.keys || []
     column_types = columns.map { |_| 'string' }

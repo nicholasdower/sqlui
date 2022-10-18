@@ -23,3 +23,6 @@ prevent races when using the network
 update controller to rescue all errors and return a message
 stringify server errors in console
 disable app if metadata fails to load
+support having a single database rather than listing all databases in metadata. Hide schema select.
+maybe add a database dropdown rather than having a separate instance per database
+entering a black query, then going back to a real query, then going forward does not clear the result or the editor
