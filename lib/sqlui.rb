@@ -174,13 +174,15 @@ class SQLUI
 
   def execute_query(sql)
     result = @queryer.call(sql)
-    rows = result.rows
-    column_types = result.columns.map { |_| 'string' }
+    rows = result.map { |row| row.values }
+    columns = result.first&.keys || []
+    column_types = columns.map { |_| 'string' }
     unless rows.empty?
-      maybe_non_null_column_value_exemplars = result.columns.each_with_index.map do |_, index|
-        rows.find do |row|
+      maybe_non_null_column_value_exemplars = columns.each_with_index.map do |_, index|
+        row = rows.find do |row|
           !row[index].nil?
-        end.try(:[], index)
+        end
+        row.nil? ? nil : row[index]
       end
       column_types = maybe_non_null_column_value_exemplars.map do |value|
         case value
@@ -197,7 +199,7 @@ class SQLUI
     end
     {
       query:        sql,
-      columns:      result.columns,
+      columns:      columns,
       column_types: column_types,
       total_rows:   rows.size,
       rows:         rows.take(@max_rows)
