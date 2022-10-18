@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqlui (0.1.4)
+    sqlui (0.1.5)
 
 GEM
   remote: http://rubygems.org/
@@ -10,7 +10,10 @@ GEM
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.8)
+    nio4r (2.5.8-java)
     puma (6.0.0)
+      nio4r (~> 2.0)
+    puma (6.0.0-java)
       nio4r (~> 2.0)
     rack (2.2.4)
     rack-protection (3.0.2)
@@ -33,6 +36,7 @@ GEM
     tilt (2.0.11)
 
 PLATFORMS
+  universal-java-11
   x86_64-darwin-20
 
 DEPENDENCIES
@@ -44,4 +48,4 @@ DEPENDENCIES
   sqlui!
 
 BUNDLED WITH
-   2.3.22
+   2.3.14
