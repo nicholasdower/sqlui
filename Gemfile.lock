@@ -7,6 +7,14 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.5.0)
+    mustermann (3.0.0)
+      ruby2_keywords (~> 0.0.1)
+    nio4r (2.5.8)
+    puma (6.0.0)
+      nio4r (~> 2.0)
+    rack (2.2.4)
+    rack-protection (3.0.2)
+      rack
     rspec-core (3.11.0)
       rspec-support (~> 3.11.0)
     rspec-expectations (3.11.1)
@@ -16,14 +24,23 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.11.0)
     rspec-support (3.11.1)
+    ruby2_keywords (0.0.5)
+    sinatra (3.0.2)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.0.2)
+      tilt (~> 2.0)
+    tilt (2.0.11)
 
 PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
-  rspec-core (~> 3.11)
-  rspec-expectations (~> 3.11)
-  rspec-mocks (~> 3.11)
+  puma (~> 6.0)
+  rspec-core (~> 3.0)
+  rspec-expectations (~> 3.0)
+  rspec-mocks (~> 3.0)
+  sinatra (~> 3.0)
   sqlui!
 
 BUNDLED WITH
