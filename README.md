@@ -39,8 +39,8 @@ end
 Add the required routes:
 
 ```ruby
-get  '/sqlui/:route'  => 'sqlui#get', constraints: { route: /.*/ }
-post '/sqlui/:route' => 'sqlui#post' constraints: { route: /.*/ }
+get  '/sqlui/:route' => 'sqlui#get',  constraints: { route: /.*/ }
+post '/sqlui/:route' => 'sqlui#post', constraints: { route: /.*/ }
 ```
 
 Visit `/sqlui/app`
