@@ -5,9 +5,10 @@ require 'set'
 class SQLUI
   MAX_ROWS = 1_000
 
-  def initialize(name:, saved_path:, max: MAX_ROWS, &block)
+  def initialize(name:, saved_path:, max_rows: MAX_ROWS, &block)
     @name = name
     @saved_path = saved_path
+    @max_rows = max_rows
     @queryer = block
     @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'resources')
   end
@@ -199,7 +200,7 @@ class SQLUI
       columns:      result.columns,
       column_types: column_types,
       total_rows:   rows.size,
-      rows:         rows.take(MAX_ROWS)
+      rows:         rows.take(@max_rows)
     }
   end
 
