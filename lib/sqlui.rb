@@ -1,15 +1,42 @@
+require 'json'
 require 'uri'
 require 'set'
 
 class SQLUI
   MAX_ROWS = 1_000
 
-  def initialize(name:, saved_path:, &block)
+  def initialize(name:, saved_path:, max: MAX_ROWS, &block)
     @name = name
     @saved_path = saved_path
     @queryer = block
     @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'resources')
   end
+
+  def get(params)
+    case params[:route]
+    when 'app'
+      { body: html.html_safe, status: 200, content_type: 'text/html' }
+    when 'sqlui.js'
+      { body: javascript, status: 200, content_type: 'text/javascript' }
+    when 'metadata'
+      { body: metadata.to_json, status: 200, content_type: 'application/json' }
+    when 'query_file'
+      { body: query_file(params).to_json, status: 200, content_type: 'application/json' }
+    else
+      { body: "unknown route: #{params[:route]}", status: 404, content_type: 'text/plain' }
+    end
+  end
+
+  def post(params)
+    case params[:route]
+    when 'query'
+      { body: query(params).to_json, status: 200, content_type: 'text/html' }
+    else
+      { body: "unknown route: #{params[:route]}", status: 404, content_type: 'text/plain' }
+    end
+  end
+
+  private
 
   def html
     @html ||= File.read(File.join(@resources_dir, 'sqlui.html'))
@@ -41,8 +68,6 @@ class SQLUI
   def metadata
     @metadata ||= load_metadata
   end
-
-  private
 
   def load_metadata
     stats_result = @queryer.call(
