@@ -56,3 +56,8 @@ Visit `/sqlui/app`
 1. `nvm use`
 1. `make install`
 1. `make build`
+
+### Running
+
+1. `make test-server`
+1. Visit http://localhost:4567/app
