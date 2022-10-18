@@ -6,6 +6,15 @@
 
 A web app which can be used to query a SQL database. Meant to be added to an existing server.
 
+## Features
+
+- Querying.
+- Sharing queries via URLs including cursor position.
+- Running one of multiple queries in a single editor based on cursor position.
+- Running a saved query (see saved tab).
+- Creating a line graph based on results.
+- Inspecting the structure of the database (see structure tab).
+
 ## Usage
 
 ### Rails
