@@ -137,7 +137,7 @@ end
 # Relase the gem.
 puts
 puts "Releasing version #{new_version}"
-execute("gem push --host=https://gems.localproxy.sc:42042 #{gem_file}")
+execute("gem push #{gem_file}")
 
 # Commit the changes (version.rb and Gemfile.lock)
 puts "Pushing release commit"
