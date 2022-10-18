@@ -15,3 +15,7 @@ update-npm:
 clean:
 	rm -rf node_modules
 	rm resources/sqlui.js
+
+.PHONY: test-server
+test-server:
+	ruby server/server.rb

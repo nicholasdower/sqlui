@@ -7,6 +7,12 @@ get '/app' do
   body File.read('resources/sqlui.html')
 end
 
+get '/sqlui.css' do
+  status 200
+  headers "Content-Type": "text/css"
+  body File.read('resources/sqlui.css')
+end
+
 get '/sqlui.js' do
   status 200
   headers "Content-Type": "text/javascript"

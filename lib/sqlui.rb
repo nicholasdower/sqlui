@@ -16,6 +16,8 @@ class SQLUI
     case params[:route]
     when 'app'
       { body: html.html_safe, status: 200, content_type: 'text/html' }
+    when 'sqlui.css'
+      { body: css, status: 200, content_type: 'text/css' }
     when 'sqlui.js'
       { body: javascript, status: 200, content_type: 'text/javascript' }
     when 'metadata'
@@ -40,6 +42,10 @@ class SQLUI
 
   def html
     @html ||= File.read(File.join(@resources_dir, 'sqlui.html'))
+  end
+
+  def css
+    @css ||= File.read(File.join(@resources_dir, 'sqlui.css'))
   end
 
   def javascript

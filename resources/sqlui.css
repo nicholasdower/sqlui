@@ -1,0 +1,242 @@
+    body {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .main-box {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      margin: 0;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    .header {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: start;
+      padding-left: 5px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .tabs-box {
+      display: flex;
+      flex-direction: row;
+      border-bottom: 1px solid #ddd;
+      height: 36px;
+      font-size: 16px;
+      font-family: Helvetica;
+    }
+
+    .tab-button, .selected-tab-button {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      width: 150px;
+      padding: 2px;
+      margin: 0px;
+      display: flex;
+      justify-content: center;
+      background-color: #fff;
+    }
+
+    .tab-button {
+      color: #888;
+    }
+
+    .tab-button:hover {
+      color: #333;
+    }
+
+    .selected-tab-button {
+      color: #333;
+      font-weight: bold;
+    }
+
+    .tab-content-element {
+      display: none;
+    }
+
+    .query-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .query {
+      display: flex;
+      flex: 1;
+    }
+
+    .submit-box {
+      display: flex;
+      border-top: 1px solid #ddd;
+      height: 36px;
+      justify-content: right;
+    }
+
+    .status {
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      flex-direction: column;
+      font-family: Helvetica;
+    }
+
+    .result-box, .saved-box, .graph-box, .structure-box {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .graph-box, .result-box {
+      border-top: 1px solid #ddd;
+    }
+
+    .graph-box {
+      padding: 20px;
+    }
+
+    table {
+      font-family: monospace;
+      flex: 1;
+      border-spacing: 0px;
+      display: flex;
+      width: 100%;
+    }
+
+    table td:last-child, table th:last-child {
+      width: 100%;
+      border-right: none !important;
+    }
+
+    td, th {
+      padding: 5px 20px 5px 5px;
+      font-weight: normal;
+      white-space: nowrap;
+      max-width: 500px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    td {
+      text-align: right;
+    }
+
+    th {
+      text-align: left;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+    }
+
+    table {
+      display: block;
+    }
+
+    thead {
+      padding: 0px;
+      background-color: #fff;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0px;
+      z-index: 100;
+      table-layout:fixed;
+    }
+
+    .highlighted-row {
+      background: #eee;
+    }
+
+    .status-box {
+      padding: 5px;
+      display: flex;
+      flex-direction: rows;
+      justify-content: space-between;
+      border-top: 1px solid #ddd;
+      height: 30px;
+    }
+
+    .CodeMirror pre.CodeMirror-placeholder {
+      color: #999;
+    }
+
+    .tabs-box {
+      display: flex;
+    }
+
+    .saved-box {
+      font-family: Helvetica;
+    }
+
+    .saved-box h1 {
+      margin: 0px;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .saved-box div:first-child {
+      border-top: none !important;
+    }
+
+    .saved-box p {
+      margin: 0px;
+      padding-left: 20px;
+      padding-bottom: 20px;
+    }
+
+    .saved-box div {
+      cursor: pointer;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .saved-box div:hover {
+      background: #eee;
+    }
+
+    .submit-button {
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .cm-editor.cm-focused {
+      outline: none !important;
+    }
+
+    .schemas, .tables {
+      border: none;
+      display: flex;
+      min-width: 200px;
+    }
+
+    .table-info {
+      display: grid;
+      grid-template-columns: 1;
+      grid-template-rows: 0.5fr 0.5fr;
+      justify-items: stretch;
+      flex: 1;
+    }
+
+    .columns {
+      border-bottom: 1px solid #ddd;
+      overflow: auto;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .indexes {
+      overflow: auto;
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    select {
+      outline: none;
+    }
