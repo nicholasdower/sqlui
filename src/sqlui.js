@@ -401,44 +401,44 @@ function fetchSaved(callback) {
 }
 
 function loadQueryOrGraphTab(callback) {
-  if (window.result) {
+  const params = new URLSearchParams(window.location.search)
+  const sql = params.get("sql");
+  const file = params.get("file");
+  const cursor = params.has("cursor") ? params.get("cursor") : 0;
+
+  if (params.has("sql") && window.result && sql === window.result["query"]) {
+    callback();
+    return;
+  } else if (params.has("file") && window.result && file === window.result["file"]) {
     callback();
     return;
   }
-  const params = new URLSearchParams(window.location.search)
 
-  if (params.has("file") && params.has("sql")) {
+  if (params.has("file") && params.has("sql") && cursor === window.result["cursor"]) {
     // TODO: show an error.
     throw "You can only specify a file or sql, not both."
   }
 
   if (params.has("sql")) {
-    const sql = params.get("sql");
+    setValue(sql);
     const cursor = params.has("cursor") ? params.get("cursor") : 0;
-    if (!window.result || sql !== window.result["query"] || cursor !== window.result["cursor"]) {
-      setValue(sql);
-      const cursor = params.has("cursor") ? params.get("cursor") : 0;
-      fetchSql(params.get("sql"), cursor, function(result) {
-        window.result = result;
-        callback();
-      });
-    }
+    fetchSql(params.get("sql"), cursor, function(result) {
+      window.result = result;
+      callback();
+    });
   } else if (params.has("file")) {
-    const file = params.get("file");
-    if (!window.result || file !== window.result["file"]) {
-      setValue("");
-      fetchFile(file, function(result) {
-        window.result = result;
-        if (window.result["query"]) {
-          setValue(result["query"]);
-        }
-        callback();
-      });
-    }
+    setValue("");
+    fetchFile(file, function(result) {
+      window.result = result;
+      if (window.result["query"]) {
+        setValue(result["query"]);
+      }
+      callback();
+    });
   }
   if (params.has("cursor")) {
     focus();
-    setCursor(params.get("cursor"));
+    setCursor(cursor);
   }
 }
 

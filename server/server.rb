@@ -23,7 +23,7 @@ post '/query' do
   status 200
   headers "Content-Type": "application/json"
   result = {
-    query:        params['sql'],
+    query:        JSON.parse(request.body.read)['sql'],
     columns:      ['name'],
     column_types: ['string'],
     total_rows:   1,
