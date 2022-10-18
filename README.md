@@ -36,11 +36,23 @@ class SqluiController < ApplicationController
   end
 
   def get
-    render SQLUI_INSTANCE.get(params)
+    render html_safe(SQLUI_INSTANCE.get(params))
+    render response
   end
 
   def post
-    render SQLUI_INSTANCE.post(params)
+    response = SQLUI_INSTANCE.post(params)
+    response[:body] = response[:body].html_safe if response[:content_type] == 'text/html'
+    render response
+  end
+
+  private
+
+  def html_safe(response)
+    if response[:content_type] == 'text/html'
+      response[:body] = response[:body].html_safe
+    end
+    response
   end
 end
 ```

@@ -16,7 +16,7 @@ class SQLUI
   def get(params)
     case params[:route]
     when 'app'
-      { body: html.html_safe, status: 200, content_type: 'text/html' }
+      { body: html, status: 200, content_type: 'text/html' }
     when 'sqlui.css'
       { body: css, status: 200, content_type: 'text/css' }
     when 'sqlui.js'
@@ -33,7 +33,7 @@ class SQLUI
   def post(params)
     case params[:route]
     when 'query'
-      { body: query(params).to_json, status: 200, content_type: 'text/html' }
+      { body: query(params).to_json, status: 200, content_type: 'application/json' }
     else
       { body: "unknown route: #{params[:route]}", status: 404, content_type: 'text/plain' }
     end
