@@ -1,5 +1,7 @@
 # SQLUI
 
+![image](https://user-images.githubusercontent.com/9117775/196360285-c034ba6a-e4f2-410b-b157-6f567811cfd6.png)
+
 ## Intro
 
 A web app which can be used to query a SQL database. Meant to be added to an existing server.
