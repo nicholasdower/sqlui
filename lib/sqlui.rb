@@ -78,7 +78,7 @@ class SQLUI
 
   def load_metadata
     stats_result = @queryer.call(
-      <<~SQL.squish
+      <<~SQL
         select
           table_schema,
           table_name,
@@ -132,7 +132,7 @@ class SQLUI
     end
 
     column_result = @queryer.call(
-      <<~SQL.squish
+      <<~SQL
         select
           table_schema,
           table_name,
