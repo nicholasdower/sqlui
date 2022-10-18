@@ -91,6 +91,13 @@ fail("#{default_branch} is behind, you must pull") unless local_commit == remote
 puts "Previous version: #{previous_version}"
 puts "Release version: #{new_version}"
 
+# Build
+puts
+puts "Building"
+execute('nvm use')
+execute('make install')
+execute('make build')
+
 # Bundle install and run specs.
 puts
 puts "Running specs"
