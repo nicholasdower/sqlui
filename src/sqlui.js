@@ -114,19 +114,18 @@ function selectStructureTab() {
   }
 
   const schemasElement = document.getElementById("schemas");
-  const schemaNames = Object.keys(window.metadata["schemas"]);
-  schemaNames.forEach(function(schemaName) {
-    const optionElement = document.createElement("option");
-    optionElement.value = schemaName;
-    optionElement.innerText = schemaName;
-    schemasElement.appendChild(optionElement);
-  });
   const tablesElement = document.getElementById("tables");
-  schemasElement.addEventListener("change", function() {
+  const columnsElement = document.getElementById("columns");
+  const indexesElement = document.getElementById("indexes");
+
+  const schemaNames = Object.keys(window.metadata["schemas"]);
+  if (schemaNames.length == 1) {
+    schemasElement.style.display = 'none';
+    // TODO: duplicate code
     while(tablesElement.firstChild) {
       tablesElement.removeChild(tablesElement.firstChild);
     }
-    const schemaName = schemasElement.value;
+    const schemaName = schemaNames[0];
     const schema = window.metadata["schemas"][schemaName];
     const tableNames = Object.keys(schema["tables"]);
     tableNames.forEach(function(tableName) {
@@ -135,9 +134,29 @@ function selectStructureTab() {
       optionElement.innerText = tableName;
       tablesElement.appendChild(optionElement);
     });
-  });
-  const columnsElement = document.getElementById("columns");
-  const indexesElement = document.getElementById("indexes");
+  } else {
+    schemasElement.style.display = 'flex';
+    schemaNames.forEach(function(schemaName) {
+      const optionElement = document.createElement("option");
+      optionElement.value = schemaName;
+      optionElement.innerText = schemaName;
+      schemasElement.appendChild(optionElement);
+    });
+    schemasElement.addEventListener("change", function() {
+      while(tablesElement.firstChild) {
+        tablesElement.removeChild(tablesElement.firstChild);
+      }
+      const schemaName = schemasElement.value;
+      const schema = window.metadata["schemas"][schemaName];
+      const tableNames = Object.keys(schema["tables"]);
+      tableNames.forEach(function(tableName) {
+        const optionElement = document.createElement("option");
+        optionElement.value = tableName;
+        optionElement.innerText = tableName;
+        tablesElement.appendChild(optionElement);
+      });
+    });
+  }
   tablesElement.addEventListener("change", function() {
     while(columnsElement.firstChild) {
       columnsElement.removeChild(columnsElement.firstChild);
@@ -145,7 +164,7 @@ function selectStructureTab() {
     while(indexesElement.firstChild) {
       indexesElement.removeChild(indexesElement.firstChild);
     }
-    const schemaName = schemasElement.value;
+    const schemaName = schemaNames.length == 1 ? schemaNames[0] : schemasElement.value;
     const tableName = tablesElement.value;
     const table = window.metadata["schemas"][schemaName]["tables"][tableName];
 

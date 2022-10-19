@@ -26,3 +26,7 @@ disable app if metadata fails to load
 support having a single database rather than listing all databases in metadata. Hide schema select.
 maybe add a database dropdown rather than having a separate instance per database
 entering a black query, then going back to a real query, then going forward does not clear the result or the editor
+add rescue blocks, return bad request rather than raising
+execute and execute all buttons
+add ability to execute current selection, change cursor to from and to
+use caching headers on js and css and html

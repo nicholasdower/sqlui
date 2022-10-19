@@ -5,8 +5,9 @@ require 'set'
 class SQLUI
   MAX_ROWS = 1_000
 
-  def initialize(client:, name:, saved_path:, max_rows: MAX_ROWS)
+  def initialize(client:, table_schema: nil, name:, saved_path:, max_rows: MAX_ROWS)
     @client = client
+    @table_schema = table_schema
     @name = name
     @saved_path = saved_path
     @max_rows = max_rows
@@ -77,6 +78,11 @@ class SQLUI
   end
 
   def load_metadata
+    if @table_schema
+      where_clause = "where table_schema = '#{@table_schema}'"
+    else
+      where_clause = "where table_schema not in('mysql', 'sys')"
+    end
     stats_result = @client.query(
       <<~SQL
         select
@@ -87,7 +93,7 @@ class SQLUI
           non_unique,
           column_name
         from information_schema.statistics
-        where table_schema not in('mysql', 'sys')
+        #{where_clause}
         order by table_schema, table_name, if(index_name = "PRIMARY", 0, index_name), seq_in_index;
       SQL
     )
@@ -131,6 +137,11 @@ class SQLUI
       column[:column_name] = row['column_name']
     end
 
+    if @table_schema
+      where_clause = "where table_schema = '#{@table_schema}'"
+    else
+      where_clause = "where table_schema not in('information_schema' 'mysql', 'performance_schema', 'sys')"
+    end
     column_result = @client.query(
       <<~SQL
         select
