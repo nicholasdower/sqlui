@@ -16,8 +16,9 @@ update-npm:
 .PHONY: clean
 clean:
 	rm -rf node_modules
-	rm resources/sqlui.js
+	rm -rf resources/sqlui.js
 	rm -rf vendor
+	rm -rf .bundle
 
 .PHONY: clean-all
 clean-all: clean
@@ -27,7 +28,3 @@ clean-all: clean
 .PHONY: run
 run:
 	PORT=8080 APP_ENV=development bundle exec ruby ./bin/sqlui config.yml
-
-.PHONY: clean
-clean:
-	git clean -fXd
