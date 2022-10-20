@@ -51,11 +51,11 @@
   <body>
     <h1>Payments Databases</h1>
     <% databases.values.each do |database| %>
-      <div class="database" onclick="window.location='<%= "/db/#{database['path']}/app" %>'">
+      <div class="database" onclick="window.location='<%= "/db/#{database['url_path']}/app" %>'">
       <h2><%= database['name'] %></h2>
-      <a href="/db/<%= database['path'] %>/app">query</a>
-      <a href="/db/<%= database['path'] %>/app?tab=saved">saved</a>
-      <a href="/db/<%= database['path'] %>/app?tab=structure">structure</a>
+      <a href="/db/<%= database['url_path'] %>/app">query</a>
+      <a href="/db/<%= database['url_path'] %>/app?tab=saved">saved</a>
+      <a href="/db/<%= database['url_path'] %>/app?tab=structure">structure</a>
       <p>
         <%= database['description'] %>
       </p>

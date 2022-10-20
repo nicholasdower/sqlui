@@ -1,4 +1,5 @@
 version: next
+- New config format.
 
 version: 0.1.13
 - No changes

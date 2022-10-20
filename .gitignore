@@ -4,6 +4,6 @@
 /resources/sqlui.js
 /vendor
 /sql/*
-!/sql/local_development
-/sql/local_development/*
-!/sql/local_development/sample.sql
+!/sql/development
+/sql/development/*
+!/sql/development/sample.sql

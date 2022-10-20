@@ -34,26 +34,26 @@ class Server < Sinatra::Base
   end
 
   config = YAML.load(ERB.new(File.read(ARGV[0])).result)
-  saved_path = config['saved_path']
-  client_map = config['databases'].values.map do |config|
+  saved_path_root = config['saved_path']
+  client_map = config['databases'].values.map do |database_config|
     client_params = {
-      host:            config['db_host'],
-      port:            config['db_port'] || 3306,
-      username:        config['db_username'],
-      password:        config['db_password'],
-      database:        config['db_database'],
+      host:            database_config['db_host'],
+      port:            database_config['db_port'] || 3306,
+      username:        database_config['db_username'],
+      password:        database_config['db_password'],
+      database:        database_config['db_database'],
       read_timeout:    10, # seconds
       write_timeout:   0,  # seconds
       connect_timeout: 5   # seconds
     }
     client = Client.new(client_params)
     [
-      config['path'], 
+      database_config['url_path'], 
       ::SQLUI.new(
         client:       client,
-        table_schema: config['db_database'],
-        name:         config['name'],
-        saved_path:   File.join(saved_path, config['path'])
+        table_schema: database_config['db_database'],
+        name:         database_config['name'],
+        saved_path:   File.join(saved_path_root, database_config['saved_path'])
       )
     ]
   end.to_h
@@ -64,7 +64,7 @@ class Server < Sinatra::Base
   end
 
   get '/db/?' do
-    erb :databases, :locals => {:databases => databases}
+    erb :databases, :locals => {:databases => config['databases']}
   end
 
   get '/db/:database' do

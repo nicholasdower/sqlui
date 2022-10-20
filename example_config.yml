@@ -1,8 +1,9 @@
 saved_path: sql
 databases:
-  local_development:
-    name:        Local Development
-    path:        local_development
+  development:
+    name:        Development
+    url_path:    development
+    saved_path:  development
     db_database: development
     db_username: root
     db_password: root
