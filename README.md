@@ -13,13 +13,14 @@ A web app which can be used to query one or more SQL databases.
   * [Create a config file like the following](#create-a-config-file-like-the-following)
   * [Install the Gem or add it to your `Gemfile`](#install-the-gem-or-add-it-to-your-gemfile)
   * [Run the gem directly or via bundle if using a Gemfile](#run-the-gem-directly-or-via-bundle-if-using-a-gemfile)
-- [Development](#development)
+- [Development Setup](#development-setup)
   * [Create a config file like the following](#create-a-config-file-like-the-following)
   * [Install Node Version Manager (nvm)](#install-node-version-manager-nvm)
   * [Install Node](#install-node)
   * [Build & Run](#build--run)
     + [Install dependencies](#install-dependencies)
     + [Build app](#build-app)
+    + [Start and seed the database](#start-and-seed-the-database)
     + [Run and view the app](#run-and-view-the-app)
 
 ## Features
@@ -47,6 +48,7 @@ databases:
     db_database: development # Database name.
     db_username: root        # Database username.
     db_password: root        # Database password.
+    db_port:     60330       # Database port.
     db_host:     127.0.0.1   # Database host.
 ```
 
@@ -70,7 +72,7 @@ sqlui <u>config-file</u>
 bundle exec sqlui <u>config-file</u>
 </pre>
 
-## Development
+## Development Setup
 
 ### Create a config file like the following
 
@@ -87,6 +89,7 @@ databases:
     db_database: development # Database name.
     db_username: root        # Database username.
     db_password: root        # Database password.
+    db_port:     60330       # Database port.
     db_host:     127.0.0.1   # Database host.
 ```
 
@@ -114,10 +117,17 @@ make install
 make build
 ```
 
+### Start and seed the database
+
+```shell
+make start-db
+make seed-db
+```
+
 #### Run and view the app
 
 ```shell
-make run
+make start
 ```
 
 Visit http://localhost:8080/db

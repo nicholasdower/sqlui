@@ -1,0 +1,11 @@
+services:
+  db:
+    container_name: sqlui_db
+    image: mysql/mysql-server:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: development
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+    ports:
+      - '60330:3306'

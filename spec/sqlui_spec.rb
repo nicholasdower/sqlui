@@ -1,4 +1,5 @@
 require_relative '../app/sqlui'
+require_relative 'spec_helper'
 
 describe SQLUI do
   let(:sqlui) do

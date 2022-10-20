@@ -25,6 +25,22 @@ clean-all: clean
 	rm config.yml
 	rm *.gem
 
-.PHONY: run
-run:
+.PHONY: start-db
+start-db:
+	docker compose up --detach db
+
+.PHONY: stop-db
+stop-db:
+	docker compose down db
+
+.PHONY: seed-db
+seed-db:
+	docker exec -it sqlui_db mysql --user=root --password=root --database=development --execute='create table names(name varchar(255), description varchar(255));'
+
+.PHONY: start
+start:
 	PORT=8080 APP_ENV=development bundle exec ruby ./bin/sqlui config.yml
+
+.PHONY: test
+test:
+	bundle exec rspec --format doc
