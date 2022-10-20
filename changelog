@@ -1,4 +1,5 @@
 version: next
+- Fix missing resources in Gem.
 
 version: 0.1.14
 - New config format.

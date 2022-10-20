@@ -12,9 +12,9 @@ Gem::Specification.new do |spec|
   spec.executables   << 'sqlui'
 
   spec.files         =
-    Dir['lib/**/*.rb'] +
-    Dir['app/**/*.rb'] +
-    Dir['resources/**/*.rb'] +
+    Dir['lib/**/*'] +
+    Dir['app/**/*'] +
+    Dir['resources/**/*'] +
     ['.version']
 
   spec.add_dependency 'mysql2',  '~> 0.0'
