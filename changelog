@@ -1,5 +1,8 @@
+version: next
+- No new features. Fix broken release script.
+
 version: 0.1.11
-- Add a server
+- Add a server.
 
 version: 0.1.10
 - Allow client to specify table_schema.
