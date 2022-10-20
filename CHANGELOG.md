@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.14
+
+- New config format.
+
 ## 0.1.13
 
 - No changes
