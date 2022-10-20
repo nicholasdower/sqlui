@@ -75,6 +75,7 @@ versions = File.read('changelog').split(/(?=^version:)/).map do |content|
     version = Version.parse(version)
   end
   description = lines[1..-1].join("\n")
+  description = "- No changes" if description.empty?
   [version, description]
 end.to_h
 new_changelog = versions[new_version]
@@ -125,6 +126,7 @@ File.write('.version', new_version)
 
 # Update the changelog
 File.write('changelog', "version: next\n\n" + versions.map { |version, changelog| "version: #{version}\n#{changelog}\n\n" }.join.strip + "\n")
+File.write('CHANGELOG.md', "# Changes\n\n" + versions.map { |version, changelog| "## #{version}\n\n#{changelog}\n\n" }.join.strip + "\n")
 
 # Build gem.
 gem_file = "sqlui-#{new_version}.gem"
@@ -146,13 +148,13 @@ STDERR.print('Proceed? ')
 begin
   unless  %w[y yes ja yep].include?(STDIN.gets.chomp.downcase)
     puts 'Aborting'
-    execute('git checkout changelog .version Gemfile.lock')
+    execute('git checkout changelog CHANGELOG.md .version Gemfile.lock')
     exit
   end
 rescue Interrupt
   puts
   puts 'Aborting'
-  execute('git checkout changelog .version Gemfile.lock')
+  execute('git checkout changelog CHANGELOG.md .version Gemfile.lock')
   exit
 end
 
