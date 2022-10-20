@@ -30,3 +30,4 @@ add rescue blocks, return bad request rather than raising
 execute and execute all buttons
 add ability to execute current selection, change cursor to from and to
 use caching headers on js and css and html
+cache js, css and html at class level instead of instance
