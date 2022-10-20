@@ -1,4 +1,4 @@
-require 'sqlui'
+require_relative '../app/sqlui'
 
 describe SQLUI do
   let(:sqlui) do

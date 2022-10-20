@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Payments Databases</title>
+
+    <style>
+      body {
+        font-family: Helvetica;
+      }
+
+      h1 {
+        font-size: 30px;
+        margin-bottom: 30px;
+      }
+
+      .database a {
+        margin-right: 10px;
+        color: darkblue;
+        font-size: 16px;
+      }
+
+      .database h2 {
+        margin: 0px;
+        margin-top: 10px;
+        margin-bottom: 0px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .database p {
+        margin: 0px;
+        margin-top: 10px;
+        padding-bottom: 20px;
+        font-size: 16px;
+      }
+
+      .database {
+        cursor: pointer;
+        border-bottom: 1px solid #eeeeee;
+      }
+
+      .database:last-child {
+        border-bottom: none;
+      }
+
+      .database:hover {
+        background: #eee;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Payments Databases</h1>
+    <% databases.values.each do |database| %>
+      <div class="database" onclick="window.location='<%= "/db/#{database['path']}/app" %>'">
+      <h2><%= database['name'] %></h2>
+      <a href="/db/<%= database['path'] %>/app">query</a>
+      <a href="/db/<%= database['path'] %>/app?tab=saved">saved</a>
+      <a href="/db/<%= database['path'] %>/app?tab=structure">structure</a>
+      <p>
+        <%= database['description'] %>
+      </p>
+    </div>
+    <% end %>
+  </body>
+</html>

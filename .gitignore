@@ -1,3 +1,9 @@
-node_modules
-resources/sqlui.js
-*.gem
+/*.gem
+/config.yml
+/node_modules
+/resources/sqlui.js
+/vendor
+/sql/*
+!/sql/local_development
+/sql/local_development/*
+!/sql/local_development/sample.sql

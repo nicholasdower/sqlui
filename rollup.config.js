@@ -1,7 +1,7 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default {
-  input: 'src/sqlui.js',
+  input: 'client/sqlui.js',
   output: {
     file: 'resources/sqlui.js',
     format: 'iife',

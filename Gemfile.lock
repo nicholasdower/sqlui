@@ -2,6 +2,9 @@ PATH
   remote: .
   specs:
     sqlui (0.1.10)
+      mysql2 (~> 0.0)
+      puma (~> 6.0)
+      sinatra (~> 3.0)
 
 GEM
   remote: http://rubygems.org/
@@ -9,6 +12,7 @@ GEM
     diff-lcs (1.5.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
+    mysql2 (0.5.4)
     nio4r (2.5.8)
     nio4r (2.5.8-java)
     puma (6.0.0)

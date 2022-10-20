@@ -4,72 +4,45 @@
 
 ## Intro
 
-A web app which can be used to query a SQL database. Meant to be added to an existing server.
+A web app which can be used to query one or more SQL databases.
 
 ## Features
 
-- Querying.
-- Sharing queries via URLs including cursor position.
-- Running one of multiple queries in a single editor based on cursor position.
-- Running a saved query (see saved tab).
-- Creating a line graph based on results.
+- List configured databases.
+- Query a database.
+- Share queries via URLs including cursor position.
+- Run one of multiple queries in a single editor based on cursor position.
+- Run a saved query file.
+- Creating a line graph based on query results.
 - Inspecting the structure of the database (see structure tab).
 
 ## Usage
 
-### Rails
+### Setup
 
-Add the Gem to your `Gemfile`:
+1. Create a config file. See `example_config.yml`.
+1. Install the Gem or add it to your `Gemfile`:
 
-```ruby
-gem 'sqlui', '~> 0.1'
+```shell
+gem install 'sqlui'
 ```
 
-Add a controller:
-
 ```ruby
-require 'sqlui'
-
-class SqluiController < ApplicationController
-  SQLUI_INSTANCE = ::SQLUI.new(name: "SQLUI (#{Rails.env.titleize})", saved_path: 'db/sql') do |sql|
-    ActiveRecord::Base.connection.execute(sql)
-  end
-
-  def get
-    render html_safe(SQLUI_INSTANCE.get(params))
-    render response
-  end
-
-  def post
-    response = SQLUI_INSTANCE.post(params)
-    response[:body] = response[:body].html_safe if response[:content_type] == 'text/html'
-    render response
-  end
-
-  private
-
-  def html_safe(response)
-    if response[:content_type] == 'text/html'
-      response[:body] = response[:body].html_safe
-    end
-    response
-  end
-end
+gem 'sqlui'
 ```
 
-Add the required routes:
+### Running
 
-```ruby
-get  '/sqlui/:route' => 'sqlui#get',  constraints: { route: /.*/ }
-post '/sqlui/:route' => 'sqlui#post', constraints: { route: /.*/ }
+```shell
+sqlui config-file
 ```
-
-Visit `/sqlui/app`
 
 ## Development
 
 ### Setup
 
+1. `cp example_config.yml config.yml`.
+1. Add database configuration to `config.yml`.
 1. `nvm install node`
 
 ### Building
@@ -80,5 +53,5 @@ Visit `/sqlui/app`
 
 ### Running
 
-1. `make test-server`
-1. Visit http://localhost:4567/app
+1. `make run`
+1. Visit http://localhost:8080/db
