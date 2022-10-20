@@ -2,7 +2,7 @@
   "name": "sqlui",
   "engines" : { 
     "npm" : ">=8.0.0",
-    "node" : ">=16.0.0"
+    "node" : ">=19.0.0 < 20.0.0"
   },
   "dependencies": {
     "@codemirror/commands": "^6.1.2",

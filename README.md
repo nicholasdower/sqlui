@@ -6,22 +6,51 @@
 
 A web app which can be used to query one or more SQL databases.
 
+## Contents
+
+- [Features](#features)
+- [Usage](#usage)
+  * [Create a config file like the following](#create-a-config-file-like-the-following)
+  * [Install the Gem or add it to your `Gemfile`](#install-the-gem-or-add-it-to-your-gemfile)
+  * [Run the gem directly or via bundle if using a Gemfile](#run-the-gem-directly-or-via-bundle-if-using-a-gemfile)
+- [Development](#development)
+  * [Create a config file like the following](#create-a-config-file-like-the-following)
+  * [Install Node Version Manager (nvm)](#install-node-version-manager-nvm)
+  * [Install Node](#install-node)
+  * [Build & Run](#build--run)
+    + [Install dependencies](#install-dependencies)
+    + [Build app](#build-app)
+    + [Run and view the app](#run-and-view-the-app)
+
 ## Features
 
-- List configured databases.
-- Query a database.
-- Share queries via URLs including cursor position.
-- Run one of multiple queries in a single editor based on cursor position.
-- Run a saved query file.
-- Creating a line graph based on query results.
-- Inspecting the structure of the database (see structure tab).
+- Querying.
+- Graphing.
+- Sharing via URL.
+- Saved queries.
+- Seeing DB structure.
 
 ## Usage
 
-### Setup
+### Create a config file like the following
 
-1. Create a config file. See `example_config.yml`.
-1. Install the Gem or add it to your `Gemfile`:
+See [example_config.yaml](https://github.com/nicholasdower/sqlui/blob/master/example_config.yml) for an example.
+
+```yaml
+saved_path: path # Path to the directory containing saved SQL files.
+databases:
+  development:
+    name:        Development # Database display name to be used in the UI.
+    description: description # Database display name to be used in the UI.
+    url_path:    development # Path to use in the URL to access this database.
+    saved_path:  development # Path within the root saved path containing saved SQL files.
+    db_database: development # Database name.
+    db_username: root        # Database username.
+    db_password: root        # Database password.
+    db_host:     127.0.0.1   # Database host.
+```
+
+### Install the Gem or add it to your `Gemfile`
 
 ```shell
 gem install 'sqlui'
@@ -31,27 +60,64 @@ gem install 'sqlui'
 gem 'sqlui'
 ```
 
-### Running
+### Run the gem directly or via bundle if using a Gemfile
 
-```shell
-sqlui config-file
-```
+<pre>
+sqlui <u>config-file</u>
+</pre>
+
+<pre>
+bundle exec sqlui <u>config-file</u>
+</pre>
 
 ## Development
 
-### Setup
+### Create a config file like the following
 
-1. `cp example_config.yml config.yml`.
-1. Add database configuration to `config.yml`.
-1. `nvm install node`
+See [example_config.yaml](https://github.com/nicholasdower/sqlui/blob/master/example_config.yml) for an example.
 
-### Building
+```yaml
+saved_path: path # Path to the directory containing saved SQL files.
+databases:
+  development:
+    name:        Development # Database display name to be used in the UI.
+    description: description # Database display name to be used in the UI.
+    url_path:    development # Path to use in the URL to access this database.
+    saved_path:  development # Path within the root saved path containing saved SQL files.
+    db_database: development # Database name.
+    db_username: root        # Database username.
+    db_password: root        # Database password.
+    db_host:     127.0.0.1   # Database host.
+```
 
-1. `nvm use`
-1. `make install`
-1. `make build`
+### Install Node Version Manager (nvm)
 
-### Running
+See https://github.com/nvm-sh/nvm#installing-and-updating.
 
-1. `make run`
-1. Visit http://localhost:8080/db
+### Install Node
+
+```shell
+nvm install 19
+```
+
+### Build & Run
+
+#### Install dependencies
+
+```shell
+make install
+```
+
+#### Build app
+
+```shell
+make build
+```
+
+#### Run and view the app
+
+```shell
+make run
+```
+
+Visit http://localhost:8080/db

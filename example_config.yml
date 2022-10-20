@@ -1,11 +1,11 @@
-saved_path: sql
-databases:
-  development:
-    name:        Development
-    url_path:    development
-    saved_path:  development
-    db_database: development
-    db_username: root
-    db_password: root
-    db_host:     127.0.0.1
-    description: Local development database
+ saved_path: path # Path to the directory containing saved SQL files.
+ databases:
+   development:
+     name:        Development # Database display name to be used in the UI.
+     description: description # Database display name to be used in the UI.
+     url_path:    development # Path to use in the URL to access this database.
+     saved_path:  development # Path within the root saved path containing saved SQL files.
+     db_database: development # Database name.
+     db_username: root        # Database username.
+     db_password: root        # Database password.
+     db_host:     127.0.0.1   # Database host.
