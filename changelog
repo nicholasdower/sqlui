@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.15
 - Fix missing resources in Gem.
 
 version: 0.1.14

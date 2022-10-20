@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.15
+
+- Fix missing resources in Gem.
+
 ## 0.1.14
 
 - New config format.
