@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.12
 - No new features. Fix broken release script.
 
 version: 0.1.11
