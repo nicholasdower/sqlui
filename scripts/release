@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'cgi'
+require 'json'
 
 def fail(msg)
   STDERR.puts("Fatal: #{msg}");
@@ -64,8 +65,23 @@ end
 previous_version = Version.parse(old_version)
 fail("new version (#{new_version}) must be greater than previous version (#{previous_version})") unless new_version > previous_version
 
+# Read changelog
+versions = File.read('changelog').split(/(?=^version:)/).map do |content|
+  lines = content.strip.split("\n")
+  version = lines[0].gsub(/^version: */, '').strip
+  if version == 'next'
+    version = new_version
+  else
+    version = Version.parse(version)
+  end
+  description = lines[1..-1].join("\n")
+  [version, description]
+end.to_h
+new_changelog = versions[new_version]
+fail('"next" version not found in changelog') unless new_changelog
+
 # Check whether there are any local changes.
-#fail("stage or commit your changes") unless execute('git status --porcelain').empty?
+fail("stage or commit your changes") unless execute('git status --porcelain').empty?
 
 # Get current branch.
 execute('git fetch')
@@ -107,6 +123,9 @@ execute('bundle exec rspec')
 puts 'Updating .version'
 File.write('.version', new_version)
 
+# Update the changelog
+File.write('changelog', versions.map { |version, changelog| "version: #{version}\n#{changelog}\n\n" }.join.strip + "\n")
+
 # Build gem.
 gem_file = "sqlui-#{new_version}.gem"
 File.delete(gem_file) if File.exist?(gem_file)
@@ -120,17 +139,20 @@ execute('bundle install')
 # Prompt to confirm we want to release.
 puts
 puts "Ready to release version #{new_version}"
+puts "Changes:"
+puts new_changelog
+puts
 STDERR.print('Proceed? ')
 begin
   unless  %w[y yes ja yep].include?(STDIN.gets.chomp.downcase)
     puts 'Aborting'
-    execute('git co .version Gemfile.lock')
+    execute('git checkout changelog .version Gemfile.lock')
     exit
   end
 rescue Interrupt
   puts
   puts 'Aborting'
-  execute('git co .version Gemfile.lock')
+  execute('git checkout changelog .version Gemfile.lock')
   exit
 end
 
@@ -142,6 +164,7 @@ execute("gem push #{gem_file}")
 # Commit the changes (version.rb and Gemfile.lock)
 puts "Pushing release commit"
 execute("git commit -a -m 'v#{new_version} release'")
+execute("git tag v#{new_version}")
 execute('git push')
 
 # Build GitHub release URL.
@@ -152,7 +175,7 @@ release_body = <<~EOF
     Before publishing, please add #{gem_file} as a file attachment.
   -->
   ### Features & Bug Fixes
-   -
+  #{changelog}
 EOF
 git_url = "https://github.com/nicholasdower/sqlui/releases/new?" +
   "title=v#{new_version}%20Release" +
