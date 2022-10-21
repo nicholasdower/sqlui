@@ -1,4 +1,6 @@
 version: next
+- Fix broken path in config.yaml.
+- Fix no structure when no indexes.
 
 version: 0.1.15
 - Fix missing resources in Gem.
