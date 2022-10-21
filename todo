@@ -32,3 +32,10 @@ add ability to execute current selection, change cursor to from and to
 use caching headers on js and css and html
 cache js, css and html at class level instead of instance
 use weak references to keep track of all clients. close connections on server shutdown
+display error on structure tab if no schemas are returned
+add a title that links to the databases list
+ensure shift click etc. work
+add js and ruby lint
+add error handling for when js fetch fails
+return metadata in page response or in a js file (is this normal)
+show a helpful message when no saved files are found or when the directory doesn't exist

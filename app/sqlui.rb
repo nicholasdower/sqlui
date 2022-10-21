@@ -11,7 +11,7 @@ class SQLUI
     @name = name
     @saved_path = saved_path
     @max_rows = max_rows
-    @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'resources')
+    @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'client', 'resources')
   end
 
   def get(params)
@@ -81,7 +81,7 @@ class SQLUI
     if @table_schema
       where_clause = "where table_schema = '#{@table_schema}'"
     else
-      where_clause = "where table_schema not in('mysql', 'sys')"
+      where_clause = "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
     end
     stats_result = @client.query(
       <<~SQL
@@ -140,7 +140,7 @@ class SQLUI
     if @table_schema
       where_clause = "where table_schema = '#{@table_schema}'"
     else
-      where_clause = "where table_schema not in('information_schema' 'mysql', 'performance_schema', 'sys')"
+      where_clause = "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
     end
     column_result = @client.query(
       <<~SQL

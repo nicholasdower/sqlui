@@ -1,7 +1,7 @@
 /*.gem
 /config.yml
 /node_modules
-/resources/sqlui.js
+/client/resources/sqlui.js
 /vendor
 /sql/*
 !/sql/development

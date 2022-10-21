@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.files         =
     Dir['lib/**/*'] +
     Dir['app/**/*'] +
-    Dir['resources/**/*'] +
+    Dir['client/resources/**/*'] +
     ['.version']
 
   spec.add_dependency 'mysql2',  '~> 0.0'

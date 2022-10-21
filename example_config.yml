@@ -1,4 +1,4 @@
- saved_path: path # Path to the directory containing saved SQL files.
+ saved_path: sql # Path to the directory containing saved SQL files.
  databases:
    development:
      name:        Development # Database display name to be used in the UI.

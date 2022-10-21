@@ -16,7 +16,7 @@ update-npm:
 .PHONY: clean
 clean:
 	rm -rf node_modules
-	rm -rf resources/sqlui.js
+	rm -rf client/resources/sqlui.js
 	rm -rf vendor
 	rm -rf .bundle
 
@@ -35,7 +35,7 @@ stop-db:
 
 .PHONY: seed-db
 seed-db:
-	docker exec -it sqlui_db mysql --user=root --password=root --database=development --execute='create table names(name varchar(255), description varchar(255));'
+	docker exec -i sqlui_db mysql --user=developer --password=password --database=development < seeds.sql
 
 .PHONY: start
 start:
