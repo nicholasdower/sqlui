@@ -78,25 +78,6 @@ class SQLUI
   end
 
   def load_metadata
-    if @table_schema
-      where_clause = "where table_schema = '#{@table_schema}'"
-    else
-      where_clause = "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
-    end
-    stats_result = @client.query(
-      <<~SQL
-        select
-          table_schema,
-          table_name,
-          index_name,
-          seq_in_index,
-          non_unique,
-          column_name
-        from information_schema.statistics
-        #{where_clause}
-        order by table_schema, table_name, if(index_name = "PRIMARY", 0, index_name), seq_in_index;
-      SQL
-    )
     result = {
       server:  @name,
       schemas: {},
@@ -107,35 +88,6 @@ class SQLUI
         }
       end
     }
-    stats_result.each do |row|
-      table_schema = row['table_schema']
-      unless result[:schemas][table_schema]
-        result[:schemas][table_schema] = {
-          tables: {}
-        }
-      end
-      tables = result[:schemas][table_schema][:tables]
-      table_name = row['table_name']
-      unless tables[table_name]
-        tables[table_name] = {
-          indexes: {},
-          columns: {}
-        }
-      end
-      indexes = tables[table_name][:indexes]
-      index_name = row['index_name']
-      unless indexes[index_name]
-        indexes[index_name] = {}
-      end
-      index = indexes[index_name]
-      column_name = row['column_name']
-      index[column_name] = {}
-      column = index[column_name]
-      column[:name] = index_name
-      column[:seq_in_index] = row['seq_in_index']
-      column[:non_unique] = row['non_unique']
-      column[:column_name] = row['column_name']
-    end
 
     if @table_schema
       where_clause = "where table_schema = '#{@table_schema}'"
@@ -155,29 +107,78 @@ class SQLUI
           column_default,
           extra
         from information_schema.columns
-        where table_schema not in('information_schema' 'mysql', 'performance_schema', 'sys')
+        #{where_clause}
         order by table_schema, table_name, column_name, ordinal_position;
-    SQL
+      SQL
     )
     column_result.each do |row|
-      table_schema = row['table_schema']
-      table_name = row['table_name']
-      column_name = row['column_name']
-      next unless result[:schemas][table_schema]
-      next unless result[:schemas][table_schema][:tables][table_name]
-
+      row = row.transform_keys(&:downcase).transform_keys(&:to_sym)
+      table_schema = row[:table_schema]
+      unless result[:schemas][table_schema]
+        result[:schemas][table_schema] = {
+          tables: {}
+        }
+      end
+      table_name = row[:table_schema]
+      tables = result[:schemas][table_schema][:tables]
+      unless tables[table_name]
+        tables[table_name] = {
+          indexes: {},
+          columns: {}
+        }
+      end
       columns = result[:schemas][table_schema][:tables][table_name][:columns]
+      column_name = row[:column_name]
       unless columns[column_name]
         columns[column_name] = {}
       end
       column = columns[column_name]
       column[:name] = column_name
-      column[:data_type] = row['data_type']
-      column[:length] = row['character_maximum_length']
-      column[:allow_null] = row['is_nullable']
-      column[:key] = row['column_key']
-      column[:default] = row['column_default']
-      column[:extra] = row['extra']
+      column[:data_type] = row[:data_type]
+      column[:length] = row[:character_maximum_length]
+      column[:allow_null] = row[:is_nullable]
+      column[:key] = row[:column_key]
+      column[:default] = row[:column_default]
+      column[:extra] = row[:extra]
+    end
+
+    if @table_schema
+      where_clause = "where table_schema = '#{@table_schema}'"
+    else
+      where_clause = "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
+    end
+    stats_result = @client.query(
+      <<~SQL
+        select
+          table_schema,
+          table_name,
+          index_name,
+          seq_in_index,
+          non_unique,
+          column_name
+        from information_schema.statistics
+        #{where_clause}
+        order by table_schema, table_name, if(index_name = "PRIMARY", 0, index_name), seq_in_index;
+      SQL
+    )
+    stats_result.each do |row|
+      row = row.transform_keys(&:downcase).transform_keys(&:to_sym)
+      table_schema = row[:table_schema]
+      tables = result[:schemas][table_schema][:tables]
+      table_name = row[:table_name]
+      indexes = tables[table_name][:indexes]
+      index_name = row[:index_name]
+      unless indexes[index_name]
+        indexes[index_name] = {}
+      end
+      index = indexes[index_name]
+      column_name = row[:column_name]
+      index[column_name] = {}
+      column = index[column_name]
+      column[:name] = index_name
+      column[:seq_in_index] = row[:seq_in_index]
+      column[:non_unique] = row[:non_unique]
+      column[:column_name] = row[:column_name]
     end
 
     result
