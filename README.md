@@ -10,7 +10,9 @@ A web app which can be used to query one or more SQL databases.
 
 - [Features](#features)
 - [Usage](#usage)
-- [Development Setup](#development-setup)
+- [Development](#development)
+  + [Default Setup](#default-setup)
+  + [Running The Server & Tests Outside of Docker](#running-the-server--tests-outside-of-docker)
 
 ## Features
 
@@ -24,8 +26,6 @@ A web app which can be used to query one or more SQL databases.
 
 ### Create a config file like the following
 
-See [example_config.yaml](https://github.com/nicholasdower/sqlui/blob/master/example_config.yml) for an example.
-
 ```yaml
 saved_path: path # Path to the directory containing saved SQL files.
 databases:
@@ -37,7 +37,7 @@ databases:
     db_database: development # Database name.
     db_username: root        # Database username.
     db_password: root        # Database password.
-    db_port:     60330       # Database port.
+    db_port:     3306        # Database port.
     db_host:     127.0.0.1   # Database host.
 ```
 
@@ -47,66 +47,41 @@ databases:
 gem install 'sqlui'
 ```
 
+or
+
 ```ruby
 gem 'sqlui'
 ```
 
 ### Run the gem directly or via bundle if using a Gemfile
 
-<pre>
-sqlui <u>config-file</u>
-</pre>
-
-<pre>
-bundle exec sqlui <u>config-file</u>
-</pre>
-
-## Development Setup
-
-### Create a config file like the following
-
-See [example_config.yaml](https://github.com/nicholasdower/sqlui/blob/master/example_config.yml) for an example.
-
-```yaml
-saved_path: path # Path to the directory containing saved SQL files.
-databases:
-  development:
-    name:        Development # Database display name to be used in the UI.
-    description: description # Database display name to be used in the UI.
-    url_path:    development # Path to use in the URL to access this database.
-    saved_path:  development # Path within the root saved path containing saved SQL files.
-    db_database: development # Database name.
-    db_username: root        # Database username.
-    db_password: root        # Database password.
-    db_port:     60330       # Database port.
-    db_host:     127.0.0.1   # Database host.
+```shell
+sqlui config-file
 ```
 
-### Install Node Version Manager (nvm)
-
-See https://github.com/nvm-sh/nvm#installing-and-updating.
-
-### Install Node
+or
 
 ```shell
-nvm install 19
+bundle exec sqlui config-file
 ```
 
-### Build & Run
+## Development
 
-#### Install dependencies
+### Default Setup
+
+By default all building, running and testing is done in Docker containers.
+
+#### Install Docker
+
+See https://docs.docker.com/get-docker/
+
+#### Install & Build
 
 ```shell
-make install
+make build-docker-image install build
 ```
 
-#### Build app
-
-```shell
-make build
-```
-
-### Start and seed the database
+#### Start and seed the database
 
 ```shell
 make start-db seed-db
@@ -121,7 +96,51 @@ make test
 #### Run and view the app
 
 ```shell
-make start
+make start-server
+```
+
+Visit http://localhost:8080/db
+
+### Running The Server & Tests Outside of Docker
+
+It is also possible to run the server tests without Docker. Docker is still used for MySQL.
+
+#### Install rvm (Ruby Version Manager)
+
+See https://rvm.io/rvm/install
+
+#### Install Ruby
+
+```shell
+rvm install ruby-3.0.0
+```
+
+#### Install nvm (Node Version Manager)
+
+See https://github.com/nvm-sh/nvm#installing-and-updating.
+
+#### Install Node
+
+```shell
+nvm install 19
+```
+
+#### Install & Build
+
+```shell
+make install-local build-local
+```
+
+#### Run the tests
+
+```shell
+make test-local
+```
+
+#### Run and view the app
+
+```shell
+make start-server-local
 ```
 
 Visit http://localhost:8080/db

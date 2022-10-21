@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Payments Databases</title>
+    <title>Databases</title>
 
     <style>
       body {
@@ -49,7 +49,7 @@
   </head>
 
   <body>
-    <h1>Payments Databases</h1>
+    <h1>Databases</h1>
     <% databases.values.each do |database| %>
       <div class="database" onclick="window.location='<%= "/db/#{database['url_path']}/app" %>'">
       <h2><%= database['name'] %></h2>

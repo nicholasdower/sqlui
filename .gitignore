@@ -1,5 +1,4 @@
 /*.gem
-/config.yml
 /node_modules
 /client/resources/sqlui.js
 /vendor

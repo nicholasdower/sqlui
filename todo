@@ -39,3 +39,8 @@ add js and ruby lint
 add error handling for when js fetch fails
 return metadata in page response or in a js file (is this normal)
 show a helpful message when no saved files are found or when the directory doesn't exist
+add name to root of config. Use on databases list as title.
+add docker instructions to readme
+dockerize browser tests
+use flags instead of env variables
+add ability to run browser tests in docker

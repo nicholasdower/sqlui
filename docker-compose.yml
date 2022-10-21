@@ -22,3 +22,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  server:
+    container_name: sqlui_server
+    build: .
+    environment:
+      PORT: 8080
+      APP_ENV: development
+    command: bash -c "cd /sqlui && bundle exec ruby ./bin/sqlui development_config.yml"
+    volumes:
+      - .:/sqlui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db-ready

@@ -1,0 +1,12 @@
+ saved_path: sql
+ databases:
+   development:
+     name:        Development
+     description: description
+     url_path:    development
+     saved_path:  development
+     db_database: development
+     db_username: developer
+     db_password: password
+     db_port:     3306
+     db_host:     db
