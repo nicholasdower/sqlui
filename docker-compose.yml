@@ -9,3 +9,16 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - '60330:3306'
+    healthcheck:
+      test: ['CMD', 'mysql', '--user=developer', '--password=password', '--database=development', '--execute', 'show databases;']
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
+  db-ready:
+    container_name: sqlui_db_ready
+    image: docker.localproxy.sc:42042/base:latest-${HOSTARCH}
+    command: 'true'
+    depends_on:
+      db:
+        condition: service_healthy

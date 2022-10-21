@@ -109,8 +109,13 @@ make build
 ### Start and seed the database
 
 ```shell
-make start-db
-make seed-db
+make start-db seed-db
+```
+
+#### Run the tests
+
+```shell
+make test
 ```
 
 #### Run and view the app

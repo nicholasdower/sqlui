@@ -27,7 +27,7 @@ clean-all: clean
 
 .PHONY: start-db
 start-db:
-	docker compose up --detach db
+	./scripts/db-ready.sh
 
 .PHONY: stop-db
 stop-db:
@@ -39,7 +39,7 @@ seed-db:
 
 .PHONY: mysql
 mysql:
-	docker exec -it sqlui_db mysql --user=root --password=root --database=development
+	docker exec -it sqlui_db mysql --user=root --password=root --database=development $(if $(QUERY),--execute "$(QUERY)",)
 
 .PHONY: start
 start:
