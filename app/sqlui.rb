@@ -119,7 +119,7 @@ class SQLUI
           tables: {}
         }
       end
-      table_name = row[:table_schema]
+      table_name = row[:table_name]
       tables = result[:schemas][table_schema][:tables]
       unless tables[table_name]
         tables[table_name] = {

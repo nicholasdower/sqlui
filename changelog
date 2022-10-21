@@ -1,4 +1,5 @@
 version: next
+- Fix broken table names in structure.
 - Fix broken path in config.yaml.
 - Fix no structure when no indexes.
 

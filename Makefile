@@ -37,6 +37,10 @@ stop-db:
 seed-db:
 	docker exec -i sqlui_db mysql --user=developer --password=password --database=development < seeds.sql
 
+.PHONY: mysql
+mysql:
+	docker exec -it sqlui_db mysql --user=root --password=root --database=development
+
 .PHONY: start
 start:
 	PORT=8080 APP_ENV=development bundle exec ruby ./bin/sqlui config.yml
