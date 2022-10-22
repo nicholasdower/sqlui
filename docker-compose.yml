@@ -8,7 +8,7 @@ services:
       MYSQL_USER: developer
       MYSQL_PASSWORD: password
     ports:
-      - '60330:3306'
+      - '3306:3306'
     healthcheck:
       test: ['CMD', 'mysql', '--user=developer', '--password=password', '--database=development', '--execute', 'show databases;']
       interval: 5s
@@ -17,17 +17,16 @@ services:
       start_period: 10s
   db-ready:
     container_name: sqlui_db_ready
-    image: docker.localproxy.sc:42042/base:latest-${HOSTARCH}
-    command: 'true'
+    image: mysql/mysql-server:latest
+    command: bash -c "cd /sqlui && mysql --host=db --user=developer --password=password --database=development --protocol=tcp < seeds.sql"
+    volumes:
+      - .:/sqlui
     depends_on:
       db:
         condition: service_healthy
   server:
     container_name: sqlui_server
     build: .
-    environment:
-      PORT: 8080
-      APP_ENV: development
     command: bash -c "cd /sqlui && bundle exec ruby ./bin/sqlui development_config.yml"
     volumes:
       - .:/sqlui
@@ -35,3 +34,23 @@ services:
       - "8080:8080"
     depends_on:
       - db-ready
+  hub:
+    container_name: sqlui_hub
+    image: selenium/hub:latest
+    environment:
+      GRID_BROWSER_TIMEOUT: 10000 # 10 seconds
+      GRID_NEW_SESSION_WAIT_TIMEOUT: 20000
+      GRID_NODE_POLLING: 300
+      GRID_TIMEOUT: 10000
+    ports:
+      - "4444:4444"
+  node-chrome:
+    container_name: sqlui_node_chrome
+    image: selenium/node-chrome:latest
+    environment:
+      SE_EVENT_BUS_HOST: hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_VNC_NO_PASSWORD: 1
+    volumes:
+      - /dev/shm:/dev/shm

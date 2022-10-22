@@ -5,6 +5,9 @@ require 'sinatra/base'
 require_relative 'sqlui'
 require 'yaml'
 
+SERVER_ENV = ENV.fetch('SERVER_ENV', 'development').to_sym
+SERVER_PORT = ENV.fetch('SERVER_PORT', 8080)
+
 if ARGV.include?('-v') || ARGV.include?('--version')
   puts File.read('.version')
   exit
@@ -16,7 +19,8 @@ raise "configuration file does not exist" unless File.exist?(ARGV[0])
 class Server < Sinatra::Base
   set :logging, true
   set :bind,    '0.0.0.0'
-  set :port,    Integer(ENV['PORT'])
+  set :port,    SERVER_PORT
+  set :env,     SERVER_ENV
 
   class Client
     def initialize(params)

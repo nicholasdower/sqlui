@@ -117,7 +117,9 @@ execute('make build')
 # Bundle install and run specs.
 puts
 puts "Running specs"
+execute('make start-detached')
 execute('make test')
+execute('make stop')
 
 # Update the version in .version
 puts 'Updating .version'

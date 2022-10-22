@@ -81,25 +81,19 @@ See https://docs.docker.com/get-docker/
 make build-docker-image install build
 ```
 
-#### Start and seed the database
+#### Start the database and server
 
 ```shell
-make start-db seed-db
+make start
 ```
+
+Visit http://localhost:8080/db
 
 #### Run the tests
 
 ```shell
 make test
 ```
-
-#### Run and view the app
-
-```shell
-make start-server
-```
-
-Visit http://localhost:8080/db
 
 ### Running The Server & Tests Outside of Docker
 
@@ -130,6 +124,10 @@ nvm install 19
 ```shell
 make install-local build-local
 ```
+
+#### Install Chromedriver
+
+See https://chromedriver.chromium.org/getting-started
 
 #### Run the tests
 
