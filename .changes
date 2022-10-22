@@ -1,5 +1,8 @@
 version: next
 
+version: 0.1.17
+- No changes
+
 version: 0.1.16
 - Fix broken table names in structure.
 - Fix broken path in config.yml.
