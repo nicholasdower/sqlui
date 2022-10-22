@@ -78,7 +78,7 @@ See https://docs.docker.com/get-docker/
 #### Install & Build
 
 ```shell
-make build-docker-image install build
+make install build
 ```
 
 #### Start the database and server

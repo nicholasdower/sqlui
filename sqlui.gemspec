@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-core',         '~> 3.0'
   spec.add_development_dependency 'rspec-expectations', '~> 3.0'
   spec.add_development_dependency 'rspec-mocks',        '~> 3.0'
+  spec.add_development_dependency 'rubocop',            '~> 1.0'
   spec.add_development_dependency 'sinatra',            '~> 3.0'
   spec.add_development_dependency 'watir',              '~> 7.0'
 end

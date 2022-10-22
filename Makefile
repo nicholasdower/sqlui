@@ -4,8 +4,19 @@ RUN = docker run --rm --tty --interactive --env BUNDLE_APP_CONFIG=/sqlui/.bundle
 IMAGE = sqlui
 RUN_IMAGE = $(RUN) $(IMAGE)
 
+create-network:
+	@docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null
+
 install:
 	$(RUN_IMAGE) /bin/bash -c 'npm install && bundle install'
+
+update:
+	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle update'
+
+update-local:
+	npm update
+	bundle config set --local path vendor/bundle
+	bundle update
 
 install-local:
 	npm install
@@ -27,7 +38,7 @@ start-rollup-local:
 build-docker-image:
 	docker build --tag sqlui .
 
-clean:
+clean: stop
 	rm -rf node_modules
 	rm -rf client/resources/sqlui.js
 	rm -rf vendor
@@ -42,9 +53,10 @@ start-detached:
 
 stop:
 	docker compose down
+	docker network rm sqlui_default || true
 
 start-db:
-	./scripts/db-ready.sh
+	docker compose up -d db-ready
 
 stop-db:
 	docker compose down db
@@ -61,8 +73,8 @@ mysql:
 mysql-local:
 	mysql --host=localhost --protocol=tcp --user=developer --password=password --database=development $(if $(QUERY),--execute "$(QUERY)",)
 
-docker-run:
-	$(RUN_IMAGE) $(CMD)
+docker-run: create-network
+	@$(RUN_IMAGE) $(CMD)
 
 start-server:
 	docker compose up db db-ready rollup server
@@ -73,7 +85,7 @@ start-server-detached:
 start-server-local:
 	./scripts/rerun bundle exec ruby ./bin/sqlui development_config_local.yml
 
-test:
+test: create-network
 	$(RUN_IMAGE) bundle exec rspec
 
 test-local:
