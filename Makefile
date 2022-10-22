@@ -31,15 +31,19 @@ build-local:
 
 lint: create-network
 	$(RUN_IMAGE) bundle exec rubocop
+	$(RUN_IMAGE) npx eslint client/*.js
 
 lint-local:
 	bundle exec rubocop
+	npx eslint client/*.js
 
 lint-fix: create-network
 	$(RUN_IMAGE) bundle exec rubocop -A
+	$(RUN_IMAGE) npx eslint client/*.js --fix
 
 lint-fix-local:
 	bundle exec rubocop -A
+	npx eslint client/*.js --fix
 
 start-rollup:
 	docker compose up --detach rollup
