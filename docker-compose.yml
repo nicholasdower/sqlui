@@ -24,15 +24,22 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  rollup:
+    container_name: sqlui_rollup
+    build: .
+    command: bash -c "cd /sqlui && make start-rollup-local"
+    volumes:
+      - .:/sqlui
   server:
     container_name: sqlui_server
     build: .
-    command: bash -c "cd /sqlui && bundle exec ruby ./bin/sqlui development_config.yml"
+    command: bash -c "cd /sqlui && ./scripts/rerun bundle exec ruby ./bin/sqlui development_config.yml"
     volumes:
       - .:/sqlui
     ports:
       - "8080:8080"
     depends_on:
+      - rollup
       - db-ready
   hub:
     container_name: sqlui_hub

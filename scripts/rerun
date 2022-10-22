@@ -1,0 +1,73 @@
+#!/usr/bin/env ruby
+
+require 'find'
+require 'set'
+
+class Watcher
+  REFRESH_DELAY = 1 # seconds
+
+  def initialize(dirs:, command:)
+    raise 'missing dirs' unless dirs && dirs.any?
+    raise 'missing command' unless command && command.any?
+
+    @dirs = dirs
+    @command = command
+    @watched_files = get_watched_files
+    @alive = true
+  end
+
+  def watch
+    @pid = Process.spawn(*@command) if @alive
+    while @alive
+      sleep REFRESH_DELAY
+      refresh
+    end
+  end
+
+  def refresh
+    files = get_updated_files
+    if files.any?
+      puts "changed: #{files.join(' ')}"
+      Process.kill('TERM', @pid) if @pid
+      @pid = nil
+      @pid = Process.spawn(*@command) if @alive
+    end
+  end
+
+  def die(signal)
+    if @pid
+      Process.kill(signal, @pid)
+      @pid = nil
+    end
+    @alive = false
+  end
+
+  def get_watched_files
+    entries = Find.find(*@dirs).flat_map do |file|
+      if FileTest.file?(file)
+        [[file, File.mtime(file).to_i]]
+      else
+        []
+      end
+    end
+    entries.to_set
+  end
+
+  def get_updated_files
+    new_watched_files = get_watched_files
+    difference = new_watched_files - @watched_files
+    @watched_files = new_watched_files
+    difference.map(&:first)
+  end
+end
+
+watcher = Watcher.new(dirs: ['app', 'client/resources'], command: ARGV)
+
+Signal.trap('INT') do
+  watcher.die('INT')
+end
+
+Signal.trap('TERM') do
+  watcher.die('TERM')
+end
+watcher.watch

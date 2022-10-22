@@ -5,7 +5,7 @@ IMAGE = sqlui
 RUN_IMAGE = $(RUN) $(IMAGE)
 
 install:
-	$(RUN_IMAGE) make install-local
+	$(RUN_IMAGE) /bin/bash -c 'npm install && bundle install'
 
 install-local:
 	npm install
@@ -16,6 +16,12 @@ build:
 	$(RUN_IMAGE) make build-local
 
 build-local:
+	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
+
+start-rollup:
+	docker compose up --detach rollup
+
+start-rollup-local:
 	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
 
 build-docker-image:
@@ -59,13 +65,13 @@ docker-run:
 	$(RUN_IMAGE) $(CMD)
 
 start-server:
-	docker compose up server
+	docker compose up db db-ready rollup server
 
 start-server-detached:
 	docker compose up --detach server
 
 start-server-local:
-	bundle exec ruby ./bin/sqlui development_config_local.yml
+	./scripts/rerun bundle exec ruby ./bin/sqlui development_config_local.yml
 
 test:
 	$(RUN_IMAGE) bundle exec rspec
