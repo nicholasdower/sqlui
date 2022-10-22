@@ -1,19 +1,24 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
+require 'English'
 require 'cgi'
+require 'fileutils'
 require 'json'
 
 def fail(msg)
-  STDERR.puts("Fatal: #{msg}");
+  warn("Fatal: #{msg}")
   exit(1)
 end
 
 def execute(command)
   result = `#{command} 2> /dev/null`.strip
-  fail("#{command} failed") unless $?.success?
+  fail("#{command} failed") unless $CHILD_STATUS.success?
+
   result
 end
 
+# Represents a library version like 1.0.0.
 class Version
   include Comparable
 
@@ -27,7 +32,7 @@ class Version
 
   def self.parse(version)
     parts = version.split('.')
-    raise ArgumentError.new("invalid version: #{version}") unless parts.size == 3
+    raise ArgumentError, "invalid version: #{version}" unless parts.size == 3
 
     major = Integer(parts[0])
     minor = Integer(parts[1])
@@ -37,12 +42,12 @@ class Version
   end
 
   def <=>(other)
-    if (self.major <=> other.major) != 0
-      self.major <=> other.major
-    elsif (self.minor <=> other.minor) != 0
-      self.minor <=> other.minor
+    if (major <=> other.major) != 0
+      major <=> other.major
+    elsif (minor <=> other.minor) != 0
+      minor <=> other.minor
     else
-      self.patch <=> other.patch
+      patch <=> other.patch
     end
   end
 
@@ -55,6 +60,7 @@ old_version = File.read('.version')
 
 # Parse version argument.
 fail("you must specify the version to be released, the previous version was #{old_version}") if ARGV.length != 1
+
 begin
   new_version = Version.parse(ARGV[0])
 rescue ArgumentError
@@ -63,26 +69,28 @@ end
 
 # Compare new version to previous version.
 previous_version = Version.parse(old_version)
-fail("new version (#{new_version}) must be greater than previous version (#{previous_version})") unless new_version > previous_version
+unless new_version > previous_version
+  fail("new version (#{new_version}) must be greater than previous version (#{previous_version})")
+end
 
 # Read changelog
-versions = File.read('changelog').split(/(?=^version:)/).map do |content|
+versions = File.read('changelog').split(/(?=^version:)/).to_h do |content|
   lines = content.strip.split("\n")
   version = lines[0].gsub(/^version: */, '').strip
-  if version == 'next'
-    version = new_version
-  else
-    version = Version.parse(version)
-  end
-  description = lines[1..-1].join("\n")
-  description = "- No changes" if description.empty?
+  version = if version == 'next'
+              new_version
+            else
+              Version.parse(version)
+            end
+  description = lines[1..].join("\n")
+  description = '- No changes' if description.empty?
   [version, description]
-end.to_h
+end
 new_changelog = versions[new_version]
 fail('"next" version not found in changelog') unless new_changelog
 
 # Check whether there are any local changes.
-fail("stage or commit your changes") unless execute('git status --porcelain').empty?
+fail('stage or commit your changes') unless execute('git status --porcelain').empty?
 
 # Get current branch.
 execute('git fetch')
@@ -91,10 +99,9 @@ fail('cannot determine current branch') if branch.empty?
 
 # Get repo default branch.
 default_branch = execute('git symbolic-ref refs/remotes/origin/HEAD')
-unless default_branch.match?(/^refs\/remotes\/origin\/[^\/]+$/)
- fail('cannot determine default branch')
-end
-default_branch = default_branch.gsub(/^refs\/remotes\/origin\//, '')
+fail('cannot determine default branch') unless default_branch.match?(%r{^refs/remotes/origin/[^/]+$})
+
+default_branch = default_branch.gsub(%r{^refs/remotes/origin/}, '')
 
 # Ensure we are on the repo's default branch. We don't want to release from a feature branch.
 fail("you must release from the #{default_branch} branch") unless branch == default_branch
@@ -108,15 +115,16 @@ fail("#{default_branch} is behind, you must pull") unless local_commit == remote
 puts "Previous version: #{previous_version}"
 puts "Release version: #{new_version}"
 
-# Build
+# Install, build and lint
 puts
-puts "Building"
+puts 'Building'
 execute('make install')
 execute('make build')
+execute('make lint')
 
-# Bundle install and run specs.
+# Run tests
 puts
-puts "Running specs"
+puts 'Running specs'
 execute('make start-detached')
 execute('make test')
 execute('make stop')
@@ -126,12 +134,20 @@ puts 'Updating .version'
 File.write('.version', new_version)
 
 # Update the changelog
-File.write('changelog', "version: next\n\n" + versions.map { |version, changelog| "version: #{version}\n#{changelog}\n\n" }.join.strip + "\n")
-File.write('CHANGELOG.md', "# Changes\n\n" + versions.map { |version, changelog| "## #{version}\n\n#{changelog}\n\n" }.join.strip + "\n")
+changelogs = versions.map do |version, changelog|
+  "version: #{version}\n#{changelog}\n\n"
+end
+File.write('changelog', "version: next\n\n#{changelogs.join.strip}\n")
+
+# Update CHANGELOG.md
+changelogs = versions.map do |version, changelog|
+  "## #{version}\n\n#{changelog}\n\n"
+end
+File.write('CHANGELOG.md', "# Changes\n\n#{changelogs.join.strip}\n")
 
 # Build gem.
 gem_file = "sqlui-#{new_version}.gem"
-File.delete(gem_file) if File.exist?(gem_file)
+FileUtils.rm_f(gem_file)
 puts "Building #{gem_file}"
 execute('gem build')
 fail("Gem file not found: #{gem_file}") unless File.exist?(gem_file)
@@ -142,12 +158,12 @@ execute('bundle install')
 # Prompt to confirm we want to release.
 puts
 puts "Ready to release version #{new_version}"
-puts "Changes:"
+puts 'Changes:'
 puts new_changelog
 puts
-STDERR.print('Proceed? ')
+$stderr.print('Proceed? ')
 begin
-  unless  %w[y yes ja yep].include?(STDIN.gets.chomp.downcase)
+  unless %w[y yes ja yep].include?($stdin.gets.chomp.downcase)
     puts 'Aborting'
     execute('git checkout changelog CHANGELOG.md .version Gemfile.lock')
     exit
@@ -165,7 +181,7 @@ puts "Releasing version #{new_version}"
 execute("gem push #{gem_file}")
 
 # Commit the changes (version.rb and Gemfile.lock)
-puts "Pushing release commit"
+puts 'Pushing release commit'
 execute("git commit -a -m 'v#{new_version} release' -m \"#{new_changelog}\"")
 execute("git tag v#{new_version}")
 execute("git push origin v#{new_version}")
@@ -173,30 +189,28 @@ execute('git push')
 
 # Build GitHub release URL.
 target_commit = execute('git rev-parse HEAD')
-release_body = <<~EOF
+release_body = <<~MARKDOWN
   <!--
     List any noteworthy new features and bug fixes below.
     Before publishing, please add #{gem_file} as a file attachment.
   -->
   ### Features & Bug Fixes
   #{new_changelog}
-EOF
-git_url = "https://github.com/nicholasdower/sqlui/releases/new?" +
-  "title=v#{new_version}%20Release" +
-  '&' +
-  "tag=v#{new_version}" +
-  '&' +
-  "target=#{target_commit}" +
-  '&' +
-  "body=#{CGI.escape(release_body)}"
+MARKDOWN
+git_url = 'https://github.com/nicholasdower/sqlui/releases/new?' \
+          "title=v#{new_version}%20Release" \
+          '&' \
+          "tag=v#{new_version}" \
+          '&' \
+          "target=#{target_commit}" \
+          '&' \
+          "body=#{CGI.escape(release_body)}"
 
 # Print success and GitHub instructions.
 puts
 puts "Version #{new_version} successfully released"
-puts "Please publish a GitHub release in your browser"
+puts 'Please publish a GitHub release in your browser'
 puts git_url
 
 # If on a Mac, open the browser.
-if system('which open 1> /dev/null 2> /dev/null')
-  execute("open \"#{git_url}\"")
-end
+execute("open \"#{git_url}\"") if system('which open 1> /dev/null 2> /dev/null')

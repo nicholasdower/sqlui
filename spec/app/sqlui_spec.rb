@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../app/sqlui'
 require_relative '../spec_helper'
 

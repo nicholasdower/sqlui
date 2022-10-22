@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 require_relative 'spec_helper'
 
@@ -6,7 +8,7 @@ describe 'all integration' do
 
   it 'loads' do
     browser.goto "http://#{SERVER_HOST}:#{SERVER_PORT}/db"
-    #browser.title
-    #browser.link(text: 'Guides').click
+    # browser.title
+    # browser.link(text: 'Guides').click
   end
 end

@@ -1,18 +1,20 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'find'
 require 'set'
 
+# Runs the specified command and restarts it when files in the specified directories change.
 class Watcher
   REFRESH_DELAY = 1 # seconds
 
   def initialize(dirs:, command:)
-    raise 'missing dirs' unless dirs && dirs.any?
-    raise 'missing command' unless command && command.any?
+    raise 'missing dirs' unless dirs&.any?
+    raise 'missing command' unless command&.any?
 
     @dirs = dirs
     @command = command
-    @watched_files = get_watched_files
+    @watched_files = watched_files
     @alive = true
   end
 
@@ -25,13 +27,13 @@ class Watcher
   end
 
   def refresh
-    files = get_updated_files
-    if files.any?
-      puts "changed: #{files.join(' ')}"
-      Process.kill('TERM', @pid) if @pid
-      @pid = nil
-      @pid = Process.spawn(*@command) if @alive
-    end
+    files = updated_files
+    return if files.empty?
+
+    puts "changed: #{files.join(' ')}"
+    Process.kill('TERM', @pid) if @pid
+    @pid = nil
+    @pid = Process.spawn(*@command) if @alive
   end
 
   def die(signal)
@@ -42,7 +44,7 @@ class Watcher
     @alive = false
   end
 
-  def get_watched_files
+  def watched_files
     entries = Find.find(*@dirs).flat_map do |file|
       if FileTest.file?(file)
         [[file, File.mtime(file).to_i]]
@@ -53,8 +55,8 @@ class Watcher
     entries.to_set
   end
 
-  def get_updated_files
-    new_watched_files = get_watched_files
+  def updated_files
+    new_watched_files = watched_files
     difference = new_watched_files - @watched_files
     @watched_files = new_watched_files
     difference.map(&:first)

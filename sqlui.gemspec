@@ -1,17 +1,21 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |spec|
   spec.name          = 'sqlui'
   spec.description   = 'A SQL UI.'
   spec.summary       = 'A SQL UI.'
   spec.homepage      = 'https://github.com/nicholasdower/sqlui'
   spec.version       = File.read('.version')
-  spec.license       = "MIT"
+  spec.license       = 'MIT'
   spec.authors       = ['Nick Dower']
   spec.email         = 'nicholasdower@gmail.com'
 
-  spec.bindir        = 'bin'
-  spec.executables   << 'sqlui'
+  spec.metadata['rubygems_mfa_required'] = 'true'
+  spec.required_ruby_version = '>= 3.0.0'
+  spec.bindir = 'bin'
+  spec.executables << 'sqlui'
 
-  spec.files         =
+  spec.files =
     Dir['lib/**/*'] +
     Dir['app/**/*'] +
     Dir['client/resources/**/*'] +

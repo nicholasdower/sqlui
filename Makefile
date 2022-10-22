@@ -29,6 +29,18 @@ build:
 build-local:
 	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
 
+lint:
+	$(RUN_IMAGE) bundle exec rubocop
+
+lint-local:
+	bundle exec rubocop
+
+lint-fix:
+	$(RUN_IMAGE) bundle exec rubocop -A
+
+lint-fix-local:
+	bundle exec rubocop -A
+
 start-rollup:
 	docker compose up --detach rollup
 

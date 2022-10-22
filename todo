@@ -42,3 +42,4 @@ show a helpful message when no saved files are found or when the directory doesn
 add name to root of config. Use on databases list as title.
 use flags instead of env variables
 watch for code changes
+add github action for build and test

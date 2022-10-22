@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'uri'
 require 'set'
 
+# Main SQLUI class responsible for producing web content. This class needs to die.
 class SQLUI
   MAX_ROWS = 1_000
 
-  def initialize(client:, table_schema: nil, name:, saved_path:, max_rows: MAX_ROWS)
+  def initialize(client:, name:, saved_path:, table_schema: nil, max_rows: MAX_ROWS)
     @client = client
     @table_schema = table_schema
     @name = name
@@ -65,12 +68,10 @@ class SQLUI
   end
 
   def query_file(params)
-    if params['file']
-      sql = File.read("#{@saved_path}/#{params['file']}")
-      execute_query(sql).tap { |r| r[:file] = params[:file] }
-    else
-      raise 'missing file param'
-    end
+    raise 'missing file param' unless params['file']
+
+    sql = File.read("#{@saved_path}/#{params['file']}")
+    execute_query(sql).tap { |r| r[:file] = params[:file] }
   end
 
   def metadata
@@ -79,21 +80,21 @@ class SQLUI
 
   def load_metadata
     result = {
-      server:  @name,
+      server: @name,
       schemas: {},
-      saved:   Dir.glob("#{@saved_path}/*.sql").sort.map do |path|
+      saved: Dir.glob("#{@saved_path}/*.sql").map do |path|
         {
-          filename:    File.basename(path),
+          filename: File.basename(path),
           description: File.readlines(path).take_while { |l| l.start_with?('--') }.map { |l| l.sub(/^-- */, '') }.join
         }
       end
     }
 
-    if @table_schema
-      where_clause = "where table_schema = '#{@table_schema}'"
-    else
-      where_clause = "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
-    end
+    where_clause = if @table_schema
+                     "where table_schema = '#{@table_schema}'"
+                   else
+                     "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
+                   end
     column_result = @client.query(
       <<~SQL
         select
@@ -129,9 +130,7 @@ class SQLUI
       end
       columns = result[:schemas][table_schema][:tables][table_name][:columns]
       column_name = row[:column_name]
-      unless columns[column_name]
-        columns[column_name] = {}
-      end
+      columns[column_name] = {} unless columns[column_name]
       column = columns[column_name]
       column[:name] = column_name
       column[:data_type] = row[:data_type]
@@ -142,11 +141,11 @@ class SQLUI
       column[:extra] = row[:extra]
     end
 
-    if @table_schema
-      where_clause = "where table_schema = '#{@table_schema}'"
-    else
-      where_clause = "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
-    end
+    where_clause = if @table_schema
+                     "where table_schema = '#{@table_schema}'"
+                   else
+                     "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
+                   end
     stats_result = @client.query(
       <<~SQL
         select
@@ -168,9 +167,7 @@ class SQLUI
       table_name = row[:table_name]
       indexes = tables[table_name][:indexes]
       index_name = row[:index_name]
-      unless indexes[index_name]
-        indexes[index_name] = {}
-      end
+      indexes[index_name] = {} unless indexes[index_name]
       index = indexes[index_name]
       column_name = row[:column_name]
       index[column_name] = {}
@@ -186,13 +183,13 @@ class SQLUI
 
   def execute_query(sql)
     result = @client.query(sql)
-    rows = result.map { |row| row.values }
+    rows = result.map(&:values)
     columns = result.first&.keys || []
     column_types = columns.map { |_| 'string' }
     unless rows.empty?
       maybe_non_null_column_value_exemplars = columns.each_with_index.map do |_, index|
-        row = rows.find do |row|
-          !row[index].nil?
+        row = rows.find do |current|
+          !current[index].nil?
         end
         row.nil? ? nil : row[index]
       end
@@ -210,22 +207,24 @@ class SQLUI
       end
     end
     {
-      query:        sql,
-      columns:      columns,
+      query: sql,
+      columns: columns,
       column_types: column_types,
-      total_rows:   rows.size,
-      rows:         rows.take(@max_rows)
+      total_rows: rows.size,
+      rows: rows.take(@max_rows)
     }
   end
 
   def find_query_at_cursor(sql, cursor)
     parts_with_ranges = []
     sql.scan(/[^;]*;[ \n]*/) { |part| parts_with_ranges << [part, 0, part.size] }
-    parts_with_ranges.inject(0) do |pos, part_with_range|
-      part_with_range[1] += pos
-      part_with_range[2] += pos
+    parts_with_ranges.inject(0) do |pos, current|
+      current[1] += pos
+      current[2] += pos
     end
-    part_with_range = parts_with_ranges.find { |part_with_range| cursor >= part_with_range[1] && cursor < part_with_range[2] } || parts_with_ranges[-1]
+    part_with_range = parts_with_ranges.find do |current|
+      cursor >= current[1] && cursor < current[2]
+    end || parts_with_ranges[-1]
     part_with_range[0]
   end
 end
