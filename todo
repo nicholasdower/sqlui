@@ -33,4 +33,3 @@ add name to root of config. Use on databases list as title.
 use flags instead of env variables
 add github action for build and test
 use paths instead of tab param for navigation
-execute a query, then go to saved, select a query, then go back twice to the original query. Saved query results are still displayed.

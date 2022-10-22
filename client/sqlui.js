@@ -429,6 +429,8 @@ function loadQueryOrGraphTab (callback) {
     throw new Error('You can only specify a file or sql, not both.')
   }
 
+  clearResult();
+
   if (params.has('sql')) {
     setValue(sql)
     const cursor = params.has('cursor') ? params.get('cursor') : 0

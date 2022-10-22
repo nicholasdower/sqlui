@@ -1,4 +1,5 @@
 version: next
+- Fix bug where going back to a previous search did not change results.
 
 version: 0.1.17
 - No changes
