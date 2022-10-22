@@ -7,10 +7,10 @@ RUN_IMAGE = $(RUN) $(IMAGE)
 create-network:
 	@docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null
 
-install:
+install: create-network
 	$(RUN_IMAGE) /bin/bash -c 'npm install && bundle install'
 
-update:
+update: create-network
 	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle update'
 
 update-local:
@@ -23,19 +23,19 @@ install-local:
 	bundle config set --local path vendor/bundle
 	bundle install
 
-build:
+build: create-network
 	$(RUN_IMAGE) make build-local
 
 build-local:
 	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
 
-lint:
+lint: create-network
 	$(RUN_IMAGE) bundle exec rubocop
 
 lint-local:
 	bundle exec rubocop
 
-lint-fix:
+lint-fix: create-network
 	$(RUN_IMAGE) bundle exec rubocop -A
 
 lint-fix-local:

@@ -6,6 +6,18 @@ require 'cgi'
 require 'fileutils'
 require 'json'
 
+def reset
+  execute('git checkout .changes CHANGELOG.md .version Gemfile.lock')
+end
+
+Signal.trap('INT') do
+  reset
+end
+
+Signal.trap('TERM') do
+  reset
+end
+
 def fail(msg)
   warn("Fatal: #{msg}")
   exit(1)
@@ -74,7 +86,7 @@ unless new_version > previous_version
 end
 
 # Read changelog
-versions = File.read('changelog').split(/(?=^version:)/).to_h do |content|
+versions = File.read('.changes').split(/(?=^version:)/).to_h do |content|
   lines = content.strip.split("\n")
   version = lines[0].gsub(/^version: */, '').strip
   version = if version == 'next'
@@ -111,20 +123,25 @@ local_commit = execute("git rev-parse #{branch}")
 remote_commit = execute("git rev-parse origin/#{branch}")
 fail("#{default_branch} is behind, you must pull") unless local_commit == remote_commit
 
+# Ensure the GitHub command is installed.
+success = system('which gh 1> /dev/null 2> /dev/null')
+fail('gh command not found, see https://github.com/cli/cli') unless success
+
 # Print versions as a sanity check.
 puts "Previous version: #{previous_version}"
 puts "Release version: #{new_version}"
 
 # Install, build and lint
 puts
-puts 'Building'
+puts 'Installing'
 execute('make install')
+puts 'Building'
 execute('make build')
+puts 'Linting'
 execute('make lint')
 
 # Run tests
-puts
-puts 'Running specs'
+puts 'Testing'
 execute('make start-detached')
 execute('make test')
 execute('make stop')
@@ -137,7 +154,7 @@ File.write('.version', new_version)
 changelogs = versions.map do |version, changelog|
   "version: #{version}\n#{changelog}\n\n"
 end
-File.write('changelog', "version: next\n\n#{changelogs.join.strip}\n")
+File.write('.changes', "version: next\n\n#{changelogs.join.strip}\n")
 
 # Update CHANGELOG.md
 changelogs = versions.map do |version, changelog|
@@ -165,20 +182,24 @@ $stderr.print('Proceed? ')
 begin
   unless %w[y yes ja yep].include?($stdin.gets.chomp.downcase)
     puts 'Aborting'
-    execute('git checkout changelog CHANGELOG.md .version Gemfile.lock')
+    reset
     exit
   end
 rescue Interrupt
   puts
   puts 'Aborting'
-  execute('git checkout changelog CHANGELOG.md .version Gemfile.lock')
+  reset
   exit
 end
 
-# Relase the gem.
 puts
 puts "Releasing version #{new_version}"
-execute("gem push #{gem_file}")
+
+# Relase the gem.
+puts 'Pushing gem to rubygems.org'
+# Use system to allow for login
+success = system("gem push #{gem_file}")
+fail('gem push failed') unless success
 
 # Commit the changes (version.rb and Gemfile.lock)
 puts 'Pushing release commit'
@@ -189,27 +210,25 @@ execute('git push')
 
 # Build GitHub release URL.
 target_commit = execute('git rev-parse HEAD')
-release_body = <<~MARKDOWN
-  <!--
-    List any noteworthy new features and bug fixes below.
-    Before publishing, please add #{gem_file} as a file attachment.
-  -->
+notes = <<~MARKDOWN
   ### Features & Bug Fixes
   #{new_changelog}
 MARKDOWN
-git_url = 'https://github.com/nicholasdower/sqlui/releases/new?' \
-          "title=v#{new_version}%20Release" \
-          '&' \
-          "tag=v#{new_version}" \
-          '&' \
-          "target=#{target_commit}" \
-          '&' \
-          "body=#{CGI.escape(release_body)}"
+
+puts
+puts 'Creating GitHub release'
+success = system("gh release create v#{new_version} " \
+                 "--title 'v#{new_version} Release' " \
+                 "--notes \"#{notes}\" " \
+                 "--target '#{target_commit}' " \
+                 "'sqlui-#{new_version}.gem'")
+fail('gh release create failed') unless success
+
+git_url = "https://github.com/nicholasdower/sqlui/releases/tag/v#{new_version}"
 
 # Print success and GitHub instructions.
 puts
 puts "Version #{new_version} successfully released"
-puts 'Please publish a GitHub release in your browser'
 puts git_url
 
 # If on a Mac, open the browser.
