@@ -1,5 +1,11 @@
 # Changes
 
+## 0.1.16
+
+- Fix broken table names in structure.
+- Fix broken path in config.yml.
+- Fix no structure when no indexes.
+
 ## 0.1.15
 
 - Fix missing resources in Gem.
