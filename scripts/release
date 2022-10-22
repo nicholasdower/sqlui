@@ -193,15 +193,13 @@ rescue Interrupt
 end
 
 puts
-puts "Releasing version #{new_version}"
 
-# Relase the gem.
-puts 'Pushing gem to rubygems.org'
-# Use system to allow for login
+# Relase the gem. Use system to allow for login.
 success = system("gem push #{gem_file}")
 fail('gem push failed') unless success
 
 # Commit the changes (version.rb and Gemfile.lock)
+puts
 puts 'Pushing release commit'
 execute("git commit -a -m 'v#{new_version} release' -m \"#{new_changelog}\"")
 execute("git tag v#{new_version}")
