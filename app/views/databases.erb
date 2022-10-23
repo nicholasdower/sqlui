@@ -5,11 +5,13 @@
     <style>
       body {
         font-family: Helvetica;
+        margin: 0px;
       }
 
       h1 {
         font-size: 30px;
-        margin-bottom: 30px;
+        margin: 10px;
+
       }
 
       .database a {
@@ -20,8 +22,6 @@
 
       .database h2 {
         margin: 0px;
-        margin-top: 10px;
-        margin-bottom: 0px;
         font-size: 20px;
         font-weight: bold;
       }
@@ -29,11 +29,12 @@
       .database p {
         margin: 0px;
         margin-top: 10px;
-        padding-bottom: 20px;
         font-size: 16px;
       }
 
       .database {
+        margin: 0px;
+        padding: 10px;
         cursor: pointer;
         border-bottom: 1px solid #eeeeee;
       }
@@ -52,11 +53,11 @@
     <h1>Databases</h1>
     <% databases.values.each do |database| %>
       <div class="database" onclick="window.location='<%= "/db/#{database['url_path']}/app" %>'">
-      <h2><%= database['name'] %></h2>
-      <a href="/db/<%= database['url_path'] %>/app">query</a>
-      <a href="/db/<%= database['url_path'] %>/app?tab=saved">saved</a>
-      <a href="/db/<%= database['url_path'] %>/app?tab=structure">structure</a>
-      <p>
+      <h2 class='name'><%= database['name'] %></h2>
+      <a class='query-link' href="/db/<%= database['url_path'] %>/app">query</a>
+      <a class='saved-link' href="/db/<%= database['url_path'] %>/app?tab=saved">saved</a>
+      <a class='structure-link' href="/db/<%= database['url_path'] %>/app?tab=structure">structure</a>
+      <p class='description'>
         <%= database['description'] %>
       </p>
     </div>

@@ -17,13 +17,7 @@ RSpec.configure do |config|
     if LOCAL
       @driver = Selenium::WebDriver.for(:chrome)
     else
-      capabilities = Selenium::WebDriver::Remote::Capabilities.chrome
-      http_client = Selenium::WebDriver::Remote::Http::Default.new
-      @driver = Selenium::WebDriver.for(
-        :remote,
-        url: 'http://hub:4444/wd/hub',
-        capabilities: capabilities,
-        http_client: http_client)
+      @driver = Selenium::WebDriver.for(:remote, url: 'http://hub:4444/wd/hub', capabilities: :chrome)
     end
   end
 end
