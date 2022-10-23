@@ -84,7 +84,7 @@ DEPENDENCIES
   rspec-expectations (~> 3.0)
   rspec-mocks (~> 3.0)
   rubocop (~> 1.0)
-  sinatra (~> 3.0)
+  selenium-webdriver (~> 4.0)
   sqlui!
   watir (~> 7.0)
 

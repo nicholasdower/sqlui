@@ -429,7 +429,7 @@ function loadQueryOrGraphTab (callback) {
     throw new Error('You can only specify a file or sql, not both.')
   }
 
-  clearResult();
+  clearResult()
 
   if (params.has('sql')) {
     setValue(sql)
@@ -477,7 +477,7 @@ function loadQueryResult () {
 
   window.result.columns.forEach(column => {
     const template = document.createElement('template')
-    template.innerHTML = `<th>${column}</th>`
+    template.innerHTML = `<th class="cell">${column}</th>`
     headerElement.appendChild(template.content.firstChild)
   })
   headerElement.appendChild(document.createElement('th'))
@@ -491,7 +491,7 @@ function loadQueryResult () {
     tbodyElement.appendChild(rowElement)
     row.forEach(function (value) {
       const template = document.createElement('template')
-      template.innerHTML = `<td>${value}</td>`
+      template.innerHTML = `<td class="cell">${value}</td>`
       rowElement.appendChild(template.content.firstChild)
     })
     rowElement.appendChild(document.createElement('td'))

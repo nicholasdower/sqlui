@@ -39,8 +39,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - rollup
-      - db-ready
+      rollup:
+        condition: service_started
+      db-ready:
+        condition: service_completed_successfully
   hub:
     container_name: sqlui_hub
     image: selenium/hub:latest

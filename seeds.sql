@@ -10,4 +10,5 @@ insert
 into development.names
     (name, description)
 values
-  ('Nick', 'A dev on the project.');
+  ('Nick', 'A dev on the project.'),
+  ('Laura', 'A supportive person.');

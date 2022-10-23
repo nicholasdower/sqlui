@@ -49,7 +49,7 @@ start-rollup:
 	docker compose up --detach rollup
 
 start-rollup-local:
-	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
+	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs --watch
 
 build-docker-image:
 	docker build --tag sqlui .
