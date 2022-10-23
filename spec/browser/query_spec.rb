@@ -36,36 +36,36 @@ describe 'query' do
 
   context 'when sql specified in query parameter' do
     before do
-      driver.get(url('/db/development/app?sql=select+id%2C+name%2C+description+from+names+order+by+id+limit+2%3B'))
+      driver.get(url('/db/seinfeld/app?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B'))
     end
 
     it 'loads expected results' do
-      wait_until_results(['1', 'Nick', 'A dev on the project.'], ['2', 'Laura', 'A supportive person.'])
+      wait_until_results(['1', 'Jerry', 'A funny guy.'], ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
     end
   end
 
   context 'when sql specified via editor' do
     before do
-      driver.get(url('/db/development/app'))
+      driver.get(url('/db/seinfeld/app'))
       editor = wait_until_editor
-      editor.send_keys('select id, name, description from names order by id limit 2;')
+      editor.send_keys('select id, name, description from characters order by id limit 2;')
       editor.send_keys(%i[control enter])
     end
 
     it 'loads expected results' do
-      wait_until_results(['1', 'Nick', 'A dev on the project.'], ['2', 'Laura', 'A supportive person.'])
+      wait_until_results(['1', 'Jerry', 'A funny guy.'], ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
     end
   end
 
   context 'when first of two editor queries executed via cursor position' do
     before do
-      driver.get(url('/db/development/app'))
+      driver.get(url('/db/seinfeld/app'))
       editor = wait_until_editor
       editor.send_keys(
         <<~SQL
-          select id, name, description from names where id = 1;
+          select id, name, description from characters where id = 1;
 
-          select id, name, description from names where id = 2;
+          select id, name, description from characters where id = 2;
         SQL
       )
       editor.send_keys(%i[up up up])
@@ -73,26 +73,26 @@ describe 'query' do
     end
 
     it 'loads expected results' do
-      wait_until_results(['1', 'Nick', 'A dev on the project.'])
+      wait_until_results(['1', 'Jerry', 'A funny guy.'])
     end
   end
 
   context 'when second of two editor queries executed via cursor position' do
     before do
-      driver.get(url('/db/development/app'))
+      driver.get(url('/db/seinfeld/app'))
       editor = wait_until_editor
       editor.send_keys(
         <<~SQL
-          select id, name, description from names where id = 1;
+          select id, name, description from characters where id = 1;
 
-          select id, name, description from names where id = 2;
+          select id, name, description from characters where id = 2;
         SQL
       )
       editor.send_keys(%i[control enter])
     end
 
     it 'loads expected results' do
-      wait_until_results(['2', 'Laura', 'A supportive person.'])
+      wait_until_results(['2', 'George', 'A short, stocky, slow-witted, bald man.'])
     end
   end
 end

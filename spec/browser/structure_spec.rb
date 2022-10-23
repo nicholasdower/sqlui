@@ -8,11 +8,11 @@ describe 'structure' do
   let(:wait) { Selenium::WebDriver::Wait.new(timeout: 5) }
 
   before do
-    driver.get(url('/db/development/app?tab=structure'))
+    driver.get(url('/db/seinfeld/app?tab=structure'))
   end
 
   it 'hides the list of schemas' do
-    expected_table_names = %w[names]
+    expected_table_names = %w[characters]
     wait.until do
       elements = driver.find_elements(css: '#structure-box > * > .tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
@@ -22,7 +22,7 @@ describe 'structure' do
   end
 
   it 'displays the list of tables' do
-    expected_table_names = %w[names]
+    expected_table_names = %w[characters]
     table_elements = wait.until do
       elements = driver.find_elements(css: '#structure-box > * > .tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?

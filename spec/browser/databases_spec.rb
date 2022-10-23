@@ -18,10 +18,10 @@ describe 'databases' do
     end
 
     description_element = database_elements[0].find_element(css: '.description')
-    expect(description_element.text).to eq('description')
+    expect(description_element.text).to eq('A database about nothing.')
 
     name_element = database_elements[0].find_element(css: '.name')
-    expect(name_element.text).to eq('Development')
+    expect(name_element.text).to eq('Seinfeld')
   end
 
   it 'links to the query tab' do

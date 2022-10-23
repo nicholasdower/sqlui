@@ -72,28 +72,22 @@ stop:
 	docker network rm sqlui_default || true
 
 start-db:
-	docker compose up -d db-ready
+	docker compose up -d db
 
 stop-db:
 	docker compose down db
 
-seed-db:
-	docker exec --interactive sqlui_db mysql --host=db --protocol=tcp --user=developer --password=password --database=development < seeds.sql
-
-seed-db-local:
-	mysql --user=developer --password=password --database=development < seeds.sql
-
 mysql:
-	docker exec --interactive --tty sqlui_db mysql --host=db --protocol=tcp --user=developer --password=password --database=development $(if $(QUERY),--execute "$(QUERY)",)
+	docker exec --interactive --tty sqlui_db mysql --user=root --password=root $(if $(QUERY),--execute "$(QUERY)",)
 
 mysql-local:
-	mysql --host=localhost --protocol=tcp --user=developer --password=password --database=development $(if $(QUERY),--execute "$(QUERY)",)
+	mysql --user=root --password=root $(if $(QUERY),--execute "$(QUERY)",)
 
 docker-run: create-network
 	@$(RUN_IMAGE) $(CMD)
 
 start-server:
-	docker compose up db db-ready rollup server
+	docker compose up db rollup server
 
 start-server-detached:
 	docker compose up --detach server

@@ -4,26 +4,16 @@ services:
     image: mysql/mysql-server:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: development
-      MYSQL_USER: developer
-      MYSQL_PASSWORD: password
     ports:
       - '3306:3306'
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ['CMD', 'mysql', '--user=developer', '--password=password', '--database=development', '--execute', 'show databases;']
+      test: ['CMD', 'mysql', '--user=root', '--password=root', '--execute', 'show databases;']
       interval: 5s
       timeout: 2s
       retries: 10
       start_period: 10s
-  db-ready:
-    container_name: sqlui_db_ready
-    image: mysql/mysql-server:latest
-    command: bash -c "cd /sqlui && mysql --host=db --user=developer --password=password --database=development --protocol=tcp < seeds.sql"
-    volumes:
-      - .:/sqlui
-    depends_on:
-      db:
-        condition: service_healthy
   rollup:
     container_name: sqlui_rollup
     build: .
@@ -41,8 +31,8 @@ services:
     depends_on:
       rollup:
         condition: service_started
-      db-ready:
-        condition: service_completed_successfully
+      db:
+        condition: service_healthy
   hub:
     container_name: sqlui_hub
     image: selenium/hub:latest

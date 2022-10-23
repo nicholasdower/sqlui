@@ -1,12 +1,12 @@
  saved_path: sql
  databases:
-   development:
-     name:        Development
-     description: description
-     url_path:    development
-     saved_path:  development
-     db_database: development
-     db_username: developer
-     db_password: password
+   seinfeld:
+     name:        Seinfeld
+     description: A database about nothing.
+     url_path:    seinfeld
+     saved_path:  seinfeld
+     db_database: seinfeld
+     db_username: root
+     db_password: root
      db_port:     3306
      db_host:     db
