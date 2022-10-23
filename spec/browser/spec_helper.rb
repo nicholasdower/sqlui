@@ -14,10 +14,10 @@ RSpec.configure do |config|
   config.after { @driver&.quit }
 
   def start_session
-    if LOCAL
-      @driver = Selenium::WebDriver.for(:chrome)
-    else
-      @driver = Selenium::WebDriver.for(:remote, url: 'http://hub:4444/wd/hub', capabilities: :chrome)
-    end
+    @driver = if LOCAL
+                Selenium::WebDriver.for(:chrome)
+              else
+                Selenium::WebDriver.for(:remote, url: 'http://hub:4444/wd/hub', capabilities: :chrome)
+              end
   end
 end

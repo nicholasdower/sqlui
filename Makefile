@@ -102,7 +102,7 @@ start-server-local:
 	./scripts/rerun bundle exec ruby ./bin/sqlui development_config_local.yml
 
 test: create-network
-	$(RUN_IMAGE) bundle exec rspec
+	$(RUN_IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 test-local:
-	LOCAL=true bundle exec rspec
+	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)

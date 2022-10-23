@@ -219,6 +219,7 @@ function createTable (parent, columns, rows) {
 
   columns.forEach(function (columnName) {
     const headerElement = document.createElement('th')
+    headerElement.classList.add('cell')
     headerElement.innerText = columnName
     headerTrElement.appendChild(headerElement)
   })
@@ -233,6 +234,7 @@ function createTable (parent, columns, rows) {
     tbodyElement.appendChild(rowElement)
     row.forEach(function (value) {
       const cellElement = document.createElement('td')
+      cellElement.classList.add('cell')
       cellElement.innerText = value
       rowElement.appendChild(cellElement)
     })
