@@ -75,7 +75,7 @@ class SQLUI
   end
 
   def metadata
-    @metadata ||= load_metadata
+    load_metadata
   end
 
   def load_metadata
