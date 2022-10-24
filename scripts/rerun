@@ -8,7 +8,7 @@ require 'set'
 class Watcher
   MIN_REFRESH_DELAY = 2
 
-  def initialize(dirs: [], files: [], command:)
+  def initialize(command:, dirs: [], files: [])
     raise 'missing dirs or files' unless dirs&.any? || files&.any?
     raise 'missing command' unless command&.any?
 
@@ -74,7 +74,8 @@ end
 watcher = Watcher.new(
   dirs: ['app', 'client/resources'],
   files: ['development_config.yml'],
-  command: ARGV)
+  command: ARGV
+)
 
 Signal.trap('INT') do
   watcher.die('INT')
