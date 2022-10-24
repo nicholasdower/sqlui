@@ -1,5 +1,10 @@
 # Changes
 
+## 0.1.18
+
+- Fix bug where going back to a previous search did not change results.
+- Fix bug where metadata was cached and changes to DB were not reflected.
+
 ## 0.1.17
 
 - No changes
