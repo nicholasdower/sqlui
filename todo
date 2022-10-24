@@ -34,3 +34,4 @@ use flags instead of env variables
 add github action for build and test
 use paths instead of tab param for navigation
 make it possible to rerun seed-db. can't figure out how to recreate users
+switch to typescript
