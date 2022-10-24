@@ -72,10 +72,19 @@ stop:
 	docker network rm sqlui_default || true
 
 start-db:
+	docker compose up db
+
+start-db-detached:
 	docker compose up -d db
 
 stop-db:
 	docker compose down db
+
+seed-db:
+	docker exec --interactive sqlui_db mysql --host=db --protocol=tcp --user=root --password=root < sql/init.sql
+
+seed-db-local:
+	mysql --protocol=tcp --user=root --password=root < sql/init.sql
 
 mysql:
 	docker exec --interactive --tty sqlui_db mysql --user=root --password=root $(if $(QUERY),--execute "$(QUERY)",)
@@ -93,7 +102,13 @@ start-server-detached:
 	docker compose up --detach server
 
 start-server-local:
-	./scripts/rerun bundle exec ruby ./bin/sqlui development_config_local.yml
+	DB_HOST=127.0.0.1 DB_PORT=3306 ./scripts/rerun bundle exec ruby ./bin/sqlui development_config.yml
+
+start-hub:
+	docker compose up hub node-chrome
+
+start-hub-detached:
+	docker compose up --detach hub node-chrome
 
 test: create-network
 	$(RUN_IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)

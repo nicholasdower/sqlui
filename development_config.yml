@@ -6,7 +6,7 @@
      url_path:    seinfeld
      saved_path:  seinfeld
      db_database: seinfeld
-     db_username: root
-     db_password: root
-     db_port:     3306
-     db_host:     db
+     db_username: newman
+     db_password: drakescoffeecake
+     db_port:     <%= Integer(ENV.fetch('DB_PORT')) %>
+     db_host:     <%= ENV.fetch('DB_HOST') %>

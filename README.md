@@ -119,26 +119,32 @@ See https://github.com/nvm-sh/nvm#installing-and-updating.
 nvm install 19
 ```
 
+#### Install Chromedriver
+
+See https://chromedriver.chromium.org/getting-started
+
 #### Install & Build
 
 ```shell
 make install-local build-local
 ```
 
-#### Install Chromedriver
-
-See https://chromedriver.chromium.org/getting-started
-
-#### Run the tests
+#### Start the database (Uses Docker)
 
 ```shell
-make test-local
+make start-db-detached
 ```
 
-#### Run and view the app
+#### Start the server
 
 ```shell
 make start-server-local
 ```
 
 Visit http://localhost:8080/db
+
+#### Run the tests
+
+```shell
+make test-local
+```

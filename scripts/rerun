@@ -8,11 +8,12 @@ require 'set'
 class Watcher
   MIN_REFRESH_DELAY = 2
 
-  def initialize(dirs:, command:)
-    raise 'missing dirs' unless dirs&.any?
+  def initialize(dirs: [], files: [], command:)
+    raise 'missing dirs or files' unless dirs&.any? || files&.any?
     raise 'missing command' unless command&.any?
 
-    @dirs = dirs
+    @dirs = dirs || []
+    @files = files || []
     @command = command
     @watched_files = watched_files
     @alive = true
@@ -51,7 +52,8 @@ class Watcher
   end
 
   def watched_files
-    entries = Find.find(*@dirs).flat_map do |file|
+    files = Find.find(*@dirs).to_a + @files
+    entries = files.flat_map do |file|
       if FileTest.file?(file)
         [[file, File.mtime(file).to_i]]
       else
@@ -69,7 +71,10 @@ class Watcher
   end
 end
 
-watcher = Watcher.new(dirs: ['app', 'client/resources'], command: ARGV)
+watcher = Watcher.new(
+  dirs: ['app', 'client/resources'],
+  files: ['development_config.yml'],
+  command: ARGV)
 
 Signal.trap('INT') do
   watcher.die('INT')

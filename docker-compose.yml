@@ -23,6 +23,9 @@ services:
   server:
     container_name: sqlui_server
     build: .
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
     command: bash -c "cd /sqlui && ./scripts/rerun bundle exec ruby ./bin/sqlui development_config.yml"
     volumes:
       - .:/sqlui
