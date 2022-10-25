@@ -19,7 +19,7 @@ class SqluiConfig
 
     databases = config[:databases]
     if databases.nil? || !databases.is_a?(Hash) || databases.empty?
-      raise ArgumentError.new('required parameter databases missing')
+      raise ArgumentError, 'required parameter databases missing'
     end
 
     @database_configs = databases.map do |_, current|
@@ -35,9 +35,7 @@ class SqluiConfig
 
   def fetch_non_empty_string(hash, key)
     value = hash[key]
-    if value.nil? || !value.is_a?(String) || value.strip.empty?
-      raise ArgumentError.new("required parameter #{key} missing")
-    end
+    raise ArgumentError, "required parameter #{key} missing" if value.nil? || !value.is_a?(String) || value.strip.empty?
 
     value.strip
   end
