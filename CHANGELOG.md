@@ -1,5 +1,10 @@
 # Changes
 
+## 0.1.19
+
+- Add ability to configure full path to databases and database list.
+- Add ability to name the server.
+
 ## 0.1.18
 
 - Fix bug where going back to a previous search did not change results.

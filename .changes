@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.19
 - Add ability to configure full path to databases and database list.
 - Add ability to name the server.
 
