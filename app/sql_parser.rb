@@ -12,6 +12,6 @@ class SqlParser
     part_with_range = parts_with_ranges.find do |current|
       cursor >= current[1] && cursor < current[2]
     end || parts_with_ranges[-1]
-    part_with_range[0]
+    part_with_range[0].strip
   end
 end
