@@ -227,7 +227,6 @@ git_url = "https://github.com/nicholasdower/sqlui/releases/tag/v#{new_version}"
 # Print success and GitHub instructions.
 puts
 puts "Version #{new_version} successfully released"
-puts git_url
 
 # If on a Mac, open the browser.
 execute("open \"#{git_url}\"") if system('which open 1> /dev/null 2> /dev/null')
