@@ -72,9 +72,17 @@ describe SqluiConfig do
         expect { subject }.to raise_error(ArgumentError, 'list_url_path should not end with a /')
       end
     end
+
+    context 'when list_url_path is only a /' do
+      let(:list_url_path) { '/' }
+
+      it "doesn't raise" do
+        expect { subject }.not_to raise_error
+      end
+    end
   end
 
-  describe '.database_config_for' do
+  describe '#database_config_for' do
     subject { sqlui_config.database_config_for(url_path: lookup_url_path) }
 
     context 'when path exists' do

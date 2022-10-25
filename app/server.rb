@@ -2,9 +2,7 @@
 
 require 'erb'
 require 'json'
-require 'mysql2'
 require 'sinatra/base'
-require 'set'
 require 'uri'
 require_relative 'environment'
 require_relative 'sql_parser'
@@ -71,9 +69,13 @@ class Server < Sinatra::Base
     end
 
     get "#{database.url_path}/metadata" do
+      database_config = @config.database_config_for(url_path: database.url_path)
+      metadata = database_config.with_client do |client|
+        load_metadata(client, database_config.database, database_config.saved_path)
+      end
       status 200
       headers 'Content-Type': 'application/json'
-      body load_metadata(url_path: database.url_path).to_json
+      body metadata.to_json
     end
 
     get "#{database.url_path}/query_file" do
@@ -81,9 +83,10 @@ class Server < Sinatra::Base
       return client_error('no such file') unless File.exist?(params[:file])
 
       database_config = @config.database_config_for(url_path: database.url_path)
-
       sql = File.read(File.join(database_config.saved_path, params[:file]))
-      result = execute_query(database_config.client, sql).tap { |r| r[:file] = params[:file] }
+      result = database_config.with_client do |client|
+        execute_query(client, sql).tap { |r| r[:file] = params[:file] }
+      end
 
       status 200
       headers 'Content-Type': 'application/json'
@@ -99,7 +102,9 @@ class Server < Sinatra::Base
       raise "can't find query at cursor" unless sql
 
       database_config = @config.database_config_for(url_path: database.url_path)
-      result = execute_query(database_config.client, sql)
+      result = database_config.with_client do |client|
+        execute_query(client, sql)
+      end
 
       status 200
       headers 'Content-Type': 'application/json'
@@ -115,12 +120,11 @@ class Server < Sinatra::Base
     body({ message: message, stacktrace: stacktrace }.compact.to_json)
   end
 
-  def load_metadata(url_path:)
-    database_config = @config.database_config_for(url_path: url_path)
+  def load_metadata(client, database, saved_path)
     result = {
       server: @config.name,
       schemas: {},
-      saved: Dir.glob("#{database_config.saved_path}/*.sql").map do |path|
+      saved: Dir.glob("#{saved_path}/*.sql").map do |path|
         {
           filename: File.basename(path),
           description: File.readlines(path).take_while { |l| l.start_with?('--') }.map { |l| l.sub(/^-- */, '') }.join
@@ -128,12 +132,12 @@ class Server < Sinatra::Base
       end
     }
 
-    where_clause = if database_config.database
-                     "where table_schema = '#{database_config.database}'"
+    where_clause = if database
+                     "where table_schema = '#{database}'"
                    else
                      "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
                    end
-    column_result = database_config.client.query(
+    column_result = client.query(
       <<~SQL
         select
           table_schema,
@@ -179,12 +183,12 @@ class Server < Sinatra::Base
       column[:extra] = row[:extra]
     end
 
-    where_clause = if database_config.database
-                     "where table_schema = '#{database_config.database}'"
+    where_clause = if database
+                     "where table_schema = '#{database}'"
                    else
                      "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
                    end
-    stats_result = database_config.client.query(
+    stats_result = client.query(
       <<~SQL
         select
           table_schema,
