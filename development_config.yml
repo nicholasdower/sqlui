@@ -1,5 +1,5 @@
 name: Development
-list_path: /sqlui
+list_url_path: /sqlui
 databases:
   seinfeld:
     display_name: Seinfeld

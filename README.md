@@ -27,19 +27,20 @@ A web app which can be used to query one or more SQL databases.
 ### Create a config file like the following
 
 ```yaml
-name:             # Server display name to be used in the UI.
-linked_path: path # Path to the directory containing saved SQL files.
+name: some_name      # Server display name to be used in the UI.
+list_url_path: /path # Absolute URL path used for the databases list.
 databases:
   development:
-    name:        Development # Database display name to be used in the UI.
-    description: description # Database description to be used in the UI.
-    url_path:    development # Path to use in the URL to access this database.
-    saved_path:  development # Path to the directory containing saved SQL files.
-    db_database: development # Database name.
-    db_username: root        # Database username.
-    db_password: root        # Database password.
-    db_port:     3306        # Database port.
-    db_host:     127.0.0.1   # Database host.
+    name:        some_name   # User-facing name.
+    description: description # User-facing description.
+    url_path:    development # Absolute URL path used to access this database.
+    saved_path:  path/to/sql # Relative path to the directory containing saved SQL files.
+    client_params:
+      database:    name        # Database name.
+      username:    root        # Database username.
+      password:    root        # Database password.
+      port:        3306        # Database port.
+      host:        127.0.0.1   # Database host.
 ```
 
 ### Install the Gem or add it to your `Gemfile`

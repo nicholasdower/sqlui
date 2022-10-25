@@ -6,7 +6,6 @@ require 'mysql2'
 require 'sinatra/base'
 require 'set'
 require 'uri'
-require 'yaml'
 require_relative 'environment'
 require_relative 'sql_parser'
 require_relative 'sqlui_config'
@@ -41,7 +40,7 @@ class Server < Sinatra::Base
     body 'OK'
   end
 
-  get "#{CONFIG.list_path}/?" do
+  get "#{CONFIG.list_url_path}/?" do
     erb :databases, locals: { config: @config }
   end
 

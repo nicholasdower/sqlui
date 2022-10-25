@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 require_relative '../../app/sql_parser'
 
 describe SqlParser do
-  describe ".find_statement_at_cursor" do
+  describe '.find_statement_at_cursor' do
     subject { SqlParser.find_statement_at_cursor(sql, cursor) }
 
     context 'when input contains only one query' do
