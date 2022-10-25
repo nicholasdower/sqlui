@@ -27,13 +27,14 @@ A web app which can be used to query one or more SQL databases.
 ### Create a config file like the following
 
 ```yaml
-saved_path: path # Path to the directory containing saved SQL files.
+name:             # Server display name to be used in the UI.
+linked_path: path # Path to the directory containing saved SQL files.
 databases:
   development:
     name:        Development # Database display name to be used in the UI.
-    description: description # Database display name to be used in the UI.
+    description: description # Database description to be used in the UI.
     url_path:    development # Path to use in the URL to access this database.
-    saved_path:  development # Path within the root saved path containing saved SQL files.
+    saved_path:  development # Path to the directory containing saved SQL files.
     db_database: development # Database name.
     db_username: root        # Database username.
     db_password: root        # Database password.
@@ -87,7 +88,7 @@ make install build
 make start
 ```
 
-Visit http://localhost:8080/db
+Visit http://localhost:8080/sqlui
 
 #### Run the tests
 
@@ -141,7 +142,7 @@ make start-db-detached
 make start-server-local
 ```
 
-Visit http://localhost:8080/db
+Visit http://localhost:8080/sqlui
 
 #### Run the tests
 

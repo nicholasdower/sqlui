@@ -35,3 +35,14 @@ add github action for build and test
 use paths instead of tab param for navigation
 make it possible to rerun seed-db. can't figure out how to recreate users
 switch to typescript
+add prometheus metrics
+add error reporting
+add a second database
+update health to only report health when client connections are working
+maybe split database configs into separate files
+cache saved files
+add padding inside select list, longest name overlaps scrollbar
+put current structure table and schema in url params
+make cmd-enter work
+symbolize keys in config, clean up config_for crap
+let client specify path root

@@ -8,7 +8,7 @@ describe 'databases' do
   let(:wait) { Selenium::WebDriver::Wait.new(timeout: 5) }
 
   before do
-    driver.get(url('/db'))
+    driver.get(url('/sqlui'))
   end
 
   it 'loads expected databases' do

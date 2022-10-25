@@ -50,15 +50,15 @@
   </head>
 
   <body>
-    <h1>Databases</h1>
-    <% databases.values.each do |database| %>
-      <div class="database" onclick="window.location='<%= "/db/#{database['url_path']}/app" %>'">
-      <h2 class='name'><%= database['name'] %></h2>
-      <a class='query-link' href="/db/<%= database['url_path'] %>/app">query</a>
-      <a class='saved-link' href="/db/<%= database['url_path'] %>/app?tab=saved">saved</a>
-      <a class='structure-link' href="/db/<%= database['url_path'] %>/app?tab=structure">structure</a>
+    <h1><% config.name %> Databases</h1>
+    <% config.databases.each do |database| %>
+      <div class="database" onclick="window.location='<%= "#{database.url_path}/app" %>'">
+      <h2 class='name'><%= database.display_name %></h2>
+      <a class='query-link' href="<%= database.url_path %>/app">query</a>
+      <a class='saved-link' href="<%= database.url_path %>/app?tab=saved">saved</a>
+      <a class='structure-link' href="<%= database.url_path %>/app?tab=structure">structure</a>
       <p class='description'>
-        <%= database['description'] %>
+        <%= database.description %>
       </p>
     </div>
     <% end %>

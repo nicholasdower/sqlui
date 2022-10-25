@@ -1,12 +1,14 @@
- saved_path: sql
- databases:
-   seinfeld:
-     name:        Seinfeld
-     description: A database about nothing.
-     url_path:    seinfeld
-     saved_path:  seinfeld
-     db_database: seinfeld
-     db_username: newman
-     db_password: drakescoffeecake
-     db_port:     <%= Integer(ENV.fetch('DB_PORT')) %>
-     db_host:     <%= ENV.fetch('DB_HOST') %>
+name: Development
+list_path: /sqlui
+databases:
+  seinfeld:
+    display_name: Seinfeld
+    description:  A database about nothing.
+    url_path:     /sqlui/seinfeld
+    saved_path:   sql/seinfeld
+    client_params:
+      database:     seinfeld
+      username:     newman
+      password:     drakescoffeecake
+      port:         <%= Integer(ENV.fetch('DB_PORT')) %>
+      host:         <%= ENV.fetch('DB_HOST') %>
