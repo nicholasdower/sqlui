@@ -44,16 +44,16 @@ describe SqluiConfig do
       it 'returns the expected config' do
         expect(subject.name).to eq('some server name')
         expect(subject.list_url_path).to eq(list_url_path)
-        expect(subject.databases.size).to eq(1)
-        expect(subject.databases.first.display_name).to eq('some database name')
-        expect(subject.databases.first.description).to eq('some description')
-        expect(subject.databases.first.url_path).to eq(url_path)
-        expect(subject.databases.first.saved_path).to eq(saved_path)
-        expect(subject.databases.first.client_params[:database]).to eq('some_database')
-        expect(subject.databases.first.client_params[:username]).to eq('some_username')
-        expect(subject.databases.first.client_params[:password]).to eq('some_password')
-        expect(subject.databases.first.client_params[:host]).to eq('some_host')
-        expect(subject.databases.first.client_params[:port]).to eq(999)
+        expect(subject.database_configs.size).to eq(1)
+        expect(subject.database_configs.first.display_name).to eq('some database name')
+        expect(subject.database_configs.first.description).to eq('some description')
+        expect(subject.database_configs.first.url_path).to eq(url_path)
+        expect(subject.database_configs.first.saved_path).to eq(saved_path)
+        expect(subject.database_configs.first.client_params[:database]).to eq('some_database')
+        expect(subject.database_configs.first.client_params[:username]).to eq('some_username')
+        expect(subject.database_configs.first.client_params[:password]).to eq('some_password')
+        expect(subject.database_configs.first.client_params[:host]).to eq('some_host')
+        expect(subject.database_configs.first.client_params[:port]).to eq(999)
       end
     end
 
@@ -78,6 +78,69 @@ describe SqluiConfig do
 
       it "doesn't raise" do
         expect { subject }.not_to raise_error
+      end
+    end
+
+    context 'when databases null' do
+      let(:config) do
+        <<~YAML
+          name: some server name
+          list_url_path: #{list_url_path}
+          databases: ~
+        YAML
+      end
+
+      it 'raises' do
+        expect { subject }.to raise_error(ArgumentError, 'required parameter databases missing')
+      end
+    end
+
+    context 'when databases not a hash' do
+      let(:config) do
+        <<~YAML
+          name: some server name
+          list_url_path: #{list_url_path}
+          databases: foo
+        YAML
+      end
+
+      it 'raises' do
+        expect { subject }.to raise_error(ArgumentError, 'required parameter databases missing')
+      end
+    end
+
+    context 'when databases not specified' do
+      let(:config) do
+        <<~YAML
+          name: some server name
+          list_url_path: #{list_url_path}
+        YAML
+      end
+
+      it 'raises' do
+        expect { subject }.to raise_error(ArgumentError, 'required parameter databases missing')
+      end
+    end
+
+    context 'when no database configs are specified' do
+      let(:config) do
+        <<~YAML
+          name: some server name
+          list_url_path: #{list_url_path}
+          databases:
+        YAML
+      end
+
+      it 'raises' do
+        expect { subject }.to raise_error(ArgumentError, 'required parameter databases missing')
+      end
+    end
+
+    context 'when config is an erb template' do
+      let(:list_url_path) { '<%= "/some/template/val" %>' }
+
+      it 'renders the template' do
+        expect(subject.list_url_path).to eq('/some/template/val')
       end
     end
   end

@@ -42,7 +42,7 @@ class Server < Sinatra::Base
     erb :databases, locals: { config: @config }
   end
 
-  CONFIG.databases.each do |database|
+  CONFIG.database_configs.each do |database|
     get database.url_path.to_s do
       redirect "#{params[:database]}/app", 301
     end
