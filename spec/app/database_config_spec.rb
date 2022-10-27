@@ -58,7 +58,7 @@ describe DatabaseConfig do
       context 'when url_path is only a /' do
         before { config_hash[:url_path] = '/' }
 
-        it "returns the expected config" do
+        it 'returns the expected config' do
           expect(subject.url_path).to eq('/')
         end
       end
@@ -114,35 +114,35 @@ describe DatabaseConfig do
     include_examples 'a required string field', :saved_path, 'some/saved/path'
 
     context 'client_params' do
-      context "when client_params is null" do
+      context 'when client_params is null' do
         before { config_hash[:client_params] = nil }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, "required parameter client_params null")
+          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params null')
         end
       end
 
-      context "when client_params is missing" do
+      context 'when client_params is missing' do
         before { config_hash.delete(:client_params) }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, "required parameter client_params missing")
+          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params missing')
         end
       end
 
-      context "when client_params is not a hash" do
+      context 'when client_params is not a hash' do
         before { config_hash[:client_params] = 'foo' }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, "required parameter client_params not a hash")
+          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params not a hash')
         end
       end
 
-      context "when client_params is empty" do
+      context 'when client_params is empty' do
         before { config_hash[:client_params] = {} }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, "required parameter client_params empty")
+          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params empty')
         end
       end
     end

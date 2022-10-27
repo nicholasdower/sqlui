@@ -149,22 +149,22 @@ describe SqluiConfig do
 
     include_examples 'a required string field',
                      [:name],
-                     'some name', -> (s) { s.name }
+                     'some name', ->(s) { s.name }
     include_examples 'a required string field',
                      [:list_url_path],
-                     '/sqlui', -> (s) { s.list_url_path }
+                     '/sqlui', ->(s) { s.list_url_path }
     include_examples 'a required string field',
-                     [:databases, :database_one, :display_name],
-                     'some display name', -> (s) { s.database_configs[0].display_name }
+                     %i[databases database_one display_name],
+                     'some display name', ->(s) { s.database_configs[0].display_name }
     include_examples 'a required string field',
-                     [:databases, :database_one, :description],
-                     'some description', -> (s) { s.database_configs[0].description }
+                     %i[databases database_one description],
+                     'some description', ->(s) { s.database_configs[0].description }
     include_examples 'a required string field',
-                     [:databases, :database_one, :url_path],
-                     '/sqlui/foo', -> (s) { s.database_configs[0].url_path }
+                     %i[databases database_one url_path],
+                     '/sqlui/foo', ->(s) { s.database_configs[0].url_path }
     include_examples 'a required string field',
-                     [:databases, :database_one, :saved_path],
-                     'some/path', -> (s) { s.database_configs[0].saved_path }
+                     %i[databases database_one saved_path],
+                     'some/path', ->(s) { s.database_configs[0].saved_path }
 
     context 'when config is an erb template' do
       before { config_hash[:list_url_path] = '<%= "/some/template/val" %>' }

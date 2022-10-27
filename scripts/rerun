@@ -74,14 +74,14 @@ end
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: ./script/rerun [options] -- command [args...]"
+  opts.banner = 'Usage: ./script/rerun [options] -- command [args...]'
 
-  opts.on("-d", "--dir <dir>", "A directory to watch") do |dir|
+  opts.on('-d', '--dir <dir>', 'A directory to watch') do |dir|
     options[:dirs] ||= []
     options[:dirs] << dir
   end
 
-  opts.on("-f", "--file <file>", "A file to watch.") do |file|
+  opts.on('-f', '--file <file>', 'A file to watch.') do |file|
     options[:files] ||= []
     options[:files] << file
   end
