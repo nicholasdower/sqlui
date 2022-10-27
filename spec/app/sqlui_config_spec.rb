@@ -4,8 +4,7 @@ require 'tempfile'
 require 'yaml'
 
 require_relative '../spec_helper'
-require_relative '../../app/array'
-require_relative '../../app/hash'
+require_relative '../../app/deep'
 require_relative '../../app/sqlui_config'
 
 describe SqluiConfig do

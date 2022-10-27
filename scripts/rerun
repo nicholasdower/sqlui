@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'find'
+require 'optparse'
 require 'set'
 
 # Runs the specified command and restarts it when files in the specified directories change.
@@ -71,17 +72,30 @@ class Watcher
   end
 end
 
-watcher = Watcher.new(
-  dirs: ['app', 'client/resources'],
-  files: ['development_config.yml'],
-  command: ARGV
-)
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ./script/rerun [options] -- command [args...]"
+
+  opts.on("-d", "--dir <dir>", "A directory to watch") do |dir|
+    options[:dirs] ||= []
+    options[:dirs] << dir
+  end
+
+  opts.on("-f", "--file <file>", "A file to watch.") do |file|
+    options[:files] ||= []
+    options[:files] << file
+  end
+end.parse!
+
+watcher = Watcher.new(dirs: options[:dirs], files: options[:files], command: ARGV)
 
 Signal.trap('INT') do
   watcher.die('INT')
+  exit 2
 end
 
 Signal.trap('TERM') do
   watcher.die('TERM')
+  exit 15
 end
 watcher.watch
