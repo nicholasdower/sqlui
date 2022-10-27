@@ -4,6 +4,7 @@ require 'erb'
 require 'json'
 require 'sinatra/base'
 require 'uri'
+require_relative 'database_metadata'
 require_relative 'environment'
 require_relative 'sql_parser'
 require_relative 'sqlui_config'
@@ -21,6 +22,9 @@ class Server < Sinatra::Base
   MAX_ROWS = 1_000
 
   CONFIG = SqluiConfig.new(ARGV[0])
+
+  # Connect to each database to verify each can be connected to.
+  CONFIG.database_configs.each { |database| database.with_client { |client| client } }
 
   def initialize(app = nil, **_kwargs)
     super
@@ -121,109 +125,16 @@ class Server < Sinatra::Base
   end
 
   def load_metadata(client, database_config)
-    database = database_config.client_params[:database]
-    saved_path = database_config.saved_path
-
-    result = {
+    {
       server: @config.name,
-      schemas: {},
-      saved: Dir.glob("#{saved_path}/*.sql").map do |path|
+      schemas: DatabaseMetadata.lookup(client, database_config),
+      saved: Dir.glob("#{database_config.saved_path}/*.sql").map do |path|
         {
           filename: File.basename(path),
           description: File.readlines(path).take_while { |l| l.start_with?('--') }.map { |l| l.sub(/^-- */, '') }.join
         }
       end
     }
-
-    where_clause = if database
-                     "where table_schema = '#{database}'"
-                   else
-                     "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
-                   end
-    column_result = client.query(
-      <<~SQL
-        select
-          table_schema,
-          table_name,
-          column_name,
-          data_type,
-          character_maximum_length,
-          is_nullable,
-          column_key,
-          column_default,
-          extra
-        from information_schema.columns
-        #{where_clause}
-        order by table_schema, table_name, column_name, ordinal_position;
-    SQL
-    )
-    column_result.each do |row|
-      row = row.transform_keys(&:downcase).transform_keys(&:to_sym)
-      table_schema = row[:table_schema]
-      unless result[:schemas][table_schema]
-        result[:schemas][table_schema] = {
-          tables: {}
-        }
-      end
-      table_name = row[:table_name]
-      tables = result[:schemas][table_schema][:tables]
-      unless tables[table_name]
-        tables[table_name] = {
-          indexes: {},
-          columns: {}
-        }
-      end
-      columns = result[:schemas][table_schema][:tables][table_name][:columns]
-      column_name = row[:column_name]
-      columns[column_name] = {} unless columns[column_name]
-      column = columns[column_name]
-      column[:name] = column_name
-      column[:data_type] = row[:data_type]
-      column[:length] = row[:character_maximum_length]
-      column[:allow_null] = row[:is_nullable]
-      column[:key] = row[:column_key]
-      column[:default] = row[:column_default]
-      column[:extra] = row[:extra]
-    end
-
-    where_clause = if database
-                     "where table_schema = '#{database}'"
-                   else
-                     "where table_schema not in('mysql', 'sys', 'information_schema', 'performance_schema')"
-                   end
-    stats_result = client.query(
-      <<~SQL
-        select
-          table_schema,
-          table_name,
-          index_name,
-          seq_in_index,
-          non_unique,
-          column_name
-        from information_schema.statistics
-        #{where_clause}
-        order by table_schema, table_name, if(index_name = "PRIMARY", 0, index_name), seq_in_index;
-    SQL
-    )
-    stats_result.each do |row|
-      row = row.transform_keys(&:downcase).transform_keys(&:to_sym)
-      table_schema = row[:table_schema]
-      tables = result[:schemas][table_schema][:tables]
-      table_name = row[:table_name]
-      indexes = tables[table_name][:indexes]
-      index_name = row[:index_name]
-      indexes[index_name] = {} unless indexes[index_name]
-      index = indexes[index_name]
-      column_name = row[:column_name]
-      index[column_name] = {}
-      column = index[column_name]
-      column[:name] = index_name
-      column[:seq_in_index] = row[:seq_in_index]
-      column[:non_unique] = row[:non_unique]
-      column[:column_name] = row[:column_name]
-    end
-
-    result
   end
 
   def execute_query(client, sql)
