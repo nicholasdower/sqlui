@@ -113,5 +113,7 @@ start-hub-detached:
 test: create-network
 	$(RUN_IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
 
+start-test-stop: start-detached test stop
+
 test-local:
 	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)

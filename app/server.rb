@@ -44,7 +44,7 @@ class Server < Sinatra::Base
 
   CONFIG.database_configs.each do |database|
     get database.url_path.to_s do
-      redirect "#{params[:database]}/app", 301
+      redirect "#{database.url_path}/app", 301
     end
 
     get "#{database.url_path}/app" do
@@ -71,7 +71,7 @@ class Server < Sinatra::Base
     get "#{database.url_path}/metadata" do
       database_config = @config.database_config_for(url_path: database.url_path)
       metadata = database_config.with_client do |client|
-        load_metadata(client, database_config.database, database_config.saved_path)
+        load_metadata(client, database_config)
       end
       status 200
       headers 'Content-Type': 'application/json'
@@ -120,7 +120,10 @@ class Server < Sinatra::Base
     body({ message: message, stacktrace: stacktrace }.compact.to_json)
   end
 
-  def load_metadata(client, database, saved_path)
+  def load_metadata(client, database_config)
+    database = database_config.client_params[:database]
+    saved_path = database_config.saved_path
+
     result = {
       server: @config.name,
       schemas: {},
