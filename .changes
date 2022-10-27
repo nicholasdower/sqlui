@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.20
 - Add execute and execute selection buttons.
 - Add support for ctrl-shift-enter to execute the entire editor contents.
 - Add support for executing more than one statement at once, for instance setting and using variables.

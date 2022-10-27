@@ -1,5 +1,15 @@
 # Changes
 
+## 0.1.20
+
+- Add execute and execute selection buttons.
+- Add support for ctrl-shift-enter to execute the entire editor contents.
+- Add support for executing more than one statement at once, for instance setting and using variables.
+- Add app name to header.
+- Add some error handling for app load and server requests.
+- Some style changes.
+- Fix bug where part of the result header was still displayed for an empty result.
+
 ## 0.1.19
 
 - Add ability to configure full path to databases and database list.
