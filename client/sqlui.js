@@ -325,6 +325,13 @@ function selectSavedTab () {
   window.savedLoaded = true
 }
 
+function submitAll () {
+  submit()
+}
+
+function submitCurrent () {
+  submit()
+}
 function submit () {
   const url = new URL(window.location)
   url.searchParams.set('cursor', getCursor())
@@ -658,7 +665,7 @@ window.onload = function () {
             window.metadata = result
             document.getElementById('loading-box').style.display = 'none'
             document.getElementById('main-box').style.display = 'flex'
-            document.getElementById('header').innerText = result.server
+            document.getElementById('server-name').innerText = result.server
             const queryElement = document.getElementById('query')
 
             init(queryElement, function () {

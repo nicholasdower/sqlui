@@ -1,5 +1,4 @@
 body {
-    font-size: 16px;
     margin: 0;
 }
 
@@ -25,14 +24,21 @@ body {
     min-height: 100%;
 }
 
-.header {
+.header, .server-name {
     display: flex;
-    flex: 1;
     align-items: center;
     justify-content: start;
-    padding-left: 5px;
     color: #333;
+}
+
+.header {
     font-weight: bold;
+    padding-left: 5px;
+}
+
+.server-name {
+    flex: 1;
+    padding-left: 15px;
 }
 
 .tabs-box {
@@ -40,7 +46,6 @@ body {
     flex-direction: row;
     border-bottom: 1px solid #ddd;
     height: 36px;
-    font-size: 16px;
     font-family: Helvetica;
 }
 
@@ -86,8 +91,15 @@ body {
 .submit-box {
     display: flex;
     border-top: 1px solid #ddd;
-    height: 36px;
     justify-content: right;
+}
+
+.submit-button {
+    cursor: pointer;
+    margin: 5px;
+    border: 1px solid #888;
+    background: none;
+    padding: 5px;
 }
 
 .status {
@@ -191,7 +203,6 @@ thead {
     padding-right: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
-    font-size: 16px;
     font-weight: bold;
 }
 
@@ -212,11 +223,6 @@ thead {
 
 .saved-box div:hover {
     background: #eee;
-}
-
-.submit-button {
-    cursor: pointer;
-    margin-right: 10px;
 }
 
 .cm-editor.cm-focused {

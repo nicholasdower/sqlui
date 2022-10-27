@@ -13,7 +13,8 @@
 
   <div id="main-box" class="main-box" style="display:none">
     <div class="tabs-box">
-      <div id="header" class="header">SQLUI</div>
+      <div class="header">SQLUI</div>
+      <div id="server-name" class="server-name"></div>
       <input id="query-tab-button" class="tab-button" type="button" value="Query" onclick="sqlui.selectTab('query')"></input>
       <input id="graph-tab-button" class="tab-button" type="button" value="Graph" onclick="sqlui.selectTab('graph')"></input>
       <input id="saved-tab-button" class="tab-button" type="button" value="Saved" onclick="sqlui.selectTab('saved')"></input>
@@ -24,11 +25,10 @@
       <div id="query"></div>
     </div>
 
-    <!--
     <div id="submit-box" class="submit-box tab-content-element graph-element query-element" style="display: none;">
-      <input id="submit-button" class="submit-button" type="button" value="submit" onclick="submit();"></input>
+      <input id="submit-all-button" class="submit-button" type="button" value="execute (ctrl-shift-enter)" onclick="submit();"></input>
+      <input id="submit-current-button" class="submit-button" type="button" value="execute selection (ctrl-enter)" onclick="submit();"></input>
     </div>
-    -->
 
     <div id="result-box" class="result-box tab-content-element query-element" style="display: none;">
     </div>
