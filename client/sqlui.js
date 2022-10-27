@@ -249,7 +249,7 @@ function selectGraphTab () {
 
   google.charts.load('current', { packages: ['corechart', 'line'] })
   google.charts.setOnLoadCallback(function () {
-    loadQueryOrGraphTab(loadGraphResult)
+    loadQueryOrGraphTab(loadGraphResult, queryErrorCallback('graph-status'))
   })
 
   const cursor = getCursor()
@@ -266,7 +266,19 @@ function selectQueryTab () {
   focus()
   setCursor(cursor)
 
-  loadQueryOrGraphTab(loadQueryResult)
+  loadQueryOrGraphTab(loadQueryResult, queryErrorCallback('query-status'))
+}
+
+function queryErrorCallback (statusElementId) {
+  const statusElement = document.getElementById(statusElementId)
+  return function (message, error) {
+    if (error) {
+      console.log(`${message}\n${error}`)
+      statusElement.innerText = `error: ${message} (check console)`
+    } else {
+      statusElement.innerText = `error: ${message}`
+    }
+  }
 }
 
 function selectSavedTab () {
@@ -374,7 +386,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sql, cursor, callback) {
+function fetchSql (sql, cursor, successCallback, errorCallback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -386,22 +398,62 @@ function fetchSql (sql, cursor, callback) {
       cursor
     })
   })
-    .then((response) => response.json())
-    .then((result) => callback(result))
+    .then((response) => {
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        response.json().then((result) => {
+          if (result?.query) {
+            successCallback(result)
+          } else if (result?.error) {
+            errorCallback(result.error, result.stacktrace)
+          } else if (result) {
+            errorCallback('failed to execute query', result.toString())
+          } else {
+            errorCallback('failed to execute query')
+          }
+        })
+      } else {
+        response.text().then((result) => {
+          errorCallback('failed to execute query', result)
+        })
+      }
+    })
+    .catch(function (error) {
+      errorCallback('failed to execute query', error.stack)
+    })
 }
 
-function fetchFile (name, callback) {
+function fetchFile (name, successCallback, errorCallback) {
   fetch(`query_file?file=${name}`, {
     headers: {
       Accept: 'application/json'
     },
     method: 'GET'
   })
-    .then((response) => response.json())
-    .then((result) => callback(result))
+    .then((response) => {
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        response.json().then((result) => {
+          if (result?.query) {
+            successCallback(result)
+          } else if (result?.error) {
+            errorCallback(result.error, result.stacktrace)
+          } else if (result) {
+            errorCallback('failed to load file  ', result.toString())
+          } else {
+            errorCallback('failed to load file')
+          }
+        })
+      } else {
+        errorCallback('failed to load file', response.toString())
+      }
+    })
+    .catch(function (error) {
+      errorCallback('failed to load file', error.stack)
+    })
 }
 
-function loadQueryOrGraphTab (callback) {
+function loadQueryOrGraphTab (callback, errorCallback) {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
   const file = params.get('file')
@@ -428,16 +480,14 @@ function loadQueryOrGraphTab (callback) {
     fetchSql(params.get('sql'), cursor, function (result) {
       window.result = result
       callback()
-    })
+    }, errorCallback)
   } else if (params.has('file')) {
     setValue('')
     fetchFile(file, function (result) {
       window.result = result
-      if (window.result.query) {
-        setValue(result.query)
-      }
+      setValue(result.query)
       callback()
-    })
+    }, errorCallback)
   }
   if (params.has('cursor')) {
     focus()
@@ -453,9 +503,9 @@ function loadQueryResult () {
 
   setQueryStatus(window.result)
 
-  if (!window.result.rows) {
-    return
-  }
+  // if (!window.result.rows) {
+  //   return
+  // }
 
   const tableElement = document.createElement('table')
   const theadElement = document.createElement('thead')
@@ -535,13 +585,6 @@ function loadGraphResult () {
 
 function setGraphStatus (result) {
   const statusElement = document.getElementById('graph-status')
-  if (!result.rows) {
-    // TODO use a popup
-    console.log('error parsing graph result')
-    console.log(JSON.stringify(result, null, 2))
-    statusElement.innerText = 'error, check console'
-    return
-  }
 
   if (result.total_rows === 1) {
     statusElement.innerText = `${result.total_rows} row`
@@ -556,13 +599,6 @@ function setGraphStatus (result) {
 
 function setQueryStatus (result) {
   const statusElement = document.getElementById('query-status')
-  if (!result.rows) {
-    // TODO use a popup
-    console.log('error parsing query result')
-    console.log(JSON.stringify(result, null, 2))
-    statusElement.innerText = 'error, check console'
-    return
-  }
 
   if (result.total_rows === 1) {
     statusElement.innerText = `${result.total_rows} row`
