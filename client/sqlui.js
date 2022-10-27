@@ -401,17 +401,6 @@ function fetchFile (name, callback) {
     .then((result) => callback(result))
 }
 
-function fetchMetadata (callback) {
-  fetch('metadata', {
-    headers: {
-      Accept: 'application/json'
-    },
-    method: 'GET'
-  })
-    .then((response) => response.json())
-    .then((result) => callback(result))
-}
-
 function loadQueryOrGraphTab (callback) {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
@@ -606,18 +595,59 @@ function route () {
 }
 
 window.onload = function () {
-  fetchMetadata(function (result) {
-    window.metadata = result
-    if (!result.server) {
-      // TODO show error
-      throw new Error('unexpected metadata response')
-    }
-    document.getElementById('header').innerText = result.server
-    const queryElement = document.getElementById('query')
-
-    init(queryElement, function () {
-      submit()
-    })
-    route()
+  fetch('metadata', {
+    headers: {
+      Accept: 'application/json'
+    },
+    method: 'GET'
   })
+    .then((response) => {
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        return response.json().then((result) => {
+          if (result.error) {
+            let error = `<pre>${result.error}`
+            if (result.stacktrace) {
+              error += '\n' + result.stacktrace + '</pre>'
+            }
+            document.getElementById('loading-box').innerHTML = error
+          } else if (!result.server) {
+            document.getElementById('loading-error').innerHTML = `
+                <pre>
+                  error loading metadata, response:
+                  ${JSON.stringify(result)}
+                </pre>
+              `
+          } else {
+            window.metadata = result
+            document.getElementById('loading-box').style.display = 'none'
+            document.getElementById('main-box').style.display = 'flex'
+            document.getElementById('header').innerText = result.server
+            const queryElement = document.getElementById('query')
+
+            init(queryElement, function () {
+              submit()
+            })
+            route()
+          }
+        })
+      } else {
+        console.log(response)
+        document.getElementById('loading-error').innerHTML = `
+                <pre>
+                  error loading metadata, response:
+                  ${response}
+                </pre>
+              `
+      }
+    })
+    .catch(function (error) {
+      console.log(error)
+      document.getElementById('loading-error').innerHTML = `
+                <pre>
+                  error loading metadata:
+                  ${error.stack}
+                </pre>
+              `
+    })
 }

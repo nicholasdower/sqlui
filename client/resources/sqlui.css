@@ -1,242 +1,255 @@
-    body {
-      font-size: 16px;
-      margin: 0;
-    }
+body {
+    font-size: 16px;
+    margin: 0;
+}
 
-    .main-box {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      margin: 0;
-      height: 100%;
-      min-height: 100%;
-    }
+.loading-box {
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0;
+    height: 100%;
+    min-height: 100%;
+    align-items: start;
+    justify-content: start;
+    padding: 10px;
+}
 
-    .header {
-      display: flex;
-      flex: 1;
-      align-items: center;
-      justify-content: start;
-      padding-left: 5px;
-      color: #333;
-      font-weight: bold;
-    }
+.main-box {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0;
+    height: 100%;
+    min-height: 100%;
+}
 
-    .tabs-box {
-      display: flex;
-      flex-direction: row;
-      border-bottom: 1px solid #ddd;
-      height: 36px;
-      font-size: 16px;
-      font-family: Helvetica;
-    }
+.header {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: start;
+    padding-left: 5px;
+    color: #333;
+    font-weight: bold;
+}
 
-    .tab-button, .selected-tab-button {
-      border: none;
-      outline: none;
-      cursor: pointer;
-      width: 150px;
-      padding: 2px;
-      margin: 0px;
-      display: flex;
-      justify-content: center;
-      background-color: #fff;
-    }
+.tabs-box {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #ddd;
+    height: 36px;
+    font-size: 16px;
+    font-family: Helvetica;
+}
 
-    .tab-button {
-      color: #888;
-    }
+.tab-button, .selected-tab-button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    width: 150px;
+    padding: 2px;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    background-color: #fff;
+}
 
-    .tab-button:hover {
-      color: #333;
-    }
+.tab-button {
+    color: #888;
+}
 
-    .selected-tab-button {
-      color: #333;
-      font-weight: bold;
-    }
+.tab-button:hover {
+    color: #333;
+}
 
-    .tab-content-element {
-      display: none;
-    }
+.selected-tab-button {
+    color: #333;
+    font-weight: bold;
+}
 
-    .query-box {
-      display: flex;
-      flex-direction: column;
-    }
+.tab-content-element {
+    display: none;
+}
 
-    .query {
-      display: flex;
-      flex: 1;
-    }
+.query-box {
+    display: flex;
+    flex-direction: column;
+}
 
-    .submit-box {
-      display: flex;
-      border-top: 1px solid #ddd;
-      height: 36px;
-      justify-content: right;
-    }
+.query {
+    display: flex;
+    flex: 1;
+}
 
-    .status {
-      display: flex;
-      justify-content: center;
-      align-content: center;
-      flex-direction: column;
-      font-family: Helvetica;
-    }
+.submit-box {
+    display: flex;
+    border-top: 1px solid #ddd;
+    height: 36px;
+    justify-content: right;
+}
 
-    .result-box, .saved-box, .graph-box, .structure-box {
-      flex: 1;
-      overflow: auto;
-      display: flex;
-      flex-direction: column;
-    }
+.status {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: Helvetica;
+}
 
-    .graph-box, .result-box {
-      border-top: 1px solid #ddd;
-    }
+.result-box, .saved-box, .graph-box, .structure-box {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
 
-    .graph-box {
-      padding: 20px;
-    }
+.graph-box, .result-box {
+    border-top: 1px solid #ddd;
+}
 
-    table {
-      font-family: monospace;
-      flex: 1;
-      border-spacing: 0px;
-      display: flex;
-      width: 100%;
-    }
+.graph-box {
+    padding: 20px;
+}
 
-    table td:last-child, table th:last-child {
-      width: 100%;
-      border-right: none !important;
-    }
+table {
+    font-family: monospace;
+    flex: 1;
+    border-spacing: 0px;
+    display: flex;
+    width: 100%;
+}
 
-    td, th {
-      padding: 5px 20px 5px 5px;
-      font-weight: normal;
-      white-space: nowrap;
-      max-width: 500px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+table td:last-child, table th:last-child {
+    width: 100%;
+    border-right: none !important;
+}
 
-    td {
-      text-align: right;
-    }
+td, th {
+    padding: 5px 20px 5px 5px;
+    font-weight: normal;
+    white-space: nowrap;
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-    th {
-      text-align: left;
-      font-weight: bold;
-      border-bottom: 1px solid #ddd;
-      border-right: 1px solid #ddd;
-    }
+td {
+    text-align: right;
+}
 
-    table {
-      display: block;
-    }
+th {
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
 
-    thead {
-      padding: 0px;
-      background-color: #fff;
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0px;
-      z-index: 100;
-      table-layout:fixed;
-    }
+table {
+    display: block;
+}
 
-    .highlighted-row {
-      background: #eee;
-    }
+thead {
+    padding: 0px;
+    background-color: #fff;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+    z-index: 100;
+    table-layout: fixed;
+}
 
-    .status-box {
-      padding: 5px;
-      display: flex;
-      flex-direction: rows;
-      justify-content: space-between;
-      border-top: 1px solid #ddd;
-      height: 30px;
-    }
+.highlighted-row {
+    background: #eee;
+}
 
-    .CodeMirror pre.CodeMirror-placeholder {
-      color: #999;
-    }
+.status-box {
+    padding: 5px;
+    display: flex;
+    flex-direction: rows;
+    justify-content: space-between;
+    border-top: 1px solid #ddd;
+    height: 30px;
+}
 
-    .tabs-box {
-      display: flex;
-    }
+.CodeMirror pre.CodeMirror-placeholder {
+    color: #999;
+}
 
-    .saved-box {
-      font-family: Helvetica;
-    }
+.tabs-box {
+    display: flex;
+}
 
-    .saved-box h1 {
-      margin: 0px;
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-top: 10px;
-      padding-bottom: 10px;
-      font-size: 16px;
-      font-weight: bold;
-    }
+.saved-box {
+    font-family: Helvetica;
+}
 
-    .saved-box div:first-child {
-      border-top: none !important;
-    }
+.saved-box h1 {
+    margin: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
 
-    .saved-box p {
-      margin: 0px;
-      padding-left: 20px;
-      padding-bottom: 20px;
-    }
+.saved-box div:first-child {
+    border-top: none !important;
+}
 
-    .saved-box div {
-      cursor: pointer;
-      border-top: 1px solid #eeeeee;
-    }
+.saved-box p {
+    margin: 0px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
 
-    .saved-box div:hover {
-      background: #eee;
-    }
+.saved-box div {
+    cursor: pointer;
+    border-top: 1px solid #eeeeee;
+}
 
-    .submit-button {
-      cursor: pointer;
-      margin-right: 10px;
-    }
+.saved-box div:hover {
+    background: #eee;
+}
 
-    .cm-editor.cm-focused {
-      outline: none !important;
-    }
+.submit-button {
+    cursor: pointer;
+    margin-right: 10px;
+}
 
-    .schemas, .tables {
-      border: none;
-      display: flex;
-      min-width: 200px;
-    }
+.cm-editor.cm-focused {
+    outline: none !important;
+}
 
-    .table-info {
-      display: grid;
-      grid-template-columns: 1;
-      grid-template-rows: 0.5fr 0.5fr;
-      justify-items: stretch;
-      flex: 1;
-    }
+.schemas, .tables {
+    border: none;
+    display: flex;
+    min-width: 200px;
+}
 
-    .columns {
-      border-bottom: 1px solid #ddd;
-      overflow: auto;
-      grid-column: 1;
-      grid-row: 1;
-    }
+.table-info {
+    display: grid;
+    grid-template-columns: 1;
+    grid-template-rows: 0.5fr 0.5fr;
+    justify-items: stretch;
+    flex: 1;
+}
 
-    .indexes {
-      overflow: auto;
-      grid-column: 1;
-      grid-row: 2;
-    }
+.columns {
+    border-bottom: 1px solid #ddd;
+    overflow: auto;
+    grid-column: 1;
+    grid-row: 1;
+}
 
-    select {
-      outline: none;
-    }
+.indexes {
+    overflow: auto;
+    grid-column: 1;
+    grid-row: 2;
+}
+
+select {
+    outline: none;
+}

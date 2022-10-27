@@ -13,10 +13,12 @@ require_relative 'sqlui'
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
   def self.init_and_run(config, resources_dir)
-    set :logging, true
-    set :bind,    '0.0.0.0'
-    set :port,    Environment.server_port
-    set :env,     Environment.server_env
+    set :logging,         true
+    set :bind,            '0.0.0.0'
+    set :port,            Environment.server_port
+    set :env,             Environment.server_env
+    set :raise_errors,    false
+    set :show_exceptions, false
 
     get '/-/health' do
       status 200
@@ -97,7 +99,7 @@ class Server < Sinatra::Base
         break client_error('missing cursor') unless params[:cursor]
 
         sql = SqlParser.find_statement_at_cursor(params[:sql], Integer(params[:cursor]))
-        raise "can't find query at cursor" unless sql
+        break client_error("can't find query at cursor") unless sql
 
         database_config = config.database_config_for(url_path: database.url_path)
         result = database_config.with_client do |client|
@@ -108,6 +110,16 @@ class Server < Sinatra::Base
         headers 'Content-Type': 'application/json'
         body result.to_json
       end
+    end
+
+    error do |e|
+      status 500
+      headers 'Content-Type': 'application/json'
+      result = {
+        error: e.message,
+        stacktrace: e.backtrace.map { |b| b }.join("\n")
+      }
+      body result.to_json
     end
 
     run!
