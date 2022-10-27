@@ -6,7 +6,7 @@ import { sql } from '@codemirror/lang-sql'
 
 /* global google */
 
-function init (parent, onSubmit) {
+function init (parent, onSubmit, onShiftSubmit) {
   const fixedHeightEditor = EditorView.theme({
     '.cm-scroller': { height: '200px', overflow: 'auto', resize: 'vertical' }
   })
@@ -14,7 +14,7 @@ function init (parent, onSubmit) {
     state: EditorState.create({
       extensions: [
         keymap.of([
-          { key: 'Ctrl-Enter', run: onSubmit, preventDefault: true },
+          { key: 'Ctrl-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
           ...defaultKeymap
         ]),
         basicSetup,
@@ -27,12 +27,19 @@ function init (parent, onSubmit) {
   })
 }
 
-function getCursor () {
-  return window.editorView.state.selection.main.head
+function getSelection () {
+  return [window.editorView.state.selection.main.from, window.editorView.state.selection.main.to]
 }
 
-function setCursor (cursor) {
-  window.editorView.dispatch({ selection: { anchor: Math.min(cursor, window.editorView.state.doc.length) } })
+function setSelection (selection) {
+  window.editorView.dispatch(
+    {
+      selection: {
+        anchor: Math.min(selection[0], window.editorView.state.doc.length),
+        head: Math.min(selection[1], window.editorView.state.doc.length)
+      }
+    }
+  )
 }
 
 function focus () {
@@ -223,7 +230,9 @@ function createTable (parent, columns, rows) {
     headerElement.innerText = columnName
     headerTrElement.appendChild(headerElement)
   })
-  headerTrElement.appendChild(document.createElement('th'))
+  if (columns.length > 0) {
+    headerTrElement.appendChild(document.createElement('th'))
+  }
   let highlight = false
   rows.forEach(function (row) {
     const rowElement = document.createElement('tr')
@@ -252,9 +261,9 @@ function selectGraphTab () {
     loadQueryOrGraphTab(loadGraphResult, queryErrorCallback('graph-status'))
   })
 
-  const cursor = getCursor()
+  const selection = getSelection()
   focus()
-  setCursor(cursor)
+  setSelection(selection)
 }
 
 function selectQueryTab () {
@@ -262,9 +271,9 @@ function selectQueryTab () {
     selected.style.display = 'flex'
   })
 
-  const cursor = getCursor()
+  const selection = getSelection()
   focus()
-  setCursor(cursor)
+  setSelection(selection)
 
   loadQueryOrGraphTab(loadQueryResult, queryErrorCallback('query-status'))
 }
@@ -325,16 +334,21 @@ function selectSavedTab () {
   window.savedLoaded = true
 }
 
-function submitAll () {
-  submit()
+export function submitAll () {
+  submit(null)
 }
 
-function submitCurrent () {
-  submit()
+export function submitCurrent () {
+  submit(getSelection())
 }
-function submit () {
+
+function submit (selection) {
   const url = new URL(window.location)
-  url.searchParams.set('cursor', getCursor())
+  if (selection) {
+    url.searchParams.set('selection', selection.join(':'))
+  } else {
+    url.searchParams.delete('selection')
+  }
 
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
@@ -393,7 +407,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sql, cursor, successCallback, errorCallback) {
+function fetchSql (sql, selection, successCallback, errorCallback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -402,7 +416,7 @@ function fetchSql (sql, cursor, successCallback, errorCallback) {
     method: 'POST',
     body: JSON.stringify({
       sql,
-      cursor
+      selection
     })
   })
     .then((response) => {
@@ -464,7 +478,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
   const file = params.get('file')
-  const cursor = params.has('cursor') ? params.get('cursor') : 0
+  const selection = params.has('selection') ? params.get('selection') : null
 
   if (params.has('sql') && window.result && sql === window.result.query) {
     callback()
@@ -474,7 +488,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
     return
   }
 
-  if (params.has('file') && params.has('sql') && cursor === window.result.cursor) {
+  if (params.has('file') && params.has('sql') && selection === window.result.selection) {
     // TODO: show an error.
     throw new Error('You can only specify a file or sql, not both.')
   }
@@ -483,8 +497,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
 
   if (params.has('sql')) {
     setValue(sql)
-    const cursor = params.has('cursor') ? params.get('cursor') : 0
-    fetchSql(params.get('sql'), cursor, function (result) {
+    fetchSql(params.get('sql'), selection, function (result) {
       window.result = result
       callback()
     }, errorCallback)
@@ -496,9 +509,9 @@ function loadQueryOrGraphTab (callback, errorCallback) {
       callback()
     }, errorCallback)
   }
-  if (params.has('cursor')) {
+  if (params.has('selection')) {
     focus()
-    setCursor(cursor)
+    setSelection(params.get('selection').split(':'))
   }
 }
 
@@ -528,7 +541,9 @@ function loadQueryResult () {
     template.innerHTML = `<th class="cell">${column}</th>`
     headerElement.appendChild(template.content.firstChild)
   })
-  headerElement.appendChild(document.createElement('th'))
+  if (window.result.columns.length > 0) {
+    headerElement.appendChild(document.createElement('th'))
+  }
   let highlight = false
   window.result.rows.forEach(function (row) {
     const rowElement = document.createElement('tr')
@@ -655,7 +670,7 @@ window.onload = function () {
             }
             document.getElementById('loading-box').innerHTML = error
           } else if (!result.server) {
-            document.getElementById('loading-error').innerHTML = `
+            document.getElementById('loading-box').innerHTML = `
                 <pre>
                   error loading metadata, response:
                   ${JSON.stringify(result)}
@@ -668,29 +683,21 @@ window.onload = function () {
             document.getElementById('server-name').innerText = result.server
             const queryElement = document.getElementById('query')
 
-            init(queryElement, function () {
-              submit()
-            })
+            init(queryElement, submitCurrent, submitAll)
             route()
           }
         })
       } else {
         console.log(response)
-        document.getElementById('loading-error').innerHTML = `
-                <pre>
-                  error loading metadata, response:
-                  ${response}
-                </pre>
-              `
+        document.getElementById('loading-box').style.display = 'flex'
+        document.getElementById('main-box').style.display = 'none'
+        document.getElementById('loading-box').innerHTML = `<pre>${response}</pre>`
       }
     })
     .catch(function (error) {
       console.log(error)
-      document.getElementById('loading-error').innerHTML = `
-                <pre>
-                  error loading metadata:
-                  ${error.stack}
-                </pre>
-              `
+      document.getElementById('loading-box').style.display = 'flex'
+      document.getElementById('main-box').style.display = 'none'
+      document.getElementById('loading-box').innerHTML = `<pre>${error.stack}</pre>`
     })
 }

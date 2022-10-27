@@ -96,15 +96,26 @@ class Server < Sinatra::Base
       post "#{database.url_path}/query" do
         params.merge!(JSON.parse(request.body.read, symbolize_names: true))
         break client_error('missing sql') unless params[:sql]
-        break client_error('missing cursor') unless params[:cursor]
 
-        sql = SqlParser.find_statement_at_cursor(params[:sql], Integer(params[:cursor]))
-        break client_error("can't find query at cursor") unless sql
+        sql = params[:sql]
+        selection = params[:selection]
+        if selection
+          selection = selection.split(':').map { |v| Integer(v) }
+
+          sql = if selection[0] == selection[1]
+                  SqlParser.find_statement_at_cursor(params[:sql], selection[0])
+                else
+                  params[:sql][selection[0], selection[1]]
+                end
+          break client_error("can't find query at selection") unless sql
+        end
 
         database_config = config.database_config_for(url_path: database.url_path)
         result = database_config.with_client do |client|
           execute_query(client, sql)
         end
+
+        result[:selection] = params[:selection]
 
         status 200
         headers 'Content-Type': 'application/json'
@@ -134,14 +145,26 @@ class Server < Sinatra::Base
   end
 
   def execute_query(client, sql)
-    result = client.query(sql)
+    if sql.include?(';')
+      results = sql.split(/(?<=;)/).map { |current| client.query(current) }
+      result = results[-1]
+    else
+      result = client.query(sql)
+    end
     # NOTE: the call to result.field_types must go before any other interaction with the result. Otherwise you will
     # get a seg fault. Seems to be a bug in Mysql2.
-    column_types = MysqlTypes.map_to_google_charts_types(result.field_types)
-    rows = result.map(&:values)
+    if result
+      column_types = MysqlTypes.map_to_google_charts_types(result.field_types)
+      rows = result.map(&:values)
+      columns = result.first&.keys || []
+    else
+      column_types = []
+      rows = []
+      columns = []
+    end
     {
       query: sql,
-      columns: result.first&.keys || [],
+      columns: columns,
       column_types: column_types,
       total_rows: rows.size,
       rows: rows.take(Sqlui::MAX_ROWS)

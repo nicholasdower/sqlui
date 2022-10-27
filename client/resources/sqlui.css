@@ -108,6 +108,8 @@ body {
     align-content: center;
     flex-direction: column;
     font-family: Helvetica;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .result-box, .saved-box, .graph-box, .structure-box {
