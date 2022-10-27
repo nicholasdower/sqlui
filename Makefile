@@ -102,7 +102,7 @@ start-server-detached:
 	docker compose up --detach server
 
 start-server-local:
-	DB_HOST=127.0.0.1 DB_PORT=3306 ./scripts/rerun --dir app --dir client/resources --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml
+	DB_HOST=127.0.0.1 DB_PORT=3306 ./scripts/rerun --dir bin --dir app --dir client/resources --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml
 
 start-hub:
 	docker compose up hub node-chrome

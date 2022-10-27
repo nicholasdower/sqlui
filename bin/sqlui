@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../app/server'
+require_relative '../app/sqlui'
+
+Sqlui.from_command_line(ARGV).run
