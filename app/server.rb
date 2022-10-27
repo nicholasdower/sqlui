@@ -6,6 +6,7 @@ require 'sinatra/base'
 require 'uri'
 require_relative 'database_metadata'
 require_relative 'environment'
+require_relative 'mysql_types'
 require_relative 'sql_parser'
 require_relative 'sqlui_config'
 
@@ -75,7 +76,20 @@ class Server < Sinatra::Base
     get "#{database.url_path}/metadata" do
       database_config = @config.database_config_for(url_path: database.url_path)
       metadata = database_config.with_client do |client|
-        load_metadata(client, database_config)
+        {
+          server: @config.name,
+          schemas: DatabaseMetadata.lookup(client, database_config),
+          saved: Dir.glob("#{database_config.saved_path}/*.sql").map do |path|
+            comment_lines = File.readlines(path).take_while do |l|
+              l.start_with?('--')
+            end
+            description = comment_lines.map { |l| l.sub(/^-- */, '') }.join
+            {
+              filename: File.basename(path),
+              description: description
+            }
+          end
+        }
       end
       status 200
       headers 'Content-Type': 'application/json'
@@ -83,8 +97,8 @@ class Server < Sinatra::Base
     end
 
     get "#{database.url_path}/query_file" do
-      return client_error('missing file param') unless params[:file]
-      return client_error('no such file') unless File.exist?(params[:file])
+      break client_error('missing file param') unless params[:file]
+      break client_error('no such file') unless File.exist?(params[:file])
 
       database_config = @config.database_config_for(url_path: database.url_path)
       sql = File.read(File.join(database_config.saved_path, params[:file]))
@@ -99,8 +113,8 @@ class Server < Sinatra::Base
 
     post "#{database.url_path}/query" do
       params.merge!(JSON.parse(request.body.read, symbolize_names: true))
-      return client_error('missing sql') unless params[:sql]
-      return client_error('missing cursor') unless params[:cursor]
+      break client_error('missing sql') unless params[:sql]
+      break client_error('missing cursor') unless params[:cursor]
 
       sql = SqlParser.find_statement_at_cursor(params[:sql], Integer(params[:cursor]))
       raise "can't find query at cursor" unless sql
@@ -121,56 +135,18 @@ class Server < Sinatra::Base
   def client_error(message, stacktrace: nil)
     status(400)
     headers('Content-Type': 'application/json')
-    body({ message: message, stacktrace: stacktrace }.compact.to_json)
-  end
-
-  def load_metadata(client, database_config)
-    {
-      server: @config.name,
-      schemas: DatabaseMetadata.lookup(client, database_config),
-      saved: Dir.glob("#{database_config.saved_path}/*.sql").map do |path|
-        {
-          filename: File.basename(path),
-          description: File.readlines(path).take_while { |l| l.start_with?('--') }.map { |l| l.sub(/^-- */, '') }.join
-        }
-      end
-    }
+    body({ error: message, stacktrace: stacktrace }.compact.to_json)
   end
 
   def execute_query(client, sql)
-    result = client.query(sql, cast: false)
+    result = client.query(sql)
+    # NOTE: the call to result.field_types must go before any other interaction with the result. Otherwise you will
+    # get a seg fault. Seems to be a bug in Mysql2.
+    column_types = MysqlTypes.map_to_google_charts_types(result.field_types)
     rows = result.map(&:values)
-    columns = result.first&.keys || []
-    # TODO: use field_types
-    column_types = columns.map { |_| 'string' }
-    unless rows.empty?
-      maybe_non_null_column_value_exemplars = columns.each_with_index.map do |_, index|
-        row = rows.find do |current|
-          !current[index].nil?
-        end
-        row.nil? ? nil : row[index]
-      end
-      column_types = maybe_non_null_column_value_exemplars.map do |value|
-        case value
-        when String, NilClass
-          'string'
-        when Integer, Float
-          'number'
-        when Date
-          'date'
-        when Time
-          'datetime'
-        when TrueClass, FalseClass
-          'boolean'
-        else
-          # TODO: report an error
-          value.class.to_s
-        end
-      end
-    end
     {
       query: sql,
-      columns: columns,
+      columns: result.first&.keys || [],
       column_types: column_types,
       total_rows: rows.size,
       rows: rows.take(MAX_ROWS)

@@ -518,8 +518,11 @@ function loadGraphResult () {
 
   window.result.rows.forEach((row) => {
     const rowValues = row.map((value, index) => {
-      if (window.result.column_types[index] === 'date') {
+      if (window.result.column_types[index] === 'date' || window.result.column_types[index] === 'datetime') {
         return new Date(value)
+      } else if (window.result.column_types[index] === 'timeofday') {
+        // TODO: This should be hour, minute, second, milliseconds
+        return [0, 0, 0, 0]
       } else {
         return value
       }
