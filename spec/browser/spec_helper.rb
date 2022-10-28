@@ -27,6 +27,23 @@ def wait_until_results(wait, *results)
   expect(rows).to eq(results)
 end
 
+def wait_until_no_results(wait)
+  wait.until do
+    driver.find_elements(css: '#result-box > table > thead > tr > th.cell').empty?
+  end
+  wait.until do
+    driver.find_elements(css: '#result-box > table > tbody > tr').empty?
+  end
+end
+
+def wait_until_query_error(wait, error_matcher)
+  error_element = wait.until do
+    element = driver.find_element(css: '#status-box > #query-status')
+    element if element && element.displayed?
+  end
+  expect(error_element.text).to match(error_matcher)
+end
+
 def url(path)
   "http://#{SERVER_HOST}:#{SERVER_PORT}#{path}"
 end

@@ -24,56 +24,125 @@ describe 'query' do
     end
   end
 
-  context 'when sql specified via editor' do
-    before do
-      driver.get(url('/sqlui/seinfeld/app'))
-      editor = wait_until_editor(wait)
-      editor.send_keys('select id, name, description from characters order by id limit 2;')
-      editor.send_keys(%i[control enter])
+  shared_examples_for 'submitted queries' do
+    context 'when single editor query specified' do
+      before do
+        driver.get(url('/sqlui/seinfeld/app'))
+        editor = wait_until_editor(wait)
+        editor.send_keys('select id, name, description from characters order by id limit 2;')
+        execute
+      end
+
+      it 'loads expected results' do
+        wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
+                           ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+      end
     end
 
-    it 'loads expected results' do
-      wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
-                         ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+    context 'when first of two editor queries executed via cursor position' do
+      before do
+        driver.get(url('/sqlui/seinfeld/app'))
+        editor = wait_until_editor(wait)
+        editor.send_keys(
+          <<~SQL
+            select id, name, description from characters where id = 1;
+  
+            select id, name, description from characters where id = 2;
+          SQL
+        )
+        editor.send_keys(%i[up up up])
+        execute
+      end
+
+      it 'loads expected results' do
+        wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'])
+      end
+    end
+
+    context 'when second of two editor queries executed via cursor position' do
+      before do
+        driver.get(url('/sqlui/seinfeld/app'))
+        editor = wait_until_editor(wait)
+        editor.send_keys(
+          <<~SQL
+            select id, name, description from characters where id = 1;
+  
+            select id, name, description from characters where id = 2;
+          SQL
+        )
+        execute
+      end
+
+      it 'loads expected results' do
+        wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+      end
+    end
+
+    context 'when invalid sql executed via editor' do
+      before do
+        driver.get(url('/sqlui/seinfeld/app'))
+        editor = wait_until_editor(wait)
+        editor.send_keys('foo')
+        execute
+      end
+
+      it 'displays an error and no results' do
+        wait_until_query_error(wait, /^error: You have an error in your SQL syntax;/)
+        wait_until_no_results(wait)
+      end
+    end
+
+    context 'when multiple statements executed via selection' do
+      before do
+        driver.get(url('/sqlui/seinfeld/app'))
+        editor = wait_until_editor(wait)
+        editor.send_keys(
+          <<~SQL
+          set @foo = 2;
+
+          select id, name, description from characters where id = @foo;
+        SQL
+        )
+        editor.send_keys(%i[shift up up up])
+        execute
+      end
+
+      it 'loads expected results' do
+        wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+      end
+    end
+
+    context 'when multiple statements executed' do
+      before do
+        driver.get(url('/sqlui/seinfeld/app'))
+        editor = wait_until_editor(wait)
+        editor.send_keys(
+          <<~SQL
+          set @foo = 2;
+
+          select id, name, description from characters where id = @foo;
+        SQL
+        )
+        execute_all
+      end
+
+      it 'loads expected results' do
+        wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+      end
     end
   end
 
-  context 'when first of two editor queries executed via cursor position' do
-    before do
-      driver.get(url('/sqlui/seinfeld/app'))
-      editor = wait_until_editor(wait)
-      editor.send_keys(
-        <<~SQL
-          select id, name, description from characters where id = 1;
+  context 'keyboarding' do
+    let(:execute) { driver.find_element(class: 'cm-content').send_keys(%i[control enter]) }
+    let(:execute_all) { driver.find_element(class: 'cm-content').send_keys(%i[shift control enter]) }
 
-          select id, name, description from characters where id = 2;
-        SQL
-      )
-      editor.send_keys(%i[up up up])
-      editor.send_keys(%i[control enter])
-    end
-
-    it 'loads expected results' do
-      wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'])
-    end
+    include_examples 'submitted queries'
   end
 
-  context 'when second of two editor queries executed via cursor position' do
-    before do
-      driver.get(url('/sqlui/seinfeld/app'))
-      editor = wait_until_editor(wait)
-      editor.send_keys(
-        <<~SQL
-          select id, name, description from characters where id = 1;
+  context 'mousing' do
+    let(:execute) { driver.find_element(id: 'submit-current-button').click }
+    let(:execute_all) { driver.find_element(id: 'submit-all-button').click }
 
-          select id, name, description from characters where id = 2;
-        SQL
-      )
-      editor.send_keys(%i[control enter])
-    end
-
-    it 'loads expected results' do
-      wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
-    end
+    include_examples 'submitted queries'
   end
 end
