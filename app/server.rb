@@ -56,12 +56,11 @@ class Server < Sinatra::Base
       end
 
       get "#{database.url_path}/metadata" do
-        database_config = config.database_config_for(url_path: database.url_path)
-        metadata = database_config.with_client do |client|
+        metadata = database.with_client do |client|
           {
             server: config.name,
-            schemas: DatabaseMetadata.lookup(client, database_config),
-            saved: Dir.glob("#{database_config.saved_path}/*.sql").map do |path|
+            schemas: DatabaseMetadata.lookup(client, database),
+            saved: Dir.glob("#{database.saved_path}/*.sql").map do |path|
               comment_lines = File.readlines(path).take_while do |l|
                 l.start_with?('--')
               end
@@ -82,9 +81,8 @@ class Server < Sinatra::Base
         break client_error('missing file param') unless params[:file]
         break client_error('no such file') unless File.exist?(params[:file])
 
-        database_config = config.database_config_for(url_path: database.url_path)
-        sql = File.read(File.join(database_config.saved_path, params[:file]))
-        result = database_config.with_client do |client|
+        sql = File.read(File.join(database.saved_path, params[:file]))
+        result = database.with_client do |client|
           execute_query(client, sql).tap { |r| r[:file] = params[:file] }
         end
 
@@ -110,8 +108,7 @@ class Server < Sinatra::Base
           break client_error("can't find query at selection") unless sql
         end
 
-        database_config = config.database_config_for(url_path: database.url_path)
-        result = database_config.with_client do |client|
+        result = database.with_client do |client|
           execute_query(client, sql)
         end
 

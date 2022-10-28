@@ -26,7 +26,7 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 3306
-    command: bash -c "cd /sqlui && ./scripts/rerun --dir bin --dir app --dir client/resources --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml"
+    command: bash -c "cd /sqlui && ./scripts/rerun --dir bin --dir app --dir client/resources --dir sql --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml"
     volumes:
       - .:/sqlui
     ports:

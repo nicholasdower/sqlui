@@ -102,7 +102,7 @@ start-server-detached:
 	docker compose up --detach server
 
 start-server-local:
-	DB_HOST=127.0.0.1 DB_PORT=3306 ./scripts/rerun --dir bin --dir app --dir client/resources --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml
+	DB_HOST=127.0.0.1 DB_PORT=3306 ./scripts/rerun --dir bin --dir app --dir client/resources --dir sql --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml
 
 start-hub:
 	docker compose up hub node-chrome
@@ -114,12 +114,12 @@ test: create-network
 	$(RUN_IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 watch-test:
-	./scripts/rerun --dir app --dir client/resources --dir spec make test
+	./scripts/rerun --dir app --dir client/resources --dir sql --dir spec make test
 
 test-local:
 	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 watch-test-local:
-	./scripts/rerun --dir app --dir client/resources --dir spec make test-local
+	./scripts/rerun --dir app --dir client/resources --dir sql --dir spec make test-local
 
 start-test-stop: start-detached test stop

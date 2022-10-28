@@ -40,7 +40,7 @@ describe MysqlTypes do
     end
 
     context 'when an unknown type is specified' do
-      let(:types) { %w[int varchar, foo] }
+      let(:types) { %w[int varchar foo] }
 
       it 'returns string as a default' do
         expect(subject).to eq(%w[number string string])

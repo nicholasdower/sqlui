@@ -1,66 +1,98 @@
 <html>
-  <head>
-    <title>Databases</title>
+<head>
+  <title>Databases</title>
 
-    <style>
+  <style>
       body {
-        font-family: Helvetica;
-        margin: 0px;
+          font-family: Helvetica;
+          margin: 0px;
       }
 
       h1 {
-        font-size: 30px;
-        margin: 10px;
+          font-size: 22px;
+      }
 
+      h2 {
+          font-size: 20px;
+      }
+
+      p {
+          font-size: 18px;
+      }
+
+      .header-box {
+          display: flex;
+          flex-direction: row;
+          border-bottom: 1px solid #ddd;
+          height: 36px;
+          font-family: Helvetica;
+      }
+
+      .header, .server-name {
+          display: flex;
+          align-items: center;
+          justify-content: start;
+          color: #333;
+      }
+
+      .server-name {
+          flex: 1;
+          padding-left: 15px;
+          font-weight: normal;
+      }
+
+      .header {
+          font-weight: bold;
+          padding-left: 5px;
       }
 
       .database a {
-        margin-right: 10px;
-        color: darkblue;
-        font-size: 16px;
+          margin-right: 10px;
+          color: darkblue;
+          font-size: 16px
       }
 
       .database h2 {
-        margin: 0px;
-        font-size: 20px;
-        font-weight: bold;
+          margin: 0px;
       }
 
       .database p {
-        margin: 0px;
-        margin-top: 10px;
-        font-size: 16px;
+          margin: 0px;
+          margin-top: 10px;
       }
 
       .database {
-        margin: 0px;
-        padding: 10px;
-        cursor: pointer;
-        border-bottom: 1px solid #eeeeee;
+          margin: 0px;
+          padding: 10px;
+          cursor: pointer;
+          border-bottom: 1px solid #eeeeee;
       }
 
       .database:last-child {
-        border-bottom: none;
+          border-bottom: none;
       }
 
       .database:hover {
-        background: #eee;
+          background: #eee;
       }
-    </style>
-  </head>
+  </style>
+</head>
 
-  <body>
-    <h1><% config.name %> Databases</h1>
-    <% config.database_configs.each do |database_config| %>
-      <div class="database" onclick="window.location='<%= "#{database_config.url_path}/app" %>'">
-      <h2 class='name'><%= database_config.display_name %></h2>
-      <a class='query-link' href="<%= database_config.url_path %>/app">query</a>
-      <a class='saved-link' href="<%= database_config.url_path %>/app?tab=saved">saved</a>
-      <a class='structure-link' href="<%= database_config.url_path %>/app?tab=structure">structure</a>
-      <p class='description'>
-        <%= database_config.description %>
-      </p>
-    </div>
-    <% end %>
-  </body>
+<body>
+<div class="header-box">
+  <h1 class="header">SQLUI</h1>
+  <h1 class="server-name"><%= config.name %> Databases</h1>
+</div>
+<% config.database_configs.each do |database_config| %>
+  <div class="database" onclick="window.location='<%= "#{database_config.url_path}/app" %>'">
+    <h2 class='name'><%= database_config.display_name %></h2>
+    <a class='query-link' href="<%= database_config.url_path %>/app">query</a>
+    <a class='saved-link' href="<%= database_config.url_path %>/app?tab=saved">saved</a>
+    <a class='structure-link' href="<%= database_config.url_path %>/app?tab=structure">structure</a>
+    <p class='description'>
+      <%= database_config.description %>
+    </p>
+  </div>
+<% end %>
+</body>
 </html>

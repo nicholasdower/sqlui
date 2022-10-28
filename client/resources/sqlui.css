@@ -2,6 +2,18 @@ body {
     margin: 0;
 }
 
+h1 {
+    font-size: 22px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+p {
+    font-size: 18px;
+}
+
 .loading-box {
     font-family: monospace;
     display: flex;
@@ -36,9 +48,15 @@ body {
     padding-left: 5px;
 }
 
+.header a {
+    text-decoration: none;
+    color: #333
+}
+
 .server-name {
     flex: 1;
     padding-left: 15px;
+    font-weight: normal;
 }
 
 .tabs-box {
@@ -110,6 +128,7 @@ body {
     font-family: Helvetica;
     white-space: nowrap;
     overflow: hidden;
+    font-size: 18px;
 }
 
 .result-box, .saved-box, .graph-box, .structure-box {
@@ -199,28 +218,28 @@ thead {
     font-family: Helvetica;
 }
 
-.saved-box h1 {
+.saved-box h2 {
     margin: 0px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
     font-weight: bold;
 }
 
-.saved-box div:first-child {
+.saved-list-item:last-child {
     border-top: none !important;
 }
 
 .saved-box p {
     margin: 0px;
-    padding-left: 20px;
-    padding-bottom: 20px;
 }
 
-.saved-box div {
+.saved-list-item {
     cursor: pointer;
-    border-top: 1px solid #eeeeee;
+    border-bottom: 1px solid #eeeeee;
+    margin: 0px;
+    padding: 10px;
+}
+
+.saved-list-item h2 {
+    margin: 0px 0px 5px;
 }
 
 .saved-box div:hover {
