@@ -9,7 +9,7 @@ class MysqlTypes
   class << self
     def map_to_google_charts_types(types)
       types.map do |type|
-        type.gsub!(/\([^)]*\)/, '').strip!
+        type = type.gsub(/\([^)]*\)/, '').strip
         case type
         when 'bool', 'boolean'
           'boolean'
