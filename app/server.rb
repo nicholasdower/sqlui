@@ -79,9 +79,11 @@ class Server < Sinatra::Base
 
       get "#{database.url_path}/query_file" do
         break client_error('missing file param') unless params[:file]
-        break client_error('no such file') unless File.exist?(params[:file])
 
-        sql = File.read(File.join(database.saved_path, params[:file]))
+        file = File.join(database.saved_path, params[:file])
+        break client_error('no such file') unless File.exist?(file)
+
+        sql = File.read(file)
         result = database.with_client do |client|
           execute_query(client, sql).tap { |r| r[:file] = params[:file] }
         end
@@ -123,8 +125,10 @@ class Server < Sinatra::Base
     error do |e|
       status 500
       headers 'Content-Type': 'application/json'
+      message = e.message.lines.first&.strip || 'unexpected error'
+      message = "#{message[0..80]}…" if message.length > 80
       result = {
-        error: e.message,
+        error: message,
         stacktrace: e.backtrace.map { |b| b }.join("\n")
       }
       body result.to_json
@@ -142,12 +146,13 @@ class Server < Sinatra::Base
   end
 
   def execute_query(client, sql)
-    if sql.include?(';')
-      results = sql.split(/(?<=;)/).map { |current| client.query(current) }
-      result = results[-1]
-    else
-      result = client.query(sql)
-    end
+    queries = if sql.include?(';')
+                sql.split(/(?<=;)/).map(&:strip).reject(&:empty?)
+              else
+                [sql]
+              end
+    results = queries.map { |current| client.query(current) }
+    result = results[-1]
     # NOTE: the call to result.field_types must go before any other interaction with the result. Otherwise you will
     # get a seg fault. Seems to be a bug in Mysql2.
     if result

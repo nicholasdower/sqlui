@@ -25,6 +25,7 @@ p {
     align-items: start;
     justify-content: start;
     padding: 10px;
+    color: #333;
 }
 
 .main-box {
@@ -64,7 +65,7 @@ p {
     flex-direction: row;
     border-bottom: 1px solid #ddd;
     height: 36px;
-    font-family: Helvetica;
+    font-family: Helvetica, sans-serif;
 }
 
 .tab-button, .selected-tab-button {
@@ -73,10 +74,11 @@ p {
     cursor: pointer;
     width: 150px;
     padding: 2px;
-    margin: 0px;
+    margin: 0;
     display: flex;
     justify-content: center;
     background-color: #fff;
+    font-size: 18px;
 }
 
 .tab-button {
@@ -118,6 +120,8 @@ p {
     border: 1px solid #888;
     background: none;
     padding: 5px;
+    font-size: 18px;
+    color: #333;
 }
 
 .status {
@@ -125,10 +129,11 @@ p {
     justify-content: center;
     align-content: center;
     flex-direction: column;
-    font-family: Helvetica;
+    font-family: Helvetica, sans-serif;
     white-space: nowrap;
     overflow: hidden;
     font-size: 18px;
+    color: #333;
 }
 
 .result-box, .saved-box, .graph-box, .structure-box {
@@ -149,9 +154,10 @@ p {
 table {
     font-family: monospace;
     flex: 1;
-    border-spacing: 0px;
+    border-spacing: 0;
     display: flex;
     width: 100%;
+    color: #333;
 }
 
 table td:last-child, table th:last-child {
@@ -184,11 +190,11 @@ table {
 }
 
 thead {
-    padding: 0px;
+    padding: 0;
     background-color: #fff;
     position: -webkit-sticky;
     position: sticky;
-    top: 0px;
+    top: 0;
     z-index: 100;
     table-layout: fixed;
 }
@@ -200,7 +206,7 @@ thead {
 .status-box {
     padding: 5px;
     display: flex;
-    flex-direction: rows;
+    flex-direction: row;
     justify-content: space-between;
     border-top: 1px solid #ddd;
     height: 30px;
@@ -215,11 +221,11 @@ thead {
 }
 
 .saved-box {
-    font-family: Helvetica;
+    font-family: Helvetica, sans-serif;
 }
 
 .saved-box h2 {
-    margin: 0px;
+    margin: 0;
     font-weight: bold;
 }
 
@@ -228,18 +234,18 @@ thead {
 }
 
 .saved-box p {
-    margin: 0px;
+    margin: 0;
 }
 
 .saved-list-item {
     cursor: pointer;
     border-bottom: 1px solid #eeeeee;
-    margin: 0px;
+    margin: 0;
     padding: 10px;
 }
 
 .saved-list-item h2 {
-    margin: 0px 0px 5px;
+    margin: 0 0 5px;
 }
 
 .saved-box div:hover {
@@ -258,7 +264,6 @@ thead {
 
 .table-info {
     display: grid;
-    grid-template-columns: 1;
     grid-template-rows: 0.5fr 0.5fr;
     justify-items: stretch;
     flex: 1;
@@ -279,4 +284,5 @@ thead {
 
 select {
     outline: none;
+    color: #333;
 }

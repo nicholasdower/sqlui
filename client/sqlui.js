@@ -312,6 +312,7 @@ function selectSavedTab () {
   }
   saved.forEach(file => {
     const divElement = document.createElement('div')
+    divElement.classList.add('saved-list-item')
     divElement.addEventListener('click', function (event) {
       clearResult()
       const url = new URL(window.location)
@@ -321,7 +322,7 @@ function selectSavedTab () {
       window.history.pushState({}, '', url)
       route()
     })
-    const nameElement = document.createElement('h1')
+    const nameElement = document.createElement('h2')
     nameElement.innerText = file.filename
     divElement.appendChild(nameElement)
 

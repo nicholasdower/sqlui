@@ -35,7 +35,6 @@ describe 'databases' do
       element = driver.find_element(css: '#result-box')
       element if element&.displayed?
     end
-    driver.navigate.back
   end
 
   it 'links to the saved tab' do
@@ -49,7 +48,6 @@ describe 'databases' do
       element = driver.find_element(css: '#saved-box')
       element if element&.displayed?
     end
-    driver.navigate.back
   end
 
   it 'links to the query tab' do
@@ -63,6 +61,5 @@ describe 'databases' do
       element = driver.find_element(css: '#structure-box')
       element if element&.displayed?
     end
-    driver.navigate.back
   end
 end
