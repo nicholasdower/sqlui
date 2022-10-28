@@ -104,8 +104,7 @@ p {
 }
 
 .query {
-    display: flex;
-    flex: 1;
+    font-size: 18px;
 }
 
 .submit-box {
@@ -158,6 +157,7 @@ table {
     display: flex;
     width: 100%;
     color: #333;
+    font-size: 18px;
 }
 
 table td:last-child, table th:last-child {
@@ -285,4 +285,5 @@ thead {
 select {
     outline: none;
     color: #333;
+    font-size: 18px;
 }

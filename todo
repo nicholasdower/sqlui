@@ -51,3 +51,6 @@ add github action to update deps
 executing all causes the cursor to be reset to 0. it also isn't in the url
 make status have a tooltip with the full error.
 add a tooltip to execute buttons ;)
+make "check console" a link that opens the console?
+fix editor and table text sizes.
+add a cancel button when the spinner is displayed
