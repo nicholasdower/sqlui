@@ -42,6 +42,12 @@
           font-weight: normal;
       }
 
+      .name-and-links {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+      }
+
       .header {
           font-weight: bold;
           padding-left: 5px;
@@ -55,7 +61,7 @@
       }
 
       .database h2 {
-          margin: 0 0 5px;
+          margin: 0 10px 0 0;
       }
 
       .database p {
@@ -77,6 +83,18 @@
           background: #eee;
       }
   </style>
+
+  <script>
+    function openDatabase(event, url) {
+      if (event.shiftKey) {
+        window.open(url, '_blank').focus()
+      } else if (event.metaKey) {
+        window.open(url).focus()
+      } else {
+        window.location = url
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -85,11 +103,13 @@
   <h1 class="server-name"><%= config.name %> Databases</h1>
 </div>
 <% config.database_configs.each do |database_config| %>
-  <div class="database" onclick="window.location='<%= "#{database_config.url_path}/app" %>'">
-    <h2 class='name'><%= database_config.display_name %></h2>
-    <a class='query-link' href="<%= database_config.url_path %>/app">query</a>
-    <a class='saved-link' href="<%= database_config.url_path %>/app?tab=saved">saved</a>
-    <a class='structure-link' href="<%= database_config.url_path %>/app?tab=structure">structure</a>
+  <div class="database" onclick="openDatabase(event, '<%= "#{database_config.url_path}/app" %>')">
+    <div class="name-and-links">
+      <h2 class='name'><%= database_config.display_name %></h2>
+      <a class='query-link' href="<%= database_config.url_path %>/app" onclick="event.stopPropagation()">query</a>
+      <a class='saved-link' href="<%= database_config.url_path %>/app?tab=saved" onclick="event.stopPropagation()">saved</a>
+      <a class='structure-link' href="<%= database_config.url_path %>/app?tab=structure" onclick="event.stopPropagation()">structure</a>
+    </div>
     <p class='description'>
       <%= database_config.description %>
     </p>

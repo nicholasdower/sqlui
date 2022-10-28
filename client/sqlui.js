@@ -60,25 +60,37 @@ function setValue (value) {
   })
 }
 
-export function selectTab (tab) {
+function goToUrl (event, url) {
+  console.log(url)
+  console.log(event)
+  if (event && event.shiftKey) {
+    window.open(url, '_blank').focus()
+  } else if (event && event.metaKey) {
+    window.open(url).focus()
+  } else {
+    window.history.pushState({}, '', url)
+  }
+}
+
+export function selectTab (event, tab) {
   window.tab = tab
   const url = new URL(window.location)
   if (url.searchParams.has('tab')) {
     if (url.searchParams.get('tab') !== tab) {
       if (tab === 'query') {
         url.searchParams.delete('tab')
-        window.history.pushState({}, '', url)
+        goToUrl(event, url)
         return route()
       } else {
         url.searchParams.set('tab', tab)
-        window.history.pushState({}, '', url)
+        goToUrl(event, url)
         return route()
       }
     }
   } else {
     if (tab !== 'query') {
       url.searchParams.set('tab', tab)
-      window.history.pushState({}, '', url)
+      goToUrl(event, url)
       return route()
     }
   }
@@ -319,7 +331,7 @@ function selectSavedTab () {
       url.searchParams.delete('sql')
       url.searchParams.delete('tab')
       url.searchParams.set('file', file.filename)
-      window.history.pushState({}, '', url)
+      goToUrl(event, url)
       route()
     })
     const nameElement = document.createElement('h2')
@@ -335,15 +347,15 @@ function selectSavedTab () {
   window.savedLoaded = true
 }
 
-export function submitAll () {
-  submit(null)
+export function submitAll (event) {
+  submit(event, null)
 }
 
-export function submitCurrent () {
-  submit(getSelection())
+export function submitCurrent (event) {
+  submit(event, getSelection())
 }
 
-function submit (selection) {
+function submit (event, selection) {
   const url = new URL(window.location)
   if (selection) {
     url.searchParams.set('selection', selection.join(':'))
@@ -357,7 +369,7 @@ function submit (selection) {
   if (url.searchParams.has('file')) {
     url.searchParams.delete('file')
     url.searchParams.set('sql', sql)
-    window.history.pushState({}, '', url)
+    goToUrl(event, url)
   } else {
     let sqlParam = url.searchParams.get('sql')?.trim()
     sqlParam = sqlParam === '' ? null : sqlParam
@@ -365,10 +377,10 @@ function submit (selection) {
     if (sqlParam !== sql) {
       if (sql === null) {
         url.searchParams.delete('sql')
-        window.history.pushState({}, '', url)
+        goToUrl(event, url)
       } else {
         url.searchParams.set('sql', sql)
-        window.history.pushState({}, '', url)
+        goToUrl(event, url)
       }
     } else {
       window.history.replaceState({}, '', url)
@@ -650,7 +662,7 @@ window.addEventListener('resize', function (event) {
 })
 
 function route () {
-  selectTab(new URLSearchParams(window.location.search).get('tab') || 'query')
+  selectTab(null, new URLSearchParams(window.location.search).get('tab') || 'query')
 }
 
 window.onload = function () {
