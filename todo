@@ -54,3 +54,5 @@ add a tooltip to execute buttons ;)
 make "check console" a link that opens the console?
 fix editor and table text sizes.
 add a cancel button when the spinner is displayed
+fix spacing on db list links
+fix broken command click on db list
