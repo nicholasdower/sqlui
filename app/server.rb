@@ -25,6 +25,10 @@ class Server < Sinatra::Base
       body 'OK'
     end
 
+    get '/?' do
+      redirect config.list_url_path, 301
+    end
+
     get "#{config.list_url_path}/?" do
       erb :databases, locals: { config: config }
     end
@@ -59,6 +63,7 @@ class Server < Sinatra::Base
         metadata = database.with_client do |client|
           {
             server: "#{config.name} - #{database.display_name}",
+            list_url_path: config.list_url_path,
             schemas: DatabaseMetadata.lookup(client, database),
             saved: Dir.glob("#{database.saved_path}/*.sql").map do |path|
               comment_lines = File.readlines(path).take_while do |l|

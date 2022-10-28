@@ -682,6 +682,7 @@ window.onload = function () {
             document.getElementById('loading-box').style.display = 'none'
             document.getElementById('main-box').style.display = 'flex'
             document.getElementById('server-name').innerText = result.server
+            document.getElementById('header-link').href = result.list_url_path
             const queryElement = document.getElementById('query')
 
             init(queryElement, submitCurrent, submitAll)
