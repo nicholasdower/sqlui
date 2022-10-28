@@ -121,7 +121,7 @@ fail("you must release from the #{default_branch} branch") unless branch == defa
 # Ensure we are on the latest remote commit.
 local_commit = execute("git rev-parse #{branch}")
 remote_commit = execute("git rev-parse origin/#{branch}")
-fail("#{default_branch} is behind, you must pull") unless local_commit == remote_commit
+fail("#{default_branch} is behind or ahead, you must pull or push") unless local_commit == remote_commit
 
 # Ensure the GitHub command is installed.
 success = system('which gh 1> /dev/null 2> /dev/null')
