@@ -1,5 +1,11 @@
 # Changes
 
+## 0.1.21
+
+- Fix bug in type mapping.
+- Link app title to databases list.
+- Fix broken saved query loading.
+
 ## 0.1.20
 
 - Add execute and execute selection buttons.

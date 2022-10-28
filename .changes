@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.21
 - Fix bug in type mapping.
 - Link app title to databases list.
 - Fix broken saved query loading.
