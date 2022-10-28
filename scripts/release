@@ -133,6 +133,8 @@ puts "Release version: #{new_version}"
 
 # Install, build and lint
 puts
+puts 'Cleaning'
+execute('make clean')
 puts 'Installing'
 execute('make install')
 puts 'Building'
