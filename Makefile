@@ -8,7 +8,7 @@ create-network:
 	@docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null
 
 install: create-network
-	$(RUN_IMAGE) /bin/bash -c 'npm install && bundle install'
+	$(RUN_IMAGE) /bin/bash -c 'npm install && bundle config set --local path vendor/bundle && bundle install'
 
 update: create-network
 	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle update'
@@ -18,6 +18,7 @@ update-local:
 	bundle config set --local path vendor/bundle
 	bundle update
 
+# Make sure to run `nvm use 19` first.
 install-local:
 	npm install
 	bundle config set --local path vendor/bundle
@@ -59,7 +60,7 @@ clean: stop
 	rm -rf client/resources/sqlui.js
 	rm -rf vendor
 	rm -rf .bundle
-	rm *.gem
+	rm -rf *.gem
 
 start:
 	docker compose up
