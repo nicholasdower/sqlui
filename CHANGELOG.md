@@ -2,7 +2,7 @@
 
 ## 0.1.23
 
-- No changes
+- Fix bug for query without semicolon.
 
 ## 0.1.22
 
