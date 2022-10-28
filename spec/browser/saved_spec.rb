@@ -14,7 +14,6 @@ describe 'saved' do
   let(:expected_file_names) { %w[sample_one.sql sample_two.sql] }
 
   it 'displays the list of saved queries' do
-    sleep 5
     name_elements = wait.until do
       elements = driver.find_elements(css: '#saved-box > .saved-list-item > h2')
       elements if elements.size == expected_file_names.size && elements[0].displayed?

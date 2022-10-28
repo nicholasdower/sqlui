@@ -58,7 +58,7 @@ class Server < Sinatra::Base
       get "#{database.url_path}/metadata" do
         metadata = database.with_client do |client|
           {
-            server: config.name,
+            server: "#{config.name} - #{database.display_name}",
             schemas: DatabaseMetadata.lookup(client, database),
             saved: Dir.glob("#{database.saved_path}/*.sql").map do |path|
               comment_lines = File.readlines(path).take_while do |l|
