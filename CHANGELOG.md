@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.24
+
+- Just some style updates.
+
 ## 0.1.23
 
 - Fix bug for query without semicolon.
