@@ -3,6 +3,8 @@
 # Used to parse strings containing one or more SQL statements.
 class SqlParser
   def self.find_statement_at_cursor(sql, cursor)
+    return sql unless sql.include?(';')
+
     parts_with_ranges = []
     sql.scan(/[^;]*;[ \n]*/) { |part| parts_with_ranges << [part, 0, part.size] }
     parts_with_ranges.inject(0) do |pos, current|

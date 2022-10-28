@@ -106,5 +106,18 @@ describe SqlParser do
         end
       end
     end
+
+    context 'when input contains zero queries' do
+      let(:sql) do
+        <<~SQL
+          foo
+        SQL
+      end
+      let(:cursor) { 0 }
+
+      it 'returns the input unchanged' do
+        expect(subject).to eq(sql)
+      end
+    end
   end
 end

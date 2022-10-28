@@ -49,3 +49,5 @@ let client specify path root
 test sqluiconfig and databaseconfig when fields are nil, empty, numbers, etc. Use different messages for each case instead of the generic one being used now.
 add github action to update deps
 executing all causes the cursor to be reset to 0. it also isn't in the url
+make status have a tooltip with the full error.
+add a tooltip to execute buttons ;)
