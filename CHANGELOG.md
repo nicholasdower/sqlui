@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.22
+
+- Show database name in title.
+
 ## 0.1.21
 
 - Fix bug in type mapping.

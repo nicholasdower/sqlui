@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.22
 - Show database name in title.
 
 version: 0.1.21
