@@ -84,14 +84,33 @@ class Server < Sinatra::Base
 
       get "#{database.url_path}/query_file" do
         break client_error('missing file param') unless params[:file]
+        break client_error('missing run') unless params[:run]
+        break client_error('invalid run') unless %w[all selection].include?(params[:run])
+        break client_error('missing selection') if params[:selection] == 'selection' && !params[:selection]
 
         file = File.join(database.saved_path, params[:file])
         break client_error('no such file') unless File.exist?(file)
 
-        sql = File.read(file)
+        full_sql = File.read(file)
+        sql = full_sql
+        run = params[:run]
+        if run == 'selection'
+          selection = params[:selection].split(':').map { |v| Integer(v) }
+
+          sql = if selection[0] == selection[1]
+                  SqlParser.find_statement_at_cursor(params[:sql], selection[0])
+                else
+                  full_sql[selection[0], selection[1]]
+                end
+          break client_error("can't find query at selection") unless sql
+        end
         result = database.with_client do |client|
           execute_query(client, sql).tap { |r| r[:file] = params[:file] }
         end
+
+        result[:run] = params[:run]
+        result[:selection] = params[:selection]
+        result[:query] = full_sql
 
         status 200
         headers 'Content-Type': 'application/json'
@@ -101,16 +120,20 @@ class Server < Sinatra::Base
       post "#{database.url_path}/query" do
         params.merge!(JSON.parse(request.body.read, symbolize_names: true))
         break client_error('missing sql') unless params[:sql]
+        break client_error('missing run') unless params[:run]
+        break client_error('invalid run') unless %w[all selection].include?(params[:run])
+        break client_error('missing selection') if params[:selection] == 'selection' && !params[:selection]
 
+        full_sql = params[:sql]
         sql = params[:sql]
-        selection = params[:selection]
-        if selection
-          selection = selection.split(':').map { |v| Integer(v) }
+        run = params[:run]
+        if run == 'selection'
+          selection = params[:selection].split(':').map { |v| Integer(v) }
 
           sql = if selection[0] == selection[1]
                   SqlParser.find_statement_at_cursor(params[:sql], selection[0])
                 else
-                  params[:sql][selection[0], selection[1]]
+                  full_sql[selection[0], selection[1]]
                 end
           break client_error("can't find query at selection") unless sql
         end
@@ -119,7 +142,9 @@ class Server < Sinatra::Base
           execute_query(client, sql)
         end
 
+        result[:run] = params[:run]
         result[:selection] = params[:selection]
+        result[:query] = full_sql
 
         status 200
         headers 'Content-Type': 'application/json'
@@ -170,7 +195,6 @@ class Server < Sinatra::Base
       columns = []
     end
     {
-      query: sql,
       columns: columns,
       column_types: column_types,
       total_rows: rows.size,

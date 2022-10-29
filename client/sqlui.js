@@ -7,6 +7,25 @@ import { sql } from '@codemirror/lang-sql'
 /* global google */
 
 function init (parent, onSubmit, onShiftSubmit) {
+  document.getElementById('query-tab-button').addEventListener('click', function (event) {
+    selectTab(event, 'query')
+  })
+  document.getElementById('saved-tab-button').addEventListener('click', function (event) {
+    selectTab(event, 'saved')
+  })
+  document.getElementById('structure-tab-button').addEventListener('click', function (event) {
+    selectTab(event, 'structure')
+  })
+  document.getElementById('graph-tab-button').addEventListener('click', function (event) {
+    selectTab(event, 'graph')
+  })
+  document.getElementById('submit-all-button').addEventListener('click', function (event) {
+    submitAll(event.target, event)
+  })
+  document.getElementById('submit-current-button').addEventListener('click', function (event) {
+    submitCurrent(event.target, event)
+  })
+
   const fixedHeightEditor = EditorView.theme({
     '.cm-scroller': { height: '200px', overflow: 'auto', resize: 'vertical' }
   })
@@ -63,7 +82,7 @@ function setValue (value) {
 function updateTabs () {
   const url = new URL(window.location)
   url.searchParams.set('tab', 'graph')
-  document.getElementById('query-tab-button').href = url.search
+  document.getElementById('graph-tab-button').href = url.search
   url.searchParams.set('tab', 'saved')
   document.getElementById('saved-tab-button').href = url.search
   url.searchParams.set('tab', 'structure')
@@ -72,14 +91,14 @@ function updateTabs () {
   document.getElementById('query-tab-button').href = url.search
 }
 
-export function selectTab (target, event, tab) {
+function selectTab (event, tab) {
   const url = new URL(window.location)
   if (tab === 'query') {
     url.searchParams.delete('tab')
   } else {
     url.searchParams.set('tab', tab)
   }
-  route(target, event, url)
+  route(event.target, event, url)
 }
 
 function route (target = null, event = null, url = null) {
@@ -338,11 +357,9 @@ function selectSavedTab () {
     divElement.classList.add('saved-list-item')
     divElement.addEventListener('click', function (event) {
       clearResult()
-      const url = new URL(window.location)
-      url.searchParams.delete('sql')
-      url.searchParams.delete('tab')
+      const url = new URL(window.location.origin + window.location.pathname)
       url.searchParams.set('file', file.filename)
-      route(divElement, event, url)
+      route(event.target, event, url)
     })
     const nameElement = document.createElement('h2')
     nameElement.innerText = file.filename
@@ -357,27 +374,22 @@ function selectSavedTab () {
   window.savedLoaded = true
 }
 
-export function submitAll (target, event) {
-  submit(target, event, null)
+function submitAll (target, event) {
+  submit(target, event, 'all')
 }
 
-export function submitCurrent (target, event) {
-  submit(target, event, getSelection())
+function submitCurrent (target, event) {
+  submit(target, event, 'selection')
 }
 
-function submit (target, event, selection) {
+function submit (target, event, run) {
   const url = new URL(window.location)
-  if (selection) {
-    url.searchParams.set('selection', selection.join(':'))
-  } else {
-    url.searchParams.delete('selection')
-  }
-
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
 
   if (url.searchParams.has('file')) {
-    if (window.result.query !== getValue()) {
+    if (!window.result || window.result.query !== getValue()) {
+      // TODO read the file first, then we should always know what the query should look like, even if it fails to execute
       url.searchParams.delete('file')
       url.searchParams.set('sql', sql)
     }
@@ -391,7 +403,29 @@ function submit (target, event, selection) {
       url.searchParams.set('sql', sql)
     }
   }
-  clearResult()
+
+  const selection = getSelection().join(':')
+  if (sql) {
+    if (run === 'selection') {
+      url.searchParams.set('selection', selection)
+      url.searchParams.set('run', run)
+    } else if (run === 'all') {
+      if (selection === '0:0') {
+        url.searchParams.delete('selection')
+      } else {
+        url.searchParams.set('selection', selection)
+      }
+      url.searchParams.delete('run')
+    } else {
+      throw new Error(`invalid run param: ${run}`)
+    }
+  } else {
+    url.searchParams.delete('selection')
+    url.searchParams.delete('run')
+    url.searchParams.delete('sql')
+    url.searchParams.delete('file')
+  }
+
   route(target, event, url)
 }
 
@@ -425,7 +459,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sql, selection, successCallback, errorCallback) {
+function fetchSql (sql, selection, run, successCallback, errorCallback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -434,7 +468,8 @@ function fetchSql (sql, selection, successCallback, errorCallback) {
     method: 'POST',
     body: JSON.stringify({
       sql,
-      selection
+      selection,
+      run
     })
   })
     .then((response) => {
@@ -462,8 +497,8 @@ function fetchSql (sql, selection, successCallback, errorCallback) {
     })
 }
 
-function fetchFile (name, successCallback, errorCallback) {
-  fetch(`query_file?file=${name}`, {
+function fetchFile (name, selection, run, successCallback, errorCallback) {
+  fetch(`query_file?file=${name}&selection=${selection}&run=${run}`, {
     headers: {
       Accept: 'application/json'
     },
@@ -496,41 +531,60 @@ function loadQueryOrGraphTab (callback, errorCallback) {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
   const file = params.get('file')
-  const selection = params.has('selection') ? params.get('selection') : null
-
-  if (params.has('sql') && window.result && sql === window.result.query) {
-    callback()
-    return
-  } else if (params.has('file') && window.result && file === window.result.file) {
-    callback()
-    return
+  const run = params.get('run') || 'all'
+  const selection = params.get('selection')
+  if (run === 'selection' && !params.has('selection')) {
+    // TODO: show an error.
+    throw new Error('You must specify a selection if run=selection.')
   }
-
-  if (params.has('file') && params.has('sql') && selection === window.result.selection) {
+  if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
     throw new Error('You can only specify a file or sql, not both.')
   }
-
-  clearResult()
+  if (window.result) {
+    if ((params.has('sql') && sql === window.result.query) || (params.has('file') && file === window.result.file)) {
+      if (run === 'all' && window.result.run === 'all') {
+        callback()
+        if (params.has('selection')) {
+          focus()
+          setSelection(selection.split(':'))
+        }
+        return
+      } else if (run === 'selection' && selection === window.result.selection) {
+        callback()
+        focus()
+        setSelection(selection.split(':'))
+        return
+      }
+    }
+  }
 
   if (params.has('sql')) {
     setValue(sql)
-    fetchSql(params.get('sql'), selection, function (result) {
+    if (params.has('selection')) {
+      focus()
+      setSelection(selection.split(':'))
+    }
+    fetchSql(params.get('sql'), selection, run, function (result) {
       window.result = result
       callback()
     }, errorCallback)
   } else if (params.has('file')) {
-    setValue('')
-    fetchFile(file, function (result) {
+    if (!window.result || window.result.query !== getValue()) {
+      // TODO read the file first, then we should always know what the query should look like, even if it failed to execute
+      setValue('')
+    }
+    fetchFile(file, selection, run, function (result) {
       window.result = result
       setValue(result.query)
+      if (params.has('selection')) {
+        focus()
+        setSelection(selection.split(':'))
+      }
       callback()
     }, errorCallback)
   }
-  if (params.has('selection')) {
-    focus()
-    setSelection(params.get('selection').split(':'))
-  }
+  clearResult()
 }
 
 function loadQueryResult () {
