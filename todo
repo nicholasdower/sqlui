@@ -69,5 +69,3 @@ test:
  - shift and meta navigation
  - executing when viewing a file after changing selection
  - executing when viewing a file after changing query
-clean up route, goToUrl and selectTab. They are calling eachother and it is confusing.
-when executing a file, fetch the contents first and store them. That way if an execution (part or whole) fails, we know whether the query has been changed.

@@ -132,14 +132,14 @@ describe 'query' do
     end
   end
 
-  context 'keyboarding' do
+  context 'when keyboarding' do
     let(:execute) { driver.find_element(class: 'cm-content').send_keys(%i[control enter]) }
     let(:execute_all) { driver.find_element(class: 'cm-content').send_keys(%i[shift control enter]) }
 
     include_examples 'submitted queries'
   end
 
-  context 'mousing' do
+  context 'when mousing' do
     let(:execute) { driver.find_element(id: 'submit-current-button').click }
     let(:execute_all) { driver.find_element(id: 'submit-all-button').click }
 

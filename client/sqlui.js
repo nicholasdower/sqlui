@@ -347,12 +347,13 @@ function selectSavedTab () {
   }
 
   const saved = window.metadata.saved
-  if (saved && saved.length === 1) {
+  if (Object.keys(saved).length === 1) {
     setSavedStatus('1 file')
   } else {
     setSavedStatus(`${saved.length} files`)
   }
-  saved.forEach(file => {
+  Object.values(saved).forEach(file => {
+    console.log(file)
     const divElement = document.createElement('div')
     divElement.classList.add('saved-list-item')
     divElement.addEventListener('click', function (event) {
@@ -388,8 +389,7 @@ function submit (target, event, run) {
   sql = sql === '' ? null : sql
 
   if (url.searchParams.has('file')) {
-    if (!window.result || window.result.query !== getValue()) {
-      // TODO read the file first, then we should always know what the query should look like, even if it fails to execute
+    if (window.metadata.saved[url.searchParams.get('file')].contents !== getValue()) {
       url.searchParams.delete('file')
       url.searchParams.set('sql', sql)
     }
@@ -497,36 +497,6 @@ function fetchSql (sql, selection, run, successCallback, errorCallback) {
     })
 }
 
-function fetchFile (name, selection, run, successCallback, errorCallback) {
-  fetch(`query_file?file=${name}&selection=${selection}&run=${run}`, {
-    headers: {
-      Accept: 'application/json'
-    },
-    method: 'GET'
-  })
-    .then((response) => {
-      const contentType = response.headers.get('content-type')
-      if (contentType && contentType.indexOf('application/json') !== -1) {
-        response.json().then((result) => {
-          if (result?.query) {
-            successCallback(result)
-          } else if (result?.error) {
-            errorCallback(result.error, result.stacktrace)
-          } else if (result) {
-            errorCallback('failed to load file  ', result.toString())
-          } else {
-            errorCallback('failed to load file')
-          }
-        })
-      } else {
-        errorCallback('failed to load file', response.toString())
-      }
-    })
-    .catch(function (error) {
-      errorCallback('failed to load file', error.stack)
-    })
-}
-
 function loadQueryOrGraphTab (callback, errorCallback) {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
@@ -559,32 +529,30 @@ function loadQueryOrGraphTab (callback, errorCallback) {
     }
   }
 
+  clearResult()
+
   if (params.has('sql')) {
     setValue(sql)
-    if (params.has('selection')) {
-      focus()
-      setSelection(selection.split(':'))
-    }
     fetchSql(params.get('sql'), selection, run, function (result) {
       window.result = result
       callback()
     }, errorCallback)
   } else if (params.has('file')) {
-    if (!window.result || window.result.query !== getValue()) {
-      // TODO read the file first, then we should always know what the query should look like, even if it failed to execute
-      setValue('')
+    const file = window.metadata.saved[params.get('file')]
+    if (!file) {
+      throw new Error(`no such file: ${params.get('file')}`)
     }
-    fetchFile(file, selection, run, function (result) {
+    const fileSql = file.contents
+    setValue(fileSql)
+    fetchSql(fileSql, selection, run, function (result) {
       window.result = result
-      setValue(result.query)
-      if (params.has('selection')) {
-        focus()
-        setSelection(selection.split(':'))
-      }
       callback()
     }, errorCallback)
   }
-  clearResult()
+  if (params.has('selection')) {
+    focus()
+    setSelection(selection.split(':'))
+  }
 }
 
 function loadQueryResult () {

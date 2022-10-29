@@ -4,7 +4,3 @@
 /node_modules
 /client/resources/sqlui.js
 /vendor
-/sql/*
-!/sql/development
-/sql/development/*
-!/sql/development/sample.sql

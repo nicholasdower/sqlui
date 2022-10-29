@@ -65,56 +65,27 @@ class Server < Sinatra::Base
             server: "#{config.name} - #{database.display_name}",
             list_url_path: config.list_url_path,
             schemas: DatabaseMetadata.lookup(client, database),
-            saved: Dir.glob("#{database.saved_path}/*.sql").map do |path|
-              comment_lines = File.readlines(path).take_while do |l|
+            saved: Dir.glob("#{database.saved_path}/*.sql").to_h do |path|
+              contents = File.read(path)
+              comment_lines = contents.split("\n").take_while do |l|
                 l.start_with?('--')
               end
+              filename = File.basename(path)
               description = comment_lines.map { |l| l.sub(/^-- */, '') }.join
-              {
-                filename: File.basename(path),
-                description: description
-              }
+              [
+                filename,
+                {
+                  filename: filename,
+                  description: description,
+                  contents: contents
+                }
+              ]
             end
           }
         end
         status 200
         headers 'Content-Type': 'application/json'
         body metadata.to_json
-      end
-
-      get "#{database.url_path}/query_file" do
-        break client_error('missing file param') unless params[:file]
-        break client_error('missing run') unless params[:run]
-        break client_error('invalid run') unless %w[all selection].include?(params[:run])
-        break client_error('missing selection') if params[:selection] == 'selection' && !params[:selection]
-
-        file = File.join(database.saved_path, params[:file])
-        break client_error('no such file') unless File.exist?(file)
-
-        full_sql = File.read(file)
-        sql = full_sql
-        run = params[:run]
-        if run == 'selection'
-          selection = params[:selection].split(':').map { |v| Integer(v) }
-
-          sql = if selection[0] == selection[1]
-                  SqlParser.find_statement_at_cursor(params[:sql], selection[0])
-                else
-                  full_sql[selection[0], selection[1]]
-                end
-          break client_error("can't find query at selection") unless sql
-        end
-        result = database.with_client do |client|
-          execute_query(client, sql).tap { |r| r[:file] = params[:file] }
-        end
-
-        result[:run] = params[:run]
-        result[:selection] = params[:selection]
-        result[:query] = full_sql
-
-        status 200
-        headers 'Content-Type': 'application/json'
-        body result.to_json
       end
 
       post "#{database.url_path}/query" do
