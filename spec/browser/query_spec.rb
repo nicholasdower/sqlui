@@ -46,7 +46,7 @@ describe 'query' do
         editor.send_keys(
           <<~SQL
             select id, name, description from characters where id = 1;
-  
+
             select id, name, description from characters where id = 2;
           SQL
         )
@@ -66,7 +66,7 @@ describe 'query' do
         editor.send_keys(
           <<~SQL
             select id, name, description from characters where id = 1;
-  
+
             select id, name, description from characters where id = 2;
           SQL
         )
@@ -98,10 +98,10 @@ describe 'query' do
         editor = wait_until_editor(wait)
         editor.send_keys(
           <<~SQL
-          set @foo = 2;
+            set @foo = 2;
 
-          select id, name, description from characters where id = @foo;
-        SQL
+            select id, name, description from characters where id = @foo;
+          SQL
         )
         editor.send_keys(%i[shift up up up])
         execute
@@ -118,10 +118,10 @@ describe 'query' do
         editor = wait_until_editor(wait)
         editor.send_keys(
           <<~SQL
-          set @foo = 2;
+            set @foo = 2;
 
-          select id, name, description from characters where id = @foo;
-        SQL
+            select id, name, description from characters where id = @foo;
+          SQL
         )
         execute_all
       end

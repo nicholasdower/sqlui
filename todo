@@ -56,3 +56,10 @@ fix editor and table text sizes.
 add a cancel button when the spinner is displayed
 fix spacing on db list links
 fix broken command click on db list
+add keyboard focus order
+maybe move db list into app
+ensure list_url_path is being used to link to db list
+maybe put selection in the url no matter what, just leave it blank when there isn't one
+separate selection and what to run so that cursor is maintained regardless of what is run &selection=0&run=all or &run=selection
+make it possible to link to a query or file but not run any query, maybe like sql=foo&run=none
+change "execute" to "run"

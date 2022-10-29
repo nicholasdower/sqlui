@@ -39,7 +39,7 @@ end
 def wait_until_query_error(wait, error_matcher)
   error_element = wait.until do
     element = driver.find_element(css: '#status-box > #query-status')
-    element if element && element.displayed?
+    element if element&.displayed?
   end
   expect(error_element.text).to match(error_matcher)
 end
