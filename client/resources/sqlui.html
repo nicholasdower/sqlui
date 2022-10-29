@@ -15,10 +15,10 @@
     <div class="tabs-box">
       <h1 class="header"><a id="header-link">SQLUI</a></h1>
       <h1 id="server-name" class="server-name"></h1>
-      <input id="query-tab-button" class="tab-button" type="button" value="Query" onclick="sqlui.selectTab(event, 'query')"></input>
-      <input id="graph-tab-button" class="tab-button" type="button" value="Graph" onclick="sqlui.selectTab(event, 'graph')"></input>
-      <input id="saved-tab-button" class="tab-button" type="button" value="Saved" onclick="sqlui.selectTab(event, 'saved')"></input>
-      <input id="structure-tab-button" class="tab-button" type="button" value="Structure" onclick="sqlui.selectTab(event, 'structure')"></input>
+      <a id="query-tab-button" class="tab-button" onclick="sqlui.selectTab(this, event, 'query')">Query</a>
+      <a id="graph-tab-button" class="tab-button" onclick="sqlui.selectTab(this, event, 'graph')">Graph</a>
+      <a id="saved-tab-button" class="tab-button" onclick="sqlui.selectTab(this, event, 'saved')">Saved</a>
+      <a id="structure-tab-button" class="tab-button" onclick="sqlui.selectTab(this, event, 'structure')">Structure</a>
     </div>
 
     <div id="query-box" class="query-box tab-content-element graph-element query-element" style="display: none;">
@@ -26,8 +26,8 @@
     </div>
 
     <div id="submit-box" class="submit-box tab-content-element graph-element query-element" style="display: none;">
-      <input id="submit-all-button" class="submit-button" type="button" value="execute (ctrl-shift-enter)" onclick="sqlui.submitAll(event);"></input>
-      <input id="submit-current-button" class="submit-button" type="button" value="execute selection (ctrl-enter)" onclick="sqlui.submitCurrent(event);"></input>
+      <input id="submit-all-button" class="submit-button" type="button" value="execute (ctrl-shift-enter)" onclick="sqlui.submitAll(this, event);"></input>
+      <input id="submit-current-button" class="submit-button" type="button" value="execute selection (ctrl-enter)" onclick="sqlui.submitCurrent(this, event);"></input>
     </div>
 
     <div id="result-box" class="result-box tab-content-element query-element" style="display: none;">

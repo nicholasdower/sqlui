@@ -60,42 +60,53 @@ function setValue (value) {
   })
 }
 
-function goToUrl (event, url) {
-  console.log(url)
-  console.log(event)
-  if (event && event.shiftKey) {
-    window.open(url, '_blank').focus()
-  } else if (event && event.metaKey) {
-    window.open(url).focus()
-  } else {
-    window.history.pushState({}, '', url)
-  }
+function updateTabs () {
+  const url = new URL(window.location)
+  url.searchParams.set('tab', 'graph')
+  document.getElementById('query-tab-button').href = url.search
+  url.searchParams.set('tab', 'saved')
+  document.getElementById('saved-tab-button').href = url.search
+  url.searchParams.set('tab', 'structure')
+  document.getElementById('structure-tab-button').href = url.search
+  url.searchParams.delete('tab')
+  document.getElementById('query-tab-button').href = url.search
 }
 
-export function selectTab (event, tab) {
-  window.tab = tab
+export function selectTab (target, event, tab) {
   const url = new URL(window.location)
-  if (url.searchParams.has('tab')) {
-    if (url.searchParams.get('tab') !== tab) {
-      if (tab === 'query') {
-        url.searchParams.delete('tab')
-        goToUrl(event, url)
-        return route()
-      } else {
-        url.searchParams.set('tab', tab)
-        goToUrl(event, url)
-        return route()
+  if (tab === 'query') {
+    url.searchParams.delete('tab')
+  } else {
+    url.searchParams.set('tab', tab)
+  }
+  route(target, event, url)
+}
+
+function route (target = null, event = null, url = null) {
+  if (url) {
+    if (event) {
+      event.preventDefault()
+      if (!(target instanceof EditorView && event instanceof KeyboardEvent)) {
+        if (event.shiftKey) {
+          window.open(url).focus()
+          return
+        }
+        if (event.metaKey) {
+          window.open(url, '_blank').focus()
+          return
+        }
       }
     }
-  } else {
-    if (tab !== 'query') {
-      url.searchParams.set('tab', tab)
-      goToUrl(event, url)
-      return route()
+    if (url.href !== window.location.href) {
+      window.history.pushState({}, '', url)
     }
+  } else {
+    url = new URL(window.location)
   }
+  updateTabs()
+  window.tab = url.searchParams.get('tab') || 'query'
 
-  const tabElement = document.getElementById(`${tab}-tab-button`)
+  const tabElement = document.getElementById(`${window.tab}-tab-button`)
   Array.prototype.forEach.call(document.getElementsByClassName('selected-tab-button'), function (selected) {
     selected.classList.remove('selected-tab-button')
     selected.classList.add('tab-button')
@@ -107,7 +118,7 @@ export function selectTab (event, tab) {
     selected.style.display = 'none'
   })
 
-  switch (tab) {
+  switch (window.tab) {
     case 'query':
       selectQueryTab()
       break
@@ -121,7 +132,7 @@ export function selectTab (event, tab) {
       selectStructureTab()
       break
     default:
-      throw new Error(`Unexpected tab: ${tab}`)
+      throw new Error(`Unexpected tab: ${window.tab}`)
   }
 }
 
@@ -331,8 +342,7 @@ function selectSavedTab () {
       url.searchParams.delete('sql')
       url.searchParams.delete('tab')
       url.searchParams.set('file', file.filename)
-      goToUrl(event, url)
-      route()
+      route(divElement, event, url)
     })
     const nameElement = document.createElement('h2')
     nameElement.innerText = file.filename
@@ -347,15 +357,15 @@ function selectSavedTab () {
   window.savedLoaded = true
 }
 
-export function submitAll (event) {
-  submit(event, null)
+export function submitAll (target, event) {
+  submit(target, event, null)
 }
 
-export function submitCurrent (event) {
-  submit(event, getSelection())
+export function submitCurrent (target, event) {
+  submit(target, event, getSelection())
 }
 
-function submit (event, selection) {
+function submit (target, event, selection) {
   const url = new URL(window.location)
   if (selection) {
     url.searchParams.set('selection', selection.join(':'))
@@ -367,27 +377,22 @@ function submit (event, selection) {
   sql = sql === '' ? null : sql
 
   if (url.searchParams.has('file')) {
-    url.searchParams.delete('file')
-    url.searchParams.set('sql', sql)
-    goToUrl(event, url)
+    if (window.result.query !== getValue()) {
+      url.searchParams.delete('file')
+      url.searchParams.set('sql', sql)
+    }
   } else {
     let sqlParam = url.searchParams.get('sql')?.trim()
     sqlParam = sqlParam === '' ? null : sqlParam
 
-    if (sqlParam !== sql) {
-      if (sql === null) {
-        url.searchParams.delete('sql')
-        goToUrl(event, url)
-      } else {
-        url.searchParams.set('sql', sql)
-        goToUrl(event, url)
-      }
-    } else {
-      window.history.replaceState({}, '', url)
+    if (sqlParam !== sql && sql === null) {
+      url.searchParams.delete('sql')
+    } else if (sqlParam !== sql) {
+      url.searchParams.set('sql', sql)
     }
   }
   clearResult()
-  route()
+  route(target, event, url)
 }
 
 function clearResult () {
@@ -660,10 +665,6 @@ window.addEventListener('resize', function (event) {
     loadGraphResult()
   }
 })
-
-function route () {
-  selectTab(null, new URLSearchParams(window.location.search).get('tab') || 'query')
-}
 
 window.onload = function () {
   fetch('metadata', {

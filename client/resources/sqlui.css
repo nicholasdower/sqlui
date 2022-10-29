@@ -71,6 +71,7 @@ p {
 .tab-button, .selected-tab-button {
     border: none;
     outline: none;
+    text-decoration: none;
     cursor: pointer;
     width: 150px;
     padding: 2px;
@@ -79,6 +80,7 @@ p {
     justify-content: center;
     background-color: #fff;
     font-size: 18px;
+    align-self: center;
 }
 
 .tab-button {

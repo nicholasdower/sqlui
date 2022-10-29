@@ -63,3 +63,11 @@ maybe put selection in the url no matter what, just leave it blank when there is
 separate selection and what to run so that cursor is maintained regardless of what is run &selection=0&run=all or &run=selection
 make it possible to link to a query or file but not run any query, maybe like sql=foo&run=none
 change "execute" to "run"
+use url scheme like /sqlui/seinfeld/query and /sqlui/seinfeld/graph
+clear selection when clearing sql
+test:
+ - shift and meta navigation
+ - executing when viewing a file after changing selection
+ - executing when viewing a file after changing query
+bug: ctrl-shift-enter opens a new window
+clean up route, goToUrl and selectTab. They are calling eachother and it is confusing.
