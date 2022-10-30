@@ -406,6 +406,8 @@ function submit (target, event, selection = null) {
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
 
+  url.searchParams.delete('run')
+
   if (url.searchParams.has('file')) {
     if (window.metadata.saved[url.searchParams.get('file')].contents !== getValue()) {
       url.searchParams.delete('file')
@@ -509,6 +511,8 @@ function loadQueryOrGraphTab (callback, errorCallback) {
   const sql = params.get('sql')
   const file = params.get('file')
   const selection = params.get('selection')
+  const run = !params.has('run') || !['0', 'false'].includes(params.get('run').toLowerCase())
+  console.log(run)
   if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
     throw new Error('You can only specify a file or sql, not both.')
@@ -530,10 +534,12 @@ function loadQueryOrGraphTab (callback, errorCallback) {
 
   if (params.has('sql')) {
     setValue(sql)
-    fetchSql(params.get('sql'), selection, function (result) {
-      window.result = result
-      callback()
-    }, errorCallback)
+    if (run) {
+      fetchSql(params.get('sql'), selection, function (result) {
+        window.result = result
+        callback()
+      }, errorCallback)
+    }
   } else if (params.has('file')) {
     const file = window.metadata.saved[params.get('file')]
     if (!file) {
@@ -541,10 +547,12 @@ function loadQueryOrGraphTab (callback, errorCallback) {
     }
     const fileSql = file.contents
     setValue(fileSql)
-    fetchSql(fileSql, selection, function (result) {
-      window.result = result
-      callback()
-    }, errorCallback)
+    if (run) {
+      fetchSql(fileSql, selection, function (result) {
+        window.result = result
+        callback()
+      }, errorCallback)
+    }
   }
   if (params.has('selection')) {
     focus()
@@ -713,7 +721,8 @@ window.onload = function () {
             window.metadata = result
             document.getElementById('loading-box').style.display = 'none'
             document.getElementById('main-box').style.display = 'flex'
-            document.getElementById('server-name').innerText = result.server
+            document.getElementById('server-name').innerText = window.metadata.server
+            document.title = `SQLUI ${window.metadata.server}`
             document.getElementById('header-link').href = result.list_url_path
             const queryElement = document.getElementById('query')
 

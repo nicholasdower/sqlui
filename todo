@@ -30,7 +30,6 @@ make "check console" a link that opens the console?
 add a cancel button when the spinner is displayed
 add keyboard focus order
 maybe move db list into app
-make it possible to link to a query or file but not run any query, maybe like sql=foo&run=none
 test:
  - shift and meta navigation
  - executing when viewing a file after changing selection
