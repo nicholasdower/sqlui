@@ -84,14 +84,10 @@ class Server < Sinatra::Base
       post "#{database.url_path}/query" do
         params.merge!(JSON.parse(request.body.read, symbolize_names: true))
         break client_error('missing sql') unless params[:sql]
-        break client_error('missing run') unless params[:run]
-        break client_error('invalid run') unless %w[all selection].include?(params[:run])
-        break client_error('missing selection') if params[:selection] == 'selection' && !params[:selection]
 
         full_sql = params[:sql]
         sql = params[:sql]
-        run = params[:run]
-        if run == 'selection'
+        if params[:selection]
           selection = params[:selection].split(':').map { |v| Integer(v) }
 
           sql = if selection[0] == selection[1]
@@ -106,7 +102,6 @@ class Server < Sinatra::Base
           execute_query(client, sql)
         end
 
-        result[:run] = params[:run]
         result[:selection] = params[:selection]
         result[:query] = full_sql
 

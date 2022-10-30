@@ -385,14 +385,14 @@ function selectSavedTab () {
 }
 
 function submitAll (target, event) {
-  submit(target, event, 'all')
+  submit(target, event)
 }
 
 function submitCurrent (target, event) {
-  submit(target, event, 'selection')
+  submit(target, event, getSelection().join(':'))
 }
 
-function submit (target, event, run) {
+function submit (target, event, selection = null) {
   const url = new URL(window.location)
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
@@ -413,24 +413,14 @@ function submit (target, event, run) {
     }
   }
 
-  const selection = getSelection().join(':')
   if (sql) {
-    if (run === 'selection') {
+    if (selection) {
       url.searchParams.set('selection', selection)
-      url.searchParams.set('run', run)
-    } else if (run === 'all') {
-      if (selection === '0:0') {
-        url.searchParams.delete('selection')
-      } else {
-        url.searchParams.set('selection', selection)
-      }
-      url.searchParams.delete('run')
     } else {
-      throw new Error(`invalid run param: ${run}`)
+      url.searchParams.delete('selection')
     }
   } else {
     url.searchParams.delete('selection')
-    url.searchParams.delete('run')
     url.searchParams.delete('sql')
     url.searchParams.delete('file')
   }
@@ -468,7 +458,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sql, selection, run, successCallback, errorCallback) {
+function fetchSql (sql, selection, successCallback, errorCallback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -477,8 +467,7 @@ function fetchSql (sql, selection, run, successCallback, errorCallback) {
     method: 'POST',
     body: JSON.stringify({
       sql,
-      selection,
-      run
+      selection
     })
   })
     .then((response) => {
@@ -510,29 +499,19 @@ function loadQueryOrGraphTab (callback, errorCallback) {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
   const file = params.get('file')
-  const run = params.get('run') || 'all'
   const selection = params.get('selection')
-  if (run === 'selection' && !params.has('selection')) {
-    // TODO: show an error.
-    throw new Error('You must specify a selection if run=selection.')
-  }
   if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
     throw new Error('You can only specify a file or sql, not both.')
   }
   if (window.result) {
     if ((params.has('sql') && sql === window.result.query) || (params.has('file') && file === window.result.file)) {
-      if (run === 'all' && window.result.run === 'all') {
+      if (selection === window.result.selection) {
         callback()
         if (params.has('selection')) {
           focus()
           setSelection(selection.split(':'))
         }
-        return
-      } else if (run === 'selection' && selection === window.result.selection) {
-        callback()
-        focus()
-        setSelection(selection.split(':'))
         return
       }
     }
@@ -542,7 +521,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
 
   if (params.has('sql')) {
     setValue(sql)
-    fetchSql(params.get('sql'), selection, run, function (result) {
+    fetchSql(params.get('sql'), selection, function (result) {
       window.result = result
       callback()
     }, errorCallback)
@@ -553,7 +532,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
     }
     const fileSql = file.contents
     setValue(fileSql)
-    fetchSql(fileSql, selection, run, function (result) {
+    fetchSql(fileSql, selection, function (result) {
       window.result = result
       callback()
     }, errorCallback)
