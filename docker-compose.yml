@@ -14,26 +14,18 @@ services:
       timeout: 2s
       retries: 10
       start_period: 10s
-  rollup:
-    container_name: sqlui_rollup
-    build: .
-    command: bash -c "cd /sqlui && make start-rollup-local"
-    volumes:
-      - .:/sqlui
   server:
     container_name: sqlui_server
     build: .
     environment:
       DB_HOST: db
       DB_PORT: 3306
-    command: bash -c "cd /sqlui && ./scripts/rerun --dir bin --dir app --dir client/resources --dir sql --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml"
+    command: bash -c "cd /sqlui && make start-server-local"
     volumes:
       - .:/sqlui
     ports:
       - "8080:8080"
     depends_on:
-      rollup:
-        condition: service_started
       db:
         condition: service_healthy
   hub:

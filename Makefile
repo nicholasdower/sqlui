@@ -4,6 +4,11 @@ RUN = docker run --rm --tty --interactive --env BUNDLE_APP_CONFIG=/sqlui/.bundle
 IMAGE = sqlui
 RUN_IMAGE = $(RUN) $(IMAGE)
 
+RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --file client/resources/sqlui.css --file client/resources/sqlui.html --file development_config.yml
+
+DB_HOST ?= 127.0.0.1
+DB_PORT ?= 3306
+
 create-network:
 	@docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null
 
@@ -28,7 +33,9 @@ build: create-network
 	$(RUN_IMAGE) make build-local
 
 build-local:
+	rm -f client/resources/sqlui.js
 	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
+	chmod 444 client/resources/sqlui.js
 
 lint: create-network
 	$(RUN_IMAGE) bundle exec rubocop
@@ -45,12 +52,6 @@ lint-fix: create-network
 lint-fix-local:
 	bundle exec rubocop -A
 	npx eslint client/*.js --fix
-
-start-rollup:
-	docker compose up --detach rollup
-
-start-rollup-local:
-	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs --watch
 
 build-docker-image:
 	docker build --tag sqlui .
@@ -97,13 +98,16 @@ docker-run: create-network
 	@$(RUN_IMAGE) $(CMD)
 
 start-server:
-	docker compose up db rollup server
+	docker compose up db server
 
 start-server-detached:
 	docker compose up --detach server
 
+build-and-start-server-local: build-local
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) bundle exec ruby ./bin/sqlui development_config.yml
+
 start-server-local:
-	DB_HOST=127.0.0.1 DB_PORT=3306 ./scripts/rerun --dir bin --dir app --dir client/resources --dir sql --file development_config.yml -- bundle exec ruby ./bin/sqlui development_config.yml
+	$(RERUN) -- make build-and-start-server-local
 
 start-hub:
 	docker compose up hub node-chrome
@@ -115,12 +119,12 @@ test: create-network
 	$(RUN_IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 watch-test:
-	./scripts/rerun --dir app --dir client/resources --dir sql --dir spec make test
+	$(RERUN) spec make test
 
 test-local:
 	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 watch-test-local:
-	./scripts/rerun --dir app --dir client/resources --dir sql --dir spec make test-local
+	$(RERUN) spec make test-local
 
 start-test-stop: start-detached test stop
