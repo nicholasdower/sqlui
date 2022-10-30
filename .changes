@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.25
 - Show spinners.
 - Add ability to link to query without running.
 - Prettify selection param. Only use when running selection.

@@ -1,5 +1,13 @@
 # Changes
 
+## 0.1.25
+
+- Show spinners.
+- Add ability to link to query without running.
+- Prettify selection param. Only use when running selection.
+- Update url scheme, e.g. /query instead of tab=query.
+- Redirect / to app.
+
 ## 0.1.24
 
 - Just some style updates.
