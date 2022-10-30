@@ -1,6 +1,5 @@
 override max?
 parameterized queries
-add progress spinner
 copy to clipboard
 autocomplete
 fix table header maybe by using flex, right now words are wrapped for no good reason

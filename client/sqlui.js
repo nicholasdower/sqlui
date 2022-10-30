@@ -157,7 +157,7 @@ function route (target = null, event = null, url = null) {
 
   switch (window.tab) {
     case 'query':
-      selectQueryTab()
+      selectResultTab()
       break
     case 'graph':
       selectGraphTab()
@@ -312,29 +312,25 @@ function createTable (parent, columns, rows) {
 }
 
 function selectGraphTab () {
-  Array.prototype.forEach.call(document.getElementsByClassName('graph-element'), function (selected) {
-    selected.style.display = 'flex'
-  })
-
-  google.charts.load('current', { packages: ['corechart', 'line'] })
-  google.charts.setOnLoadCallback(function () {
-    maybeFetchResult()
-  })
+  document.getElementById('query-box').style.display = 'flex'
+  document.getElementById('submit-box').style.display = 'flex'
+  document.getElementById('graph-box').style.display = 'flex'
+  document.getElementById('graph-status').style.display = 'flex'
+  maybeFetchResult()
 
   const selection = getSelection()
   focus()
   setSelection(selection)
 }
 
-function selectQueryTab () {
-  Array.prototype.forEach.call(document.getElementsByClassName('query-element'), function (selected) {
-    selected.style.display = 'flex'
-  })
-
+function selectResultTab () {
+  document.getElementById('query-box').style.display = 'flex'
+  document.getElementById('submit-box').style.display = 'flex'
+  document.getElementById('result-box').style.display = 'flex'
+  document.getElementById('result-status').style.display = 'flex'
   const selection = getSelection()
   focus()
   setSelection(selection)
-
   maybeFetchResult()
 }
 
@@ -430,19 +426,19 @@ function submit (target, event, selection = null) {
 
 function clearResult () {
   clearGraphStatus()
-  clearQueryStatus()
+  clearResultStatus()
   clearGraphBox()
   clearResultBox()
-  const existingRequest = window.request
+  const existingRequest = window.sqlFetch
   if (existingRequest?.state === 'pending') {
     existingRequest.state = 'aborted'
     existingRequest.fetchController.abort()
   }
-  window.request = null
+  window.sqlFetch = null
 }
 
-function clearQueryStatus () {
-  document.getElementById('query-status').innerText = ''
+function clearResultStatus () {
+  document.getElementById('result-status').innerText = ''
 }
 
 function clearGraphStatus () {
@@ -463,7 +459,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (request, selection, successCallback, errorCallback) {
+function fetchSql (request, selection, callback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -483,29 +479,35 @@ function fetchSql (request, selection, successCallback, errorCallback) {
           if (result?.query) {
             request.state = 'success'
             request.result = result
-            successCallback(request)
           } else {
             request.state = 'error'
             if (result?.error) {
-              errorCallback(result.error, result.stacktrace)
+              request.error_message = result.error
+              request.error_details = result.stacktrace
             } else if (result) {
-              errorCallback('failed to execute query', result.toString())
+              request.error_message = 'failed to execute query'
+              request.error_details = result.toString()
             } else {
-              errorCallback('failed to execute query')
+              request.error_message = 'failed to execute query'
             }
           }
+          callback(request)
         })
       } else {
         response.text().then((result) => {
           request.state = 'error'
-          errorCallback('failed to execute query', result)
+          request.error_message = 'failed to execute query'
+          request.error_details = result
+          callback(request)
         })
       }
     })
     .catch(function (error) {
       if (request.state === 'pending') {
         request.state = 'error'
-        errorCallback('failed to execute query', error.stack)
+        request.error_message = 'failed to execute query'
+        request.error_details = error.stack
+        callback(request)
       }
     })
 }
@@ -541,14 +543,14 @@ function maybeFetchResult () {
     request.sql = sql
   }
 
-  const existingRequest = window.request
+  const existingRequest = window.sqlFetch
   if (existingRequest) {
     const selectionMatches = selection === existingRequest.selection
     const sqlMatches = params.has('sql') && sql === existingRequest.sql
     const fileMatches = params.has('file') && file === existingRequest.file
     const queryMatches = sqlMatches || fileMatches
     if (selectionMatches && queryMatches) {
-      displayFetchSqlRequest(existingRequest)
+      displaySqlFetch(existingRequest)
       if (params.has('selection')) {
         focus()
         setSelection(selection)
@@ -562,9 +564,9 @@ function maybeFetchResult () {
   if (params.has('sql') || params.has('file')) {
     setValue(request.sql)
     if (run) {
-      window.request = request
-      displayFetchSqlRequest(request)
-      fetchSql(request, selection, displayFetchSqlRequest, displayQueryError)
+      window.sqlFetch = request
+      displaySqlFetch(request)
+      fetchSql(request, selection, displaySqlFetch)
     }
   }
   if (params.has('selection')) {
@@ -573,38 +575,57 @@ function maybeFetchResult () {
   }
 }
 
-function displayQueryRequest (request) {
-  if (request.state === 'pending') {
-    // todo: show spinner
+function displaySqlFetchInResultTab (fetch) {
+  const fetchSqlBoxElement = document.getElementById('fetch-sql-box')
+  const resultBoxElement = document.getElementById('result-box')
+  if (fetch.state === 'pending') {
+    clearResultBox()
+    resultBoxElement.style.display = 'none'
+    fetchSqlBoxElement.style.display = 'flex'
     return
   }
 
-  const resultElement = document.getElementById('result-box')
-  if (resultElement.children.length > 0) {
+  resultBoxElement.style.display = 'flex'
+  fetchSqlBoxElement.style.display = 'none'
+
+  if (fetch.state === 'error') {
+    clearResultBox()
+    displaySqlFetchError('result-status', fetch.error_message, fetch.error_details)
     return
   }
 
-  setQueryStatus(request.result)
+  if (fetch.state !== 'success') {
+    throw new Error(`unexpected fetch sql request status: ${fetch.status}`)
+  }
+
+  if (document.getElementById('result-table')) {
+    // Results already displayed.
+    return
+  }
+
+  clearResultBox()
+  displaySqlFetchResultStatus('result-status', fetch.result)
 
   const tableElement = document.createElement('table')
+  tableElement.id = 'result-table'
   const theadElement = document.createElement('thead')
   const headerElement = document.createElement('tr')
   const tbodyElement = document.createElement('tbody')
   theadElement.appendChild(headerElement)
   tableElement.appendChild(theadElement)
   tableElement.appendChild(tbodyElement)
-  resultElement.appendChild(tableElement)
+  resultBoxElement.appendChild(tableElement)
 
-  request.result.columns.forEach(column => {
+  fetch.result.columns.forEach(column => {
     const template = document.createElement('template')
     template.innerHTML = `<th class="cell">${column}</th>`
     headerElement.appendChild(template.content.firstChild)
   })
-  if (request.result.columns.length > 0) {
+  if (fetch.result.columns.length > 0) {
     headerElement.appendChild(document.createElement('th'))
   }
   let highlight = false
-  request.result.rows.forEach(function (row) {
+  fetch.result.rows.forEach(function (row) {
     const rowElement = document.createElement('tr')
     if (highlight) {
       rowElement.classList.add('highlighted-row')
@@ -618,60 +639,67 @@ function displayQueryRequest (request) {
     })
     rowElement.appendChild(document.createElement('td'))
   })
-
-  document.getElementById('result-box').style.display = 'flex'
 }
 
-function displayFetchSqlRequest (request) {
+function displaySqlFetch (fetch) {
   if (window.tab === 'query') {
-    displayQueryRequest(request)
+    displaySqlFetchInResultTab(fetch)
   } else if (window.tab === 'graph') {
-    displayGraphRequest(request)
+    displaySqlFetchInGraphTab(fetch)
   }
 }
 
-function displayQueryError (message, error) {
-  let statusElementId
-  if (window.tab === 'query') {
-    statusElementId = 'query-status'
-  } else if (window.tab === 'graph') {
-    statusElementId = 'graph-status'
-  } else {
-    return
-  }
+function displaySqlFetchError (statusElementId, message, details) {
   const statusElement = document.getElementById(statusElementId)
-  if (error) {
-    console.log(`${message}\n${error}`)
+  if (details) {
+    console.log(`${message}\n${details}`)
     statusElement.innerText = `error: ${message} (check console)`
   } else {
     statusElement.innerText = `error: ${message}`
   }
 }
 
-function displayGraphRequest (request) {
-  if (request.state === 'pending') {
-    console.log('spinner')
+function displaySqlFetchInGraphTab (fetch) {
+  const graphBoxElement = document.getElementById('graph-box')
+  const fetchSqlBoxElement = document.getElementById('fetch-sql-box')
+  if (fetch.state === 'pending') {
+    clearGraphBox()
+    graphBoxElement.style.display = 'none'
+    fetchSqlBoxElement.style.display = 'flex'
     return
   }
 
-  setGraphStatus(request.result)
+  graphBoxElement.style.display = 'flex'
+  fetchSqlBoxElement.style.display = 'none'
 
-  if (!request.result.rows) {
+  if (fetch.state === 'error') {
+    clearGraphBox()
+    displaySqlFetchError('graph-status', fetch.error_message, fetch.error_details)
     return
   }
-  if (request.result.rows.length === 0 || request.result.columns.length < 2) {
+
+  if (fetch.state !== 'success') {
+    throw new Error(`unexpected fetch sql request status: ${fetch.status}`)
+  }
+  clearGraphBox()
+  displaySqlFetchResultStatus('graph-status', fetch.result)
+
+  if (!fetch.result.rows) {
+    return
+  }
+  if (fetch.result.rows.length === 0 || fetch.result.columns.length < 2) {
     return
   }
   const dataTable = new google.visualization.DataTable()
-  request.result.columns.forEach((column, index) => {
-    dataTable.addColumn(request.result.column_types[index], column)
+  fetch.result.columns.forEach((column, index) => {
+    dataTable.addColumn(fetch.result.column_types[index], column)
   })
 
-  request.result.rows.forEach((row) => {
+  fetch.result.rows.forEach((row) => {
     const rowValues = row.map((value, index) => {
-      if (request.result.column_types[index] === 'date' || request.result.column_types[index] === 'datetime') {
+      if (fetch.result.column_types[index] === 'date' || fetch.result.column_types[index] === 'datetime') {
         return new Date(value)
-      } else if (request.result.column_types[index] === 'timeofday') {
+      } else if (fetch.result.column_types[index] === 'timeofday') {
         // TODO: This should be hour, minute, second, milliseconds
         return [0, 0, 0, 0]
       } else {
@@ -681,36 +709,20 @@ function displayGraphRequest (request) {
     dataTable.addRow(rowValues)
   })
 
-  const graphBoxElement = document.getElementById('graph-box')
-
   const chart = new google.visualization.LineChart(graphBoxElement)
   const options = {
     hAxis: {
-      title: request.result.columns[0]
+      title: fetch.result.columns[0]
     },
     vAxis: {
-      title: request.result.columns[1]
+      title: fetch.result.columns[1]
     }
   }
   chart.draw(dataTable, options)
 }
 
-function setGraphStatus (result) {
-  const statusElement = document.getElementById('graph-status')
-
-  if (result.total_rows === 1) {
-    statusElement.innerText = `${result.total_rows} row`
-  } else {
-    statusElement.innerText = `${result.total_rows} rows`
-  }
-
-  if (result.total_rows > result.rows.length) {
-    statusElement.innerText += ` (truncated to ${result.rows.length})`
-  }
-}
-
-function setQueryStatus (result) {
-  const statusElement = document.getElementById('query-status')
+function displaySqlFetchResultStatus (statusElementId, result) {
+  const statusElement = document.getElementById(statusElementId)
 
   if (result.total_rows === 1) {
     statusElement.innerText = `${result.total_rows} row`
@@ -732,20 +744,24 @@ window.addEventListener('popstate', function (event) {
 })
 
 window.addEventListener('resize', function (event) {
-  if (window.tab === 'graph' && window.request.result) {
+  if (window.tab === 'graph' && window.sqlFetch.result) {
     clearGraphBox()
-    displayGraphRequest()
+    displaySqlFetchInGraphTab(window.sqlFetch)
   }
 })
 
 window.onload = function () {
-  fetch('metadata', {
-    headers: {
-      Accept: 'application/json'
-    },
-    method: 'GET'
-  })
-    .then((response) => {
+  Promise.all([
+    google.charts.load('current', { packages: ['corechart', 'line'] }),
+    fetch('metadata', {
+      headers: {
+        Accept: 'application/json'
+      },
+      method: 'GET'
+    })
+  ])
+    .then((results) => {
+      const response = results[1]
       const contentType = response.headers.get('content-type')
       if (contentType && contentType.indexOf('application/json') !== -1) {
         return response.json().then((result) => {

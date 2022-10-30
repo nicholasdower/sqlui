@@ -70,7 +70,7 @@ class Server < Sinatra::Base
                 {
                   filename: filename,
                   description: description,
-                  contents: contents
+                  contents: contents.strip
                 }
               ]
             end
