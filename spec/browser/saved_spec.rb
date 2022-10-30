@@ -8,7 +8,7 @@ describe 'saved' do
   let(:wait) { Selenium::WebDriver::Wait.new(timeout: 5) }
 
   before do
-    driver.get(url('/sqlui/seinfeld/app?tab=saved'))
+    driver.get(url('/sqlui/seinfeld/saved'))
   end
 
   let(:expected_file_names) { %w[sample_one.sql sample_two.sql] }

@@ -103,12 +103,12 @@
   <h1 class="server-name"><%= config.name %> Databases</h1>
 </div>
 <% config.database_configs.each do |database_config| %>
-  <div class="database" onclick="openDatabase(event, '<%= "#{database_config.url_path}/app" %>')">
+  <div class="database" onclick="openDatabase(event, '<%= "#{database_config.url_path}/query" %>')">
     <div class="name-and-links">
       <h2 class='name'><%= database_config.display_name %></h2>
-      <a class='query-link' href="<%= database_config.url_path %>/app" onclick="event.stopPropagation()">query</a>
-      <a class='saved-link' href="<%= database_config.url_path %>/app?tab=saved" onclick="event.stopPropagation()">saved</a>
-      <a class='structure-link' href="<%= database_config.url_path %>/app?tab=structure" onclick="event.stopPropagation()">structure</a>
+      <a class='query-link' href="<%= database_config.url_path %>/query" onclick="event.stopPropagation()">query</a>
+      <a class='saved-link' href="<%= database_config.url_path %>/saved" onclick="event.stopPropagation()">saved</a>
+      <a class='structure-link' href="<%= database_config.url_path %>/structure" onclick="event.stopPropagation()">structure</a>
     </div>
     <p class='description'>
       <%= database_config.description %>

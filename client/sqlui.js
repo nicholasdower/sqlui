@@ -79,25 +79,34 @@ function setValue (value) {
   })
 }
 
+function setTabInUrl (url, tab) {
+  url.pathname = url.pathname.replace(/\/[^/]+$/, `/${tab}`)
+}
+
+function getTabFromUrl (url) {
+  const match = url.pathname.match(/\/([^/]+)$/)
+  if (match && ['query', 'graph', 'structure', 'saved'].includes(match[1])) {
+    return match[1]
+  } else {
+    throw new Error(`invalid tab: ${url.pathname}`)
+  }
+}
+
 function updateTabs () {
   const url = new URL(window.location)
-  url.searchParams.set('tab', 'graph')
-  document.getElementById('graph-tab-button').href = url.search
-  url.searchParams.set('tab', 'saved')
-  document.getElementById('saved-tab-button').href = url.search
-  url.searchParams.set('tab', 'structure')
-  document.getElementById('structure-tab-button').href = url.search
-  url.searchParams.delete('tab')
-  document.getElementById('query-tab-button').href = url.search
+  setTabInUrl(url, 'graph')
+  document.getElementById('graph-tab-button').href = url.pathname + url.search
+  setTabInUrl(url, 'saved')
+  document.getElementById('saved-tab-button').href = url.pathname + url.search
+  setTabInUrl(url, 'structure')
+  document.getElementById('structure-tab-button').href = url.pathname + url.search
+  setTabInUrl(url, 'query')
+  document.getElementById('query-tab-button').href = url.pathname + url.search
 }
 
 function selectTab (event, tab) {
   const url = new URL(window.location)
-  if (tab === 'query') {
-    url.searchParams.delete('tab')
-  } else {
-    url.searchParams.set('tab', tab)
-  }
+  setTabInUrl(url, tab)
   route(event.target, event, url)
 }
 
@@ -123,7 +132,7 @@ function route (target = null, event = null, url = null) {
     url = new URL(window.location)
   }
   updateTabs()
-  window.tab = url.searchParams.get('tab') || 'query'
+  window.tab = getTabFromUrl(url)
 
   const tabElement = document.getElementById(`${window.tab}-tab-button`)
   Array.prototype.forEach.call(document.getElementsByClassName('selected-tab-button'), function (selected) {
@@ -353,12 +362,12 @@ function selectSavedTab () {
     setSavedStatus(`${saved.length} files`)
   }
   Object.values(saved).forEach(file => {
-    console.log(file)
     const divElement = document.createElement('div')
     divElement.classList.add('saved-list-item')
     divElement.addEventListener('click', function (event) {
       clearResult()
       const url = new URL(window.location.origin + window.location.pathname)
+      setTabInUrl(url, 'query')
       url.searchParams.set('file', file.filename)
       route(event.target, event, url)
     })

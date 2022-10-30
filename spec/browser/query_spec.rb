@@ -15,7 +15,9 @@ describe 'query' do
 
   context 'when sql specified in query parameter' do
     before do
-      driver.get(url('/sqlui/seinfeld/app?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B'))
+      driver.get(
+        url('/sqlui/seinfeld/query?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B')
+      )
     end
 
     it 'loads expected results' do
@@ -27,7 +29,7 @@ describe 'query' do
   shared_examples_for 'submitted queries' do
     context 'when single editor query specified' do
       before do
-        driver.get(url('/sqlui/seinfeld/app'))
+        driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys('select id, name, description from characters order by id limit 2;')
         execute
@@ -41,7 +43,7 @@ describe 'query' do
 
     context 'when first of two editor queries executed via cursor position' do
       before do
-        driver.get(url('/sqlui/seinfeld/app'))
+        driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys(
           <<~SQL
@@ -61,7 +63,7 @@ describe 'query' do
 
     context 'when second of two editor queries executed via cursor position' do
       before do
-        driver.get(url('/sqlui/seinfeld/app'))
+        driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys(
           <<~SQL
@@ -80,7 +82,7 @@ describe 'query' do
 
     context 'when invalid sql executed via editor' do
       before do
-        driver.get(url('/sqlui/seinfeld/app'))
+        driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys('foo')
         execute
@@ -94,7 +96,7 @@ describe 'query' do
 
     context 'when multiple statements executed via selection' do
       before do
-        driver.get(url('/sqlui/seinfeld/app'))
+        driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys(
           <<~SQL
@@ -114,7 +116,7 @@ describe 'query' do
 
     context 'when multiple statements executed' do
       before do
-        driver.get(url('/sqlui/seinfeld/app'))
+        driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys(
           <<~SQL

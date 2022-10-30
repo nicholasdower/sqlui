@@ -34,15 +34,8 @@ class Server < Sinatra::Base
     end
 
     config.database_configs.each do |database|
-      get database.url_path.to_s do
-        redirect "#{database.url_path}/app", 301
-      end
-
-      get "#{database.url_path}/app" do
-        @html ||= File.read(File.join(resources_dir, 'sqlui.html'))
-        status 200
-        headers 'Content-Type': 'text/html'
-        body @html
+      get "#{database.url_path}/?" do
+        redirect "#{database.url_path}/query", 301
       end
 
       get "#{database.url_path}/sqlui.css" do
@@ -120,6 +113,13 @@ class Server < Sinatra::Base
         status 200
         headers 'Content-Type': 'application/json'
         body result.to_json
+      end
+
+      get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
+        @html ||= File.read(File.join(resources_dir, 'sqlui.html'))
+        status 200
+        headers 'Content-Type': 'text/html'
+        body @html
       end
     end
 

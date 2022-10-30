@@ -22,7 +22,7 @@ class Watcher
   end
 
   def watch
-    @pid = Process.spawn(*@command, :pgroup => true) if @alive
+    @pid = Process.spawn(*@command, pgroup: true) if @alive
     while @alive
       minutes_since_last_change = ((Time.now - @last_change) / 60).to_i
       minutes_since_last_change = [minutes_since_last_change, 0].max
@@ -40,14 +40,14 @@ class Watcher
     puts "changed: #{files.join(' ')}"
     @last_change = Time.now
     kill('TERM')
-    @pid = Process.spawn(*@command, :pgroup => true) if @alive
+    @pid = Process.spawn(*@command, pgroup: true) if @alive
   end
 
   def kill(signal)
-    if @pid
-      Process.kill(signal, -Process.getpgid(@pid)) if @pid
-      @pid = nil
-    end
+    return unless @pid
+
+    Process.kill(signal, -Process.getpgid(@pid)) if @pid
+    @pid = nil
   end
 
   def die(signal)

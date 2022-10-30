@@ -8,7 +8,7 @@ describe 'structure' do
   let(:wait) { Selenium::WebDriver::Wait.new(timeout: 5) }
 
   before do
-    driver.get(url('/sqlui/seinfeld/app?tab=structure'))
+    driver.get(url('/sqlui/seinfeld/structure'))
   end
 
   it 'hides the list of schemas' do
