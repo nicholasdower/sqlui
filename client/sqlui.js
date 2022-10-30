@@ -47,18 +47,27 @@ function init (parent, onSubmit, onShiftSubmit) {
 }
 
 function getSelection () {
-  return [window.editorView.state.selection.main.from, window.editorView.state.selection.main.to]
+  const anchor = window.editorView.state.selection.main.anchor
+  const head = window.editorView.state.selection.main.head
+  if (anchor === head) {
+    return `${anchor}`
+  } else {
+    return `${anchor}-${head}`
+  }
 }
 
 function setSelection (selection) {
-  window.editorView.dispatch(
-    {
-      selection: {
-        anchor: Math.min(selection[0], window.editorView.state.doc.length),
-        head: Math.min(selection[1], window.editorView.state.doc.length)
-      }
-    }
-  )
+  let anchor
+  let head
+  if (selection.includes('-')) {
+    selection = selection.split('-').map(x => parseInt(x))
+    anchor = Math.min(selection[0], window.editorView.state.doc.length)
+    head = Math.min(selection[1], window.editorView.state.doc.length)
+  } else {
+    anchor = Math.min(parseInt(selection), window.editorView.state.doc.length)
+    head = anchor
+  }
+  window.editorView.dispatch({ selection: { anchor, head } })
 }
 
 function focus () {
@@ -389,7 +398,7 @@ function submitAll (target, event) {
 }
 
 function submitCurrent (target, event) {
-  submit(target, event, getSelection().join(':'))
+  submit(target, event, getSelection())
 }
 
 function submit (target, event, selection = null) {
@@ -510,7 +519,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
         callback()
         if (params.has('selection')) {
           focus()
-          setSelection(selection.split(':'))
+          setSelection(selection)
         }
         return
       }
@@ -539,7 +548,7 @@ function loadQueryOrGraphTab (callback, errorCallback) {
   }
   if (params.has('selection')) {
     focus()
-    setSelection(selection.split(':'))
+    setSelection(selection)
   }
 }
 

@@ -88,13 +88,21 @@ class Server < Sinatra::Base
         full_sql = params[:sql]
         sql = params[:sql]
         if params[:selection]
-          selection = params[:selection].split(':').map { |v| Integer(v) }
+          selection = params[:selection]
+          if selection.include?('-')
+            # sort because the selection could be in either direction
+            selection = params[:selection].split('-').map { |v| Integer(v) }.sort
+          else
+            selection = Integer(selection)
+            selection = [selection, selection]
+          end
 
           sql = if selection[0] == selection[1]
                   SqlParser.find_statement_at_cursor(params[:sql], selection[0])
                 else
                   full_sql[selection[0], selection[1]]
                 end
+
           break client_error("can't find query at selection") unless sql
         end
 
