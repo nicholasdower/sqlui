@@ -318,7 +318,7 @@ function selectGraphTab () {
 
   google.charts.load('current', { packages: ['corechart', 'line'] })
   google.charts.setOnLoadCallback(function () {
-    loadQueryOrGraphTab(loadGraphResult, queryErrorCallback('graph-status'))
+    maybeFetchResult()
   })
 
   const selection = getSelection()
@@ -335,19 +335,7 @@ function selectQueryTab () {
   focus()
   setSelection(selection)
 
-  loadQueryOrGraphTab(loadQueryResult, queryErrorCallback('query-status'))
-}
-
-function queryErrorCallback (statusElementId) {
-  const statusElement = document.getElementById(statusElementId)
-  return function (message, error) {
-    if (error) {
-      console.log(`${message}\n${error}`)
-      statusElement.innerText = `error: ${message} (check console)`
-    } else {
-      statusElement.innerText = `error: ${message}`
-    }
-  }
+  maybeFetchResult()
 }
 
 function selectSavedTab () {
@@ -402,6 +390,7 @@ function submitCurrent (target, event) {
 }
 
 function submit (target, event, selection = null) {
+  clearResult()
   const url = new URL(window.location)
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
@@ -444,7 +433,12 @@ function clearResult () {
   clearQueryStatus()
   clearGraphBox()
   clearResultBox()
-  window.result = null
+  const existingRequest = window.request
+  if (existingRequest?.state === 'pending') {
+    existingRequest.state = 'aborted'
+    existingRequest.fetchController.abort()
+  }
+  window.request = null
 }
 
 function clearQueryStatus () {
@@ -469,7 +463,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sql, selection, successCallback, errorCallback) {
+function fetchSql (request, selection, successCallback, errorCallback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -477,81 +471,100 @@ function fetchSql (sql, selection, successCallback, errorCallback) {
     },
     method: 'POST',
     body: JSON.stringify({
-      sql,
+      sql: request.sql,
       selection
-    })
+    }),
+    signal: request.fetchController.signal
   })
     .then((response) => {
       const contentType = response.headers.get('content-type')
       if (contentType && contentType.indexOf('application/json') !== -1) {
         response.json().then((result) => {
           if (result?.query) {
-            successCallback(result)
-          } else if (result?.error) {
-            errorCallback(result.error, result.stacktrace)
-          } else if (result) {
-            errorCallback('failed to execute query', result.toString())
+            request.state = 'success'
+            request.result = result
+            successCallback(request)
           } else {
-            errorCallback('failed to execute query')
+            request.state = 'error'
+            if (result?.error) {
+              errorCallback(result.error, result.stacktrace)
+            } else if (result) {
+              errorCallback('failed to execute query', result.toString())
+            } else {
+              errorCallback('failed to execute query')
+            }
           }
         })
       } else {
         response.text().then((result) => {
+          request.state = 'error'
           errorCallback('failed to execute query', result)
         })
       }
     })
     .catch(function (error) {
-      errorCallback('failed to execute query', error.stack)
+      if (request.state === 'pending') {
+        request.state = 'error'
+        errorCallback('failed to execute query', error.stack)
+      }
     })
 }
 
-function loadQueryOrGraphTab (callback, errorCallback) {
+function maybeFetchResult () {
   const params = new URLSearchParams(window.location.search)
   const sql = params.get('sql')
   const file = params.get('file')
   const selection = params.get('selection')
   const run = !params.has('run') || !['0', 'false'].includes(params.get('run').toLowerCase())
-  console.log(run)
+
   if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
     throw new Error('You can only specify a file or sql, not both.')
   }
-  if (window.result) {
-    if ((params.has('sql') && sql === window.result.query) || (params.has('file') && file === window.result.file)) {
-      if (selection === window.result.selection) {
-        callback()
-        if (params.has('selection')) {
-          focus()
-          setSelection(selection)
-        }
-        return
+
+  const request = {
+    fetchController: new AbortController(),
+    state: 'pending',
+    sql,
+    file,
+    selection
+  }
+
+  if (params.has('file')) {
+    const fileDetails = window.metadata.saved[params.get('file')]
+    if (!fileDetails) {
+      throw new Error(`no such file: ${params.get('file')}`)
+    }
+    request.file = file
+    request.sql = fileDetails.contents
+  } else if (params.has('sql')) {
+    request.sql = sql
+  }
+
+  const existingRequest = window.request
+  if (existingRequest) {
+    const selectionMatches = selection === existingRequest.selection
+    const sqlMatches = params.has('sql') && sql === existingRequest.sql
+    const fileMatches = params.has('file') && file === existingRequest.file
+    const queryMatches = sqlMatches || fileMatches
+    if (selectionMatches && queryMatches) {
+      displayFetchSqlRequest(existingRequest)
+      if (params.has('selection')) {
+        focus()
+        setSelection(selection)
       }
+      return
     }
   }
 
   clearResult()
 
-  if (params.has('sql')) {
-    setValue(sql)
+  if (params.has('sql') || params.has('file')) {
+    setValue(request.sql)
     if (run) {
-      fetchSql(params.get('sql'), selection, function (result) {
-        window.result = result
-        callback()
-      }, errorCallback)
-    }
-  } else if (params.has('file')) {
-    const file = window.metadata.saved[params.get('file')]
-    if (!file) {
-      throw new Error(`no such file: ${params.get('file')}`)
-    }
-    const fileSql = file.contents
-    setValue(fileSql)
-    if (run) {
-      fetchSql(fileSql, selection, function (result) {
-        window.result = result
-        callback()
-      }, errorCallback)
+      window.request = request
+      displayFetchSqlRequest(request)
+      fetchSql(request, selection, displayFetchSqlRequest, displayQueryError)
     }
   }
   if (params.has('selection')) {
@@ -560,17 +573,18 @@ function loadQueryOrGraphTab (callback, errorCallback) {
   }
 }
 
-function loadQueryResult () {
+function displayQueryRequest (request) {
+  if (request.state === 'pending') {
+    // todo: show spinner
+    return
+  }
+
   const resultElement = document.getElementById('result-box')
   if (resultElement.children.length > 0) {
     return
   }
 
-  setQueryStatus(window.result)
-
-  // if (!window.result.rows) {
-  //   return
-  // }
+  setQueryStatus(request.result)
 
   const tableElement = document.createElement('table')
   const theadElement = document.createElement('thead')
@@ -581,16 +595,16 @@ function loadQueryResult () {
   tableElement.appendChild(tbodyElement)
   resultElement.appendChild(tableElement)
 
-  window.result.columns.forEach(column => {
+  request.result.columns.forEach(column => {
     const template = document.createElement('template')
     template.innerHTML = `<th class="cell">${column}</th>`
     headerElement.appendChild(template.content.firstChild)
   })
-  if (window.result.columns.length > 0) {
+  if (request.result.columns.length > 0) {
     headerElement.appendChild(document.createElement('th'))
   }
   let highlight = false
-  window.result.rows.forEach(function (row) {
+  request.result.rows.forEach(function (row) {
     const rowElement = document.createElement('tr')
     if (highlight) {
       rowElement.classList.add('highlighted-row')
@@ -608,25 +622,56 @@ function loadQueryResult () {
   document.getElementById('result-box').style.display = 'flex'
 }
 
-function loadGraphResult () {
-  setGraphStatus(window.result)
+function displayFetchSqlRequest (request) {
+  if (window.tab === 'query') {
+    displayQueryRequest(request)
+  } else if (window.tab === 'graph') {
+    displayGraphRequest(request)
+  }
+}
 
-  if (!window.result.rows) {
+function displayQueryError (message, error) {
+  let statusElementId
+  if (window.tab === 'query') {
+    statusElementId = 'query-status'
+  } else if (window.tab === 'graph') {
+    statusElementId = 'graph-status'
+  } else {
     return
   }
-  if (window.result.rows.length === 0 || window.result.columns.length < 2) {
+  const statusElement = document.getElementById(statusElementId)
+  if (error) {
+    console.log(`${message}\n${error}`)
+    statusElement.innerText = `error: ${message} (check console)`
+  } else {
+    statusElement.innerText = `error: ${message}`
+  }
+}
+
+function displayGraphRequest (request) {
+  if (request.state === 'pending') {
+    console.log('spinner')
+    return
+  }
+
+  setGraphStatus(request.result)
+
+  if (!request.result.rows) {
+    return
+  }
+  if (request.result.rows.length === 0 || request.result.columns.length < 2) {
     return
   }
   const dataTable = new google.visualization.DataTable()
-  window.result.columns.forEach((column, index) => {
-    dataTable.addColumn(window.result.column_types[index], column)
+  request.result.columns.forEach((column, index) => {
+    dataTable.addColumn(request.result.column_types[index], column)
   })
 
-  window.result.rows.forEach((row) => {
+  request.result.rows.forEach((row) => {
     const rowValues = row.map((value, index) => {
-      if (window.result.column_types[index] === 'date' || window.result.column_types[index] === 'datetime') {
+      if (request.result.column_types[index] === 'date' || request.result.column_types[index] === 'datetime') {
         return new Date(value)
-      } else if (window.result.column_types[index] === 'timeofday') {
+      } else if (request.result.column_types[index] === 'timeofday') {
         // TODO: This should be hour, minute, second, milliseconds
         return [0, 0, 0, 0]
       } else {
@@ -641,10 +686,10 @@ function loadGraphResult () {
   const chart = new google.visualization.LineChart(graphBoxElement)
   const options = {
     hAxis: {
-      title: window.result.columns[0]
+      title: request.result.columns[0]
     },
     vAxis: {
-      title: window.result.columns[1]
+      title: request.result.columns[1]
     }
   }
   chart.draw(dataTable, options)
@@ -687,9 +732,9 @@ window.addEventListener('popstate', function (event) {
 })
 
 window.addEventListener('resize', function (event) {
-  if (window.tab === 'graph' && window.result) {
+  if (window.tab === 'graph' && window.request.result) {
     clearGraphBox()
-    loadGraphResult()
+    displayGraphRequest()
   }
 })
 
