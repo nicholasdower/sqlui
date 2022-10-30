@@ -1,9 +1,4 @@
-tests
-maybe collapse query
 override max?
-show errors 
-handle very large errors
-update controller to rescue all errors and return a message
 parameterized queries
 add progress spinner
 copy to clipboard
@@ -12,59 +7,32 @@ fix table header maybe by using flex, right now words are wrapped for no good re
 pagination?
 make chart type configurable
 maybe highlight the current file in the saved tab
-include app name and environment in startup response
-show app name and environment in header and as title
 prevent races when using the network
-disable app if metadata fails to load
-entering a blank query, then going back to a real query, then going forward does not clear the result or the editor
-add rescue blocks, return bad request rather than raising
-execute and execute all buttons
-add ability to execute current selection, change cursor to from and to
 use caching headers on js and css and html
 cache js, css and html at class level instead of instance
 use weak references to keep track of all clients. close connections on server shutdown
 display error on structure tab if no schemas are returned
-add a title that links to the databases list
-ensure shift click etc. work
-add error handling for when js fetch fails
-return metadata in page response or in a js file (is this normal)
 show a helpful message when no saved files are found or when the directory doesn't exist
-add name to root of config. Use on databases list as title.
-use flags instead of env variables
 add github action for build and test
-use paths instead of tab param for navigation
 make it possible to rerun seed-db. can't figure out how to recreate users
 switch to typescript
 add prometheus metrics
 add error reporting
 add a second database
-update health to only report health when client connections are working
-maybe split database configs into separate files
 cache saved files
 add padding inside select list, longest name overlaps scrollbar
 put current structure table and schema in url params
 make cmd-enter work
-symbolize keys in config, clean up config_for crap
-let client specify path root
-test sqluiconfig and databaseconfig when fields are nil, empty, numbers, etc. Use different messages for each case instead of the generic one being used now.
 add github action to update deps
-executing all causes the cursor to be reset to 0. it also isn't in the url
 make status have a tooltip with the full error.
 add a tooltip to execute buttons ;)
 make "check console" a link that opens the console?
-fix editor and table text sizes.
 add a cancel button when the spinner is displayed
-fix spacing on db list links
-fix broken command click on db list
 add keyboard focus order
 maybe move db list into app
-ensure list_url_path is being used to link to db list
-maybe put selection in the url no matter what, just leave it blank when there isn't one
-separate selection and what to run so that cursor is maintained regardless of what is run &selection=0&run=all or &run=selection
 make it possible to link to a query or file but not run any query, maybe like sql=foo&run=none
-change "execute" to "run"
-clear selection when clearing sql
 test:
  - shift and meta navigation
  - executing when viewing a file after changing selection
  - executing when viewing a file after changing query
+maybe add support for tags on database config to easily see production vs staging for instance
