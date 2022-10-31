@@ -1,5 +1,11 @@
 # Changes
 
+## 0.1.26
+
+- Add cancel button.
+- Queries are no longer automatically run.
+- Add view and run options to saved query list.
+
 ## 0.1.25
 
 - Show spinners.
