@@ -355,21 +355,48 @@ function selectSavedTab () {
     setSavedStatus(`${saved.length} files`)
   }
   Object.values(saved).forEach(file => {
-    const divElement = document.createElement('div')
-    divElement.classList.add('saved-list-item')
-    divElement.addEventListener('click', function (event) {
+    const viewUrl = new URL(window.location.origin + window.location.pathname)
+    setTabInUrl(viewUrl, 'query')
+    viewUrl.searchParams.set('file', file.filename)
+
+    const viewLinkElement = document.createElement('a')
+    viewLinkElement.classList.add('view-link')
+    viewLinkElement.innerText = 'view'
+    viewLinkElement.href = viewUrl.pathname + viewUrl.search
+    viewLinkElement.addEventListener('click', function (event) {
       clearResult()
-      const url = new URL(window.location.origin + window.location.pathname)
-      setTabInUrl(url, 'query')
-      url.searchParams.set('file', file.filename)
-      route(event.target, event, url)
+      route(event.target, event, viewUrl)
     })
+
+    const runUrl = new URL(window.location.origin + window.location.pathname)
+    setTabInUrl(runUrl, 'query')
+    runUrl.searchParams.set('file', file.filename)
+    runUrl.searchParams.set('run', 'true')
+
+    const runLinkElement = document.createElement('a')
+    runLinkElement.classList.add('run-link')
+    runLinkElement.innerText = 'run'
+    runLinkElement.href = runUrl.pathname + runUrl.search
+    runLinkElement.addEventListener('click', function (event) {
+      clearResult()
+      route(event.target, event, runUrl)
+    })
+
     const nameElement = document.createElement('h2')
     nameElement.innerText = file.filename
-    divElement.appendChild(nameElement)
+
+    const nameAndLinksElement = document.createElement('div')
+    nameAndLinksElement.classList.add('name-and-links')
+    nameAndLinksElement.appendChild(nameElement)
+    nameAndLinksElement.appendChild(viewLinkElement)
+    nameAndLinksElement.appendChild(runLinkElement)
 
     const descriptionElement = document.createElement('p')
     descriptionElement.innerText = file.description
+
+    const divElement = document.createElement('div')
+    divElement.classList.add('saved-list-item')
+    divElement.appendChild(nameAndLinksElement)
     divElement.appendChild(descriptionElement)
 
     savedElement.appendChild(divElement)

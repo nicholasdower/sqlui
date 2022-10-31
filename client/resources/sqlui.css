@@ -243,18 +243,30 @@ thead {
 }
 
 .saved-list-item {
-    cursor: pointer;
     border-bottom: 1px solid #eeeeee;
     margin: 0;
     padding: 10px;
 }
 
 .saved-list-item h2 {
-    margin: 0 0 5px;
+    margin: 0 10px 0 0;
 }
 
-.saved-box div:hover {
-    background: #eee;
+.saved-list-item p {
+    margin: 10px 0 0;
+}
+
+.name-and-links {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.name-and-links a {
+    margin-right: 5px;
+    color: darkblue;
+    font-size: 16px;
+    text-decoration: none;
 }
 
 .cm-editor.cm-focused {

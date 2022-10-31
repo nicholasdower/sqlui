@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-  <title>Databases</title>
+  <title><%= config.name %> Databases</title>
 
   <style>
       body {
@@ -71,30 +71,13 @@
       .database {
           margin: 0;
           padding: 10px;
-          cursor: pointer;
           border-bottom: 1px solid #eeeeee;
       }
 
       .database:last-child {
           border-bottom: none;
       }
-
-      .database:hover {
-          background: #eee;
-      }
   </style>
-
-  <script>
-    function openDatabase(event, url) {
-      if (event.shiftKey) {
-        window.open(url, '_blank').focus()
-      } else if (event.metaKey) {
-        window.open(url).focus()
-      } else {
-        window.location = url
-      }
-    }
-  </script>
 </head>
 
 <body>
@@ -103,12 +86,12 @@
   <h1 class="server-name"><%= config.name %> Databases</h1>
 </div>
 <% config.database_configs.each do |database_config| %>
-  <div class="database" onclick="openDatabase(event, '<%= "#{database_config.url_path}/query" %>')">
+  <div class="database">
     <div class="name-and-links">
       <h2 class='name'><%= database_config.display_name %></h2>
-      <a class='query-link' href="<%= database_config.url_path %>/query" onclick="event.stopPropagation()">query</a>
-      <a class='saved-link' href="<%= database_config.url_path %>/saved" onclick="event.stopPropagation()">saved</a>
-      <a class='structure-link' href="<%= database_config.url_path %>/structure" onclick="event.stopPropagation()">structure</a>
+      <a class='query-link' href="<%= database_config.url_path %>/query">query</a>
+      <a class='saved-link' href="<%= database_config.url_path %>/saved">saved</a>
+      <a class='structure-link' href="<%= database_config.url_path %>/structure">structure</a>
     </div>
     <p class='description'>
       <%= database_config.description %>
