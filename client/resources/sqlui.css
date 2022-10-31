@@ -113,7 +113,11 @@ p {
     display: flex;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    justify-content: right;
+}
+
+.submit-fill {
+    display: flex;
+    flex: 1
 }
 
 .submit-button {

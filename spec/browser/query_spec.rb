@@ -16,7 +16,10 @@ describe 'query' do
   context 'when sql specified in query parameter with run' do
     before do
       driver.get(
-        url('/sqlui/seinfeld/query?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B&run=true')
+        url(
+          '/sqlui/seinfeld/query' \
+          '?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B&run=true'
+        )
       )
     end
 

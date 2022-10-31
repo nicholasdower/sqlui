@@ -1,4 +1,4 @@
-import { EditorView, basicSetup } from 'codemirror'
+import { basicSetup, EditorView } from 'codemirror'
 import { defaultKeymap } from '@codemirror/commands'
 import { EditorState } from '@codemirror/state'
 import { keymap, placeholder } from '@codemirror/view'
@@ -24,6 +24,9 @@ function init (parent, onSubmit, onShiftSubmit) {
   })
   document.getElementById('submit-current-button').addEventListener('click', function (event) {
     submitCurrent(event.target, event)
+  })
+  document.getElementById('cancel-button').addEventListener('click', function (event) {
+    clearResult()
   })
 
   const fixedHeightEditor = EditorView.theme({
@@ -316,6 +319,8 @@ function selectGraphTab () {
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('graph-box').style.display = 'flex'
   document.getElementById('graph-status').style.display = 'flex'
+  document.getElementById('fetch-sql-box').style.display = 'none'
+  document.getElementById('cancel-button').style.display = 'none'
   maybeFetchResult()
 
   const selection = getSelection()
@@ -328,6 +333,8 @@ function selectResultTab () {
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('result-box').style.display = 'flex'
   document.getElementById('result-status').style.display = 'flex'
+  document.getElementById('fetch-sql-box').style.display = 'none'
+  document.getElementById('cancel-button').style.display = 'none'
   const selection = getSelection()
   focus()
   setSelection(selection)
@@ -453,16 +460,18 @@ function submit (target, event, selection = null) {
 }
 
 function clearResult () {
-  clearGraphStatus()
-  clearResultStatus()
-  clearGraphBox()
-  clearResultBox()
-  const existingRequest = window.sqlFetch
-  if (existingRequest?.state === 'pending') {
-    existingRequest.state = 'aborted'
-    existingRequest.fetchController.abort()
+  const existingFetch = window.sqlFetch
+  if (existingFetch?.state === 'pending') {
+    existingFetch.state = 'aborted'
+    existingFetch.fetchController.abort()
   }
   window.sqlFetch = null
+
+  clearGraphBox()
+  clearGraphStatus()
+
+  clearResultBox()
+  clearResultStatus()
 }
 
 function clearResultStatus () {
@@ -487,7 +496,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (request, selection, callback) {
+function fetchSql (sqlFetch, selection, callback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -495,48 +504,48 @@ function fetchSql (request, selection, callback) {
     },
     method: 'POST',
     body: JSON.stringify({
-      sql: request.sql,
+      sql: sqlFetch.sql,
       selection
     }),
-    signal: request.fetchController.signal
+    signal: sqlFetch.fetchController.signal
   })
     .then((response) => {
       const contentType = response.headers.get('content-type')
       if (contentType && contentType.indexOf('application/json') !== -1) {
         response.json().then((result) => {
           if (result?.query) {
-            request.state = 'success'
-            request.result = result
+            sqlFetch.state = 'success'
+            sqlFetch.result = result
           } else {
-            request.state = 'error'
+            sqlFetch.state = 'error'
             if (result?.error) {
-              request.error_message = result.error
-              request.error_details = result.stacktrace
+              sqlFetch.error_message = result.error
+              sqlFetch.error_details = result.stacktrace
             } else if (result) {
-              request.error_message = 'failed to execute query'
-              request.error_details = result.toString()
+              sqlFetch.error_message = 'failed to execute query'
+              sqlFetch.error_details = result.toString()
             } else {
-              request.error_message = 'failed to execute query'
+              sqlFetch.error_message = 'failed to execute query'
             }
           }
-          callback(request)
+          callback(sqlFetch)
         })
       } else {
         response.text().then((result) => {
-          request.state = 'error'
-          request.error_message = 'failed to execute query'
-          request.error_details = result
-          callback(request)
+          sqlFetch.state = 'error'
+          sqlFetch.error_message = 'failed to execute query'
+          sqlFetch.error_details = result
+          callback(sqlFetch)
         })
       }
     })
     .catch(function (error) {
-      if (request.state === 'pending') {
-        request.state = 'error'
-        request.error_message = 'failed to execute query'
-        request.error_details = error.stack
-        callback(request)
+      if (sqlFetch.state === 'pending') {
+        sqlFetch.state = 'error'
+        sqlFetch.error_message = 'failed to execute query'
+        sqlFetch.error_details = error
       }
+      callback(sqlFetch)
     })
 }
 
@@ -553,7 +562,7 @@ function maybeFetchResult () {
     throw new Error('You can only specify a file or sql, not both.')
   }
 
-  const request = {
+  const sqlFetch = {
     fetchController: new AbortController(),
     state: 'pending',
     sql,
@@ -566,10 +575,10 @@ function maybeFetchResult () {
     if (!fileDetails) {
       throw new Error(`no such file: ${params.get('file')}`)
     }
-    request.file = file
-    request.sql = fileDetails.contents
+    sqlFetch.file = file
+    sqlFetch.sql = fileDetails.contents
   } else if (params.has('sql')) {
-    request.sql = sql
+    sqlFetch.sql = sql
   }
 
   const existingRequest = window.sqlFetch
@@ -591,13 +600,13 @@ function maybeFetchResult () {
   clearResult()
 
   if (params.has('sql') || params.has('file')) {
-    setValue(request.sql)
+    setValue(sqlFetch.sql)
     if (run) {
       url.searchParams.delete('run')
       window.history.replaceState({}, '', url)
-      window.sqlFetch = request
-      displaySqlFetch(request)
-      fetchSql(request, selection, displaySqlFetch)
+      window.sqlFetch = sqlFetch
+      displaySqlFetch(sqlFetch)
+      fetchSql(sqlFetch, selection, displaySqlFetch)
     }
   }
   if (params.has('selection')) {
@@ -607,17 +616,22 @@ function maybeFetchResult () {
 }
 
 function displaySqlFetchInResultTab (fetch) {
-  const fetchSqlBoxElement = document.getElementById('fetch-sql-box')
-  const resultBoxElement = document.getElementById('result-box')
   if (fetch.state === 'pending') {
     clearResultBox()
-    resultBoxElement.style.display = 'none'
-    fetchSqlBoxElement.style.display = 'flex'
+    document.getElementById('cancel-button').style.display = 'flex'
+    document.getElementById('result-box').style.display = 'none'
+    document.getElementById('fetch-sql-box').style.display = 'flex'
     return
   }
 
-  resultBoxElement.style.display = 'flex'
-  fetchSqlBoxElement.style.display = 'none'
+  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('fetch-sql-box').style.display = 'none'
+  document.getElementById('result-box').style.display = 'flex'
+
+  if (fetch.state === 'aborted') {
+    clearResultBox()
+    return
+  }
 
   if (fetch.state === 'error') {
     clearResultBox()
@@ -645,7 +659,7 @@ function displaySqlFetchInResultTab (fetch) {
   theadElement.appendChild(headerElement)
   tableElement.appendChild(theadElement)
   tableElement.appendChild(tbodyElement)
-  resultBoxElement.appendChild(tableElement)
+  document.getElementById('result-box').appendChild(tableElement)
 
   fetch.result.columns.forEach(column => {
     const template = document.createElement('template')
@@ -691,17 +705,22 @@ function displaySqlFetchError (statusElementId, message, details) {
 }
 
 function displaySqlFetchInGraphTab (fetch) {
-  const graphBoxElement = document.getElementById('graph-box')
-  const fetchSqlBoxElement = document.getElementById('fetch-sql-box')
   if (fetch.state === 'pending') {
     clearGraphBox()
-    graphBoxElement.style.display = 'none'
-    fetchSqlBoxElement.style.display = 'flex'
+    document.getElementById('cancel-button').style.display = 'flex'
+    document.getElementById('graph-box').style.display = 'none'
+    document.getElementById('fetch-sql-box').style.display = 'flex'
     return
   }
 
-  graphBoxElement.style.display = 'flex'
-  fetchSqlBoxElement.style.display = 'none'
+  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('fetch-sql-box').style.display = 'none'
+  document.getElementById('graph-box').style.display = 'flex'
+
+  if (fetch.state === 'aborted') {
+    clearGraphBox()
+    return
+  }
 
   if (fetch.state === 'error') {
     clearGraphBox()
@@ -740,7 +759,7 @@ function displaySqlFetchInGraphTab (fetch) {
     dataTable.addRow(rowValues)
   })
 
-  const chart = new google.visualization.LineChart(graphBoxElement)
+  const chart = new google.visualization.LineChart(document.getElementById('graph-box'))
   const options = {
     hAxis: {
       title: fetch.result.columns[0]
