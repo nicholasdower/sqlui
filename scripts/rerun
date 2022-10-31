@@ -69,7 +69,7 @@ class Watcher
 
   def updated_files
     new_watched_files = watched_files
-    difference = new_watched_files - @watched_files
+    difference = (new_watched_files - @watched_files) + (@watched_files - new_watched_files)
     @watched_files = new_watched_files
     difference.map(&:first)
   end

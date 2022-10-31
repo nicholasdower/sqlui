@@ -354,13 +354,9 @@ function selectSavedTab () {
   if (savedElement.children.length > 0) {
     return
   }
-
   const saved = window.metadata.saved
-  if (Object.keys(saved).length === 1) {
-    setSavedStatus('1 file')
-  } else {
-    setSavedStatus(`${saved.length} files`)
-  }
+  const numFiles = Object.keys(saved).length
+  setSavedStatus(`${numFiles} file${numFiles === 1 ? '' : 's'}`)
   Object.values(saved).forEach(file => {
     const viewUrl = new URL(window.location.origin + window.location.pathname)
     setTabInUrl(viewUrl, 'query')
