@@ -13,16 +13,28 @@ describe 'query' do
     end
   end
 
-  context 'when sql specified in query parameter' do
+  context 'when sql specified in query parameter with run' do
     before do
       driver.get(
-        url('/sqlui/seinfeld/query?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B')
+        url('/sqlui/seinfeld/query?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B&run=true')
       )
     end
 
     it 'loads expected results' do
       wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
                          ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+    end
+  end
+
+  context 'when sql specified in query parameter without run' do
+    before do
+      driver.get(
+        url('/sqlui/seinfeld/query?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+2%3B')
+      )
+    end
+
+    it 'does not load any results' do
+      wait_until_no_results(wait)
     end
   end
 

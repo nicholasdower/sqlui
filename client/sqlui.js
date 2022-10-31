@@ -391,7 +391,7 @@ function submit (target, event, selection = null) {
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
 
-  url.searchParams.delete('run')
+  url.searchParams.set('run', 'true')
 
   if (url.searchParams.has('file')) {
     if (window.metadata.saved[url.searchParams.get('file')].contents !== getValue()) {
@@ -419,6 +419,7 @@ function submit (target, event, selection = null) {
     url.searchParams.delete('selection')
     url.searchParams.delete('sql')
     url.searchParams.delete('file')
+    url.searchParams.delete('run')
   }
 
   route(target, event, url)
@@ -513,11 +514,12 @@ function fetchSql (request, selection, callback) {
 }
 
 function maybeFetchResult () {
-  const params = new URLSearchParams(window.location.search)
+  const url = new URL(window.location)
+  const params = url.searchParams
   const sql = params.get('sql')
   const file = params.get('file')
   const selection = params.get('selection')
-  const run = !params.has('run') || !['0', 'false'].includes(params.get('run').toLowerCase())
+  const run = ['1', 'true'].includes(params.get('run')?.toLowerCase())
 
   if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
@@ -564,6 +566,8 @@ function maybeFetchResult () {
   if (params.has('sql') || params.has('file')) {
     setValue(request.sql)
     if (run) {
+      url.searchParams.delete('run')
+      window.history.replaceState({}, '', url)
       window.sqlFetch = request
       displaySqlFetch(request)
       fetchSql(request, selection, displaySqlFetch)

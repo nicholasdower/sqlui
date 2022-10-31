@@ -29,10 +29,9 @@ end
 
 def wait_until_no_results(wait)
   wait.until do
-    driver.find_elements(css: '#result-box > table > thead > tr > th.cell').empty?
-  end
-  wait.until do
-    driver.find_elements(css: '#result-box > table > tbody > tr').empty?
+    driver.find_element(css: '#result-box > table')
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    true
   end
 end
 
