@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.27
+
+- Fix bug in saved file count.
+
 ## 0.1.26
 
 - Add cancel button.

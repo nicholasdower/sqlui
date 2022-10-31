@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.27
 - Fix bug in saved file count.
 
 version: 0.1.26

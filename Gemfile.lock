@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqlui (0.1.26)
+    sqlui (0.1.27)
       mysql2 (~> 0.0)
       puma (~> 6.0)
       sinatra (~> 3.0)
