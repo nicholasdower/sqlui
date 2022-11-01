@@ -3,8 +3,8 @@
 require 'selenium-webdriver'
 
 LOCAL = %w[1 true].include?(ENV.fetch('LOCAL', 'false').strip.downcase)
-SERVER_HOST = ENV.fetch('SERVER_HOST', LOCAL ? 'localhost' : 'server')
-SERVER_PORT = ENV.fetch('SERVER_PORT', 8080)
+APP_HOST = ENV.fetch('APP_HOST', LOCAL ? 'localhost' : 'server')
+APP_PORT = ENV.fetch('APP_PORT', 8080)
 
 def wait_until_editor(wait)
   wait.until do
@@ -44,7 +44,7 @@ def wait_until_query_error(wait, error_matcher)
 end
 
 def url(path)
-  "http://#{SERVER_HOST}:#{SERVER_PORT}#{path}"
+  "http://#{APP_HOST}:#{APP_PORT}#{path}"
 end
 
 RSpec.configure do |config|
