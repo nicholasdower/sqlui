@@ -1,5 +1,10 @@
 # Changes
 
+## 0.1.28
+
+- Use APP_ENV and APP_PORT instead of SERVER_ENV and SERVER_PORT.
+- Add "SQLUI" to database list title.
+
 ## 0.1.27
 
 - Fix bug in saved file count.
