@@ -38,3 +38,7 @@ update readme
 add a help tab
 show timer when waiting for a response
 send client errors to the server, at least log them
+add copy query to clipboard button
+browser notifications when query completes
+resizable columns
+copy cell contents for really long cells that can't be highlighted

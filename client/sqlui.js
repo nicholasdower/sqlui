@@ -551,7 +551,18 @@ function maybeFetchResult () {
   const sql = params.get('sql')
   const file = params.get('file')
   const selection = params.get('selection')
-  const run = ['1', 'true'].includes(params.get('run')?.toLowerCase())
+  const hasSqluiReferrer = document.referrer && new URL(document.referrer).origin === url.origin
+
+  // Only allow auto-run if coming from another SQLUI page. The idea here is to let the app link to URLs with run=true
+  // but not other apps. We use this feature when the user clicks submit or runs a saved query for instance. Instead of
+  // actually fetching on submit, we simply add run=true to the URL and go through the normal routing. The advantage is
+  // that meta/shift-clicking can be used to run a query in a new tab or window.
+  let run = false
+  if (params.has('run')) {
+    run = hasSqluiReferrer && ['1', 'true'].includes(params.get('run')?.toLowerCase())
+    url.searchParams.delete('run')
+    window.history.replaceState({}, '', url)
+  }
 
   if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
@@ -598,8 +609,6 @@ function maybeFetchResult () {
   if (params.has('sql') || params.has('file')) {
     setValue(sqlFetch.sql)
     if (run) {
-      url.searchParams.delete('run')
-      window.history.replaceState({}, '', url)
       window.sqlFetch = sqlFetch
       displaySqlFetch(sqlFetch)
       fetchSql(sqlFetch, selection, displaySqlFetch)
