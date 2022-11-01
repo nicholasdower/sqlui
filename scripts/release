@@ -20,6 +20,7 @@ end
 
 def fail(msg)
   warn("Fatal: #{msg}")
+  reset
   exit(1)
 end
 
