@@ -42,3 +42,4 @@ add copy query to clipboard button
 browser notifications when query completes
 resizable columns
 copy cell contents for really long cells that can't be highlighted
+the editor is too short on a large screen. it should be a percentage
