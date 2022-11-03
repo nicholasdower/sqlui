@@ -1,6 +1,11 @@
 #!/bin/bash
 
-source $HOME/.nvm/nvm.sh;
-if [ "$(nvm current)" != "v19.0.0" ]; then
-  nvm use --silent
+set -e -u -o pipefail
+
+EXPECTED=`cat .nvmrc`
+CURRENT=`node -v`
+
+if [ "$EXPECTED" != "$CURRENT" ]; then
+  source $HOME/.nvm/nvm.sh;
+  nvm use --silent || (echo "failed to set node version to $EXPECTED"; exit 1)
 fi

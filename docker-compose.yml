@@ -16,7 +16,7 @@ services:
       start_period: 10s
   server:
     container_name: sqlui_server
-    build: .
+    image: nicholasdower/sqlui:latest
     environment:
       DB_HOST: db
     command: bash -c "cd /sqlui && make start-server-local"
@@ -27,6 +27,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: curl --silent --fail localhost:8080/-/health || exit 1
+      interval: 2s
+      timeout: 1s
+      retries: 5
+      start_period: 10s
   hub:
     container_name: sqlui_hub
     image: selenium/hub:latest

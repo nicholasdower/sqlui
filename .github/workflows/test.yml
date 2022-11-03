@@ -1,0 +1,46 @@
+name: Lint & Test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**'
+      - '!**/*.md'
+      - '!/todo'
+      - '!/.changes'
+      - '!/LICENSE.txt'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**'
+      - '!**/*.md'
+      - '!/todo'
+      - '!/.changes'
+      - '!/LICENSE.txt'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: make install
+      - name: Build
+        run: make build
+      - name: Lint
+        run: make lint
+      - name: Start Database
+        run: make start-db-detached
+      - name: Start Hub
+        run: make start-hub-detached
+      - name: Start Node Chrome
+        run: make start-node-chrome-detached
+      - name: Start Server
+        run: make start-server-detached
+      - name: Test
+        run: make test
+      - name: Kill
+        if: always()
+        run: make kill
