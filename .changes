@@ -1,4 +1,6 @@
 version: next
+- Move port and environment into config. No more environment variables.
+- Fix bug preventing running queries unless referrer set.
 
 version: 0.1.28
 - Use APP_ENV and APP_PORT instead of SERVER_ENV and SERVER_PORT.

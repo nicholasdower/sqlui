@@ -5,7 +5,6 @@ require 'json'
 require 'sinatra/base'
 require 'uri'
 require_relative 'database_metadata'
-require_relative 'environment'
 require_relative 'mysql_types'
 require_relative 'sql_parser'
 require_relative 'sqlui'
@@ -13,10 +12,12 @@ require_relative 'sqlui'
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
   def self.init_and_run(config, resources_dir)
+    ENV['APP_ENV'] = config.environment
+
     set :logging,         true
     set :bind,            '0.0.0.0'
-    set :port,            Environment.server_port
-    set :env,             Environment.server_env
+    set :port,            config.port
+    set :environment,     config.environment
     set :raise_errors,    false
     set :show_exceptions, false
 

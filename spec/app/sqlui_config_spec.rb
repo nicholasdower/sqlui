@@ -23,6 +23,8 @@ describe SqluiConfig do
   let(:config_hash) do
     {
       name: 'some server name',
+      port: 8080,
+      environment: 'development',
       list_url_path: '/some/path',
       databases: {
         database_one: {
@@ -77,6 +79,40 @@ describe SqluiConfig do
       end
     end
 
+    context 'port' do
+      context 'when port is valid' do
+        before { config_hash.deep_set(:port, value: 8080) }
+
+        it 'uses the value' do
+          expect(subject.port).to eq(8080)
+        end
+      end
+
+      context 'when port is null' do
+        before { config_hash.deep_set(:port, value: nil) }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'required parameter port null')
+        end
+      end
+
+      context 'when port is missing' do
+        before { config_hash.deep_delete(:port) }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'required parameter port missing')
+        end
+      end
+
+      context 'when port is not an integer' do
+        before { config_hash.deep_set(:port, value: 'foo') }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'required parameter port not an integer')
+        end
+      end
+    end
+
     context 'list_url_path slashes' do
       context 'when list_url_path does not start with a /' do
         before { config_hash[:list_url_path] = 'db/path' }
@@ -105,6 +141,14 @@ describe SqluiConfig do
 
     shared_examples_for 'a required string field' do |path, example_value, accessor|
       context path.join(' -> ') do
+        context "when #{path.join(' -> ')} is valid" do
+          before { config_hash.deep_set(*path, value: example_value) }
+
+          it 'uses the value' do
+            expect(accessor.call(subject)).to eq(example_value)
+          end
+        end
+
         context "when #{path.join(' -> ')} is null" do
           before { config_hash.deep_set(*path, value: nil) }
 
@@ -150,6 +194,9 @@ describe SqluiConfig do
     include_examples 'a required string field',
                      [:name],
                      'some name', ->(s) { s.name }
+    include_examples 'a required string field',
+                     [:environment],
+                     'development', ->(s) { s.environment }
     include_examples 'a required string field',
                      [:list_url_path],
                      '/sqlui', ->(s) { s.list_url_path }

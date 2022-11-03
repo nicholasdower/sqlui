@@ -7,6 +7,10 @@ module Enumerable
     self
   end
 
+  def deep_symbolize_keys!
+    deep_transform_keys!(&:to_sym)
+  end
+
   def deep_dup(result = {})
     map do |value|
       value.respond_to?(:deep_dup) ? value.deep_dup : value.clone
@@ -18,9 +22,13 @@ end
 # Deep extensions for Hash.
 class Hash
   def deep_transform_keys!(&block)
-    transform_keys!(&:to_s)
+    transform_keys!(&block)
     each_value { |value| value.deep_transform_keys!(&block) if value.respond_to?(:deep_transform_keys!) }
     self
+  end
+
+  def deep_symbolize_keys!
+    deep_transform_keys!(&:to_sym)
   end
 
   def deep_dup(result = {})
@@ -54,5 +62,16 @@ class Hash
 
       self.[](path[0]).deep_delete(*path[1..])
     end
+  end
+
+  def deep_merge!(hash)
+    hash.each do |key, value|
+      if self[key].is_a?(Hash) && value.is_a?(Hash)
+        self[key].deep_merge!(value)
+      else
+        self[key] = value
+      end
+    end
+    self
   end
 end

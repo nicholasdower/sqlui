@@ -119,10 +119,10 @@ function updateTabs () {
 function selectTab (event, tab) {
   const url = new URL(window.location)
   setTabInUrl(url, tab)
-  route(event.target, event, url)
+  route(event.target, event, url, true)
 }
 
-function route (target = null, event = null, url = null) {
+function route (target = null, event = null, url = null, internal = false) {
   if (url) {
     if (event) {
       event.preventDefault()
@@ -160,10 +160,10 @@ function route (target = null, event = null, url = null) {
 
   switch (window.tab) {
     case 'query':
-      selectResultTab()
+      selectResultTab(internal)
       break
     case 'graph':
-      selectGraphTab()
+      selectGraphTab(internal)
       break
     case 'saved':
       selectSavedTab()
@@ -314,21 +314,21 @@ function createTable (parent, columns, rows) {
   })
 }
 
-function selectGraphTab () {
+function selectGraphTab (internal) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('graph-box').style.display = 'flex'
   document.getElementById('graph-status').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.display = 'none'
-  maybeFetchResult()
+  maybeFetchResult(internal)
 
   const selection = getSelection()
   focus()
   setSelection(selection)
 }
 
-function selectResultTab () {
+function selectResultTab (internal) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('result-box').style.display = 'flex'
@@ -338,7 +338,7 @@ function selectResultTab () {
   const selection = getSelection()
   focus()
   setSelection(selection)
-  maybeFetchResult()
+  maybeFetchResult(internal)
 }
 
 function selectSavedTab () {
@@ -368,7 +368,7 @@ function selectSavedTab () {
     viewLinkElement.href = viewUrl.pathname + viewUrl.search
     viewLinkElement.addEventListener('click', function (event) {
       clearResult()
-      route(event.target, event, viewUrl)
+      route(event.target, event, viewUrl, true)
     })
 
     const runUrl = new URL(window.location.origin + window.location.pathname)
@@ -382,7 +382,7 @@ function selectSavedTab () {
     runLinkElement.href = runUrl.pathname + runUrl.search
     runLinkElement.addEventListener('click', function (event) {
       clearResult()
-      route(event.target, event, runUrl)
+      route(event.target, event, runUrl, true)
     })
 
     const nameElement = document.createElement('h2')
@@ -416,17 +416,16 @@ function submitCurrent (target, event) {
 }
 
 function submit (target, event, selection = null) {
-  clearResult()
   const url = new URL(window.location)
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
-
-  url.searchParams.set('run', 'true')
-
+  let file = null
   if (url.searchParams.has('file')) {
     if (window.metadata.saved[url.searchParams.get('file')].contents !== getValue()) {
       url.searchParams.delete('file')
       url.searchParams.set('sql', sql)
+    } else {
+      file = url.searchParams.get('file')
     }
   } else {
     let sqlParam = url.searchParams.get('sql')?.trim()
@@ -452,7 +451,9 @@ function submit (target, event, selection = null) {
     url.searchParams.delete('run')
   }
 
-  route(target, event, url)
+  fetchResult(buildSqlFetch(sql, file, selection))
+
+  route(target, event, url, true)
 }
 
 function clearResult () {
@@ -492,7 +493,7 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sqlFetch, selection, callback) {
+function fetchSql (sqlFetch, callback) {
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -501,7 +502,7 @@ function fetchSql (sqlFetch, selection, callback) {
     method: 'POST',
     body: JSON.stringify({
       sql: sqlFetch.sql,
-      selection
+      selection: sqlFetch.selection
     }),
     signal: sqlFetch.fetchController.signal
   })
@@ -545,7 +546,7 @@ function fetchSql (sqlFetch, selection, callback) {
     })
 }
 
-function maybeFetchResult () {
+function maybeFetchResult (internal) {
   const url = new URL(window.location)
   const params = url.searchParams
   const sql = params.get('sql')
@@ -554,12 +555,10 @@ function maybeFetchResult () {
   const hasSqluiReferrer = document.referrer && new URL(document.referrer).origin === url.origin
 
   // Only allow auto-run if coming from another SQLUI page. The idea here is to let the app link to URLs with run=true
-  // but not other apps. We use this feature when the user clicks submit or runs a saved query for instance. Instead of
-  // actually fetching on submit, we simply add run=true to the URL and go through the normal routing. The advantage is
-  // that meta/shift-clicking can be used to run a query in a new tab or window.
+  // but not other apps. This allows meta/shift-clicking to run a query.
   let run = false
   if (params.has('run')) {
-    run = hasSqluiReferrer && ['1', 'true'].includes(params.get('run')?.toLowerCase())
+    run = (internal || hasSqluiReferrer) && ['1', 'true'].includes(params.get('run')?.toLowerCase())
     url.searchParams.delete('run')
     window.history.replaceState({}, '', url)
   }
@@ -569,24 +568,7 @@ function maybeFetchResult () {
     throw new Error('You can only specify a file or sql, not both.')
   }
 
-  const sqlFetch = {
-    fetchController: new AbortController(),
-    state: 'pending',
-    sql,
-    file,
-    selection
-  }
-
-  if (params.has('file')) {
-    const fileDetails = window.metadata.saved[params.get('file')]
-    if (!fileDetails) {
-      throw new Error(`no such file: ${params.get('file')}`)
-    }
-    sqlFetch.file = file
-    sqlFetch.sql = fileDetails.contents
-  } else if (params.has('sql')) {
-    sqlFetch.sql = sql
-  }
+  const sqlFetch = buildSqlFetch(sql, file, selection)
 
   const existingRequest = window.sqlFetch
   if (existingRequest) {
@@ -609,15 +591,42 @@ function maybeFetchResult () {
   if (params.has('sql') || params.has('file')) {
     setValue(sqlFetch.sql)
     if (run) {
-      window.sqlFetch = sqlFetch
-      displaySqlFetch(sqlFetch)
-      fetchSql(sqlFetch, selection, displaySqlFetch)
+      fetchResult(sqlFetch)
     }
   }
   if (params.has('selection')) {
     focus()
     setSelection(selection)
   }
+}
+
+function buildSqlFetch (sql, file, selection) {
+  const sqlFetch = {
+    fetchController: new AbortController(),
+    state: 'pending',
+    sql,
+    file,
+    selection
+  }
+
+  if (file) {
+    const fileDetails = window.metadata.saved[file]
+    if (!fileDetails) {
+      throw new Error(`no such file: ${file}`)
+    }
+    sqlFetch.file = file
+    sqlFetch.sql = fileDetails.contents
+  } else if (sql) {
+    sqlFetch.sql = sql
+  }
+
+  return sqlFetch
+}
+
+function fetchResult (sqlFetch) {
+  window.sqlFetch = sqlFetch
+  displaySqlFetch(sqlFetch)
+  fetchSql(sqlFetch, displaySqlFetch)
 }
 
 function displaySqlFetchInResultTab (fetch) {

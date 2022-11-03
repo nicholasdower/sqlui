@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require_relative 'database_config'
 require_relative 'args'
+require_relative 'database_config'
+require_relative 'deep'
 
 # App config including database configs.
 class SqluiConfig
-  attr_reader :name, :list_url_path, :database_configs
+  attr_reader :name, :port, :environment, :list_url_path, :database_configs
 
-  def initialize(filename)
-    config = YAML.safe_load(ERB.new(File.read(filename)).result)
-    deep_symbolize!(config)
+  def initialize(filename, overrides = {})
+    config = YAML.safe_load(ERB.new(File.read(filename)).result).deep_merge!(overrides)
+    config.deep_symbolize_keys!
     @name = Args.fetch_non_empty_string(config, :name).strip
+    @port = Args.fetch_non_empty_int(config, :port)
+    @environment = Args.fetch_non_empty_string(config, :environment).strip
     @list_url_path = Args.fetch_non_empty_string(config, :list_url_path).strip
     raise ArgumentError, 'list_url_path should start with a /' unless @list_url_path.start_with?('/')
     if @list_url_path.length > 1 && @list_url_path.end_with?('/')
@@ -29,16 +32,5 @@ class SqluiConfig
     raise ArgumentError, "no config found for path #{url_path}" unless config
 
     config
-  end
-
-  private
-
-  def deep_symbolize!(object)
-    return object unless object.is_a? Hash
-
-    object.transform_keys!(&:to_sym)
-    object.each_value { |child| deep_symbolize!(child) }
-
-    object
   end
 end

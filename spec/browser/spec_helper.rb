@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require 'selenium-webdriver'
+require_relative '../../app/server'
+require_relative '../../app/sqlui_config'
 
 LOCAL = %w[1 true].include?(ENV.fetch('LOCAL', 'false').strip.downcase)
-APP_HOST = ENV.fetch('APP_HOST', LOCAL ? 'localhost' : 'server')
-APP_PORT = ENV.fetch('APP_PORT', 8080)
+APP_PORT = 9090
+APP_HOST = LOCAL ? 'localhost' : 'test'
 
 def wait_until_editor(wait)
   wait.until do
@@ -29,6 +31,10 @@ end
 
 def wait_until_no_results(wait)
   wait.until do
+    element = driver.find_element(css: '#result-box')
+    element if element&.displayed?
+  end
+  wait.until do
     driver.find_element(css: '#result-box > table')
   rescue Selenium::WebDriver::Error::NoSuchElementError
     true
@@ -47,7 +53,35 @@ def url(path)
   "http://#{APP_HOST}:#{APP_PORT}#{path}"
 end
 
+class TestServer
+  def start
+    @thread = Thread.new do
+      config = SqluiConfig.new('development_config.yml', { port: APP_PORT, environment: 'test' })
+      Server.init_and_run(config, 'client/resources')
+    end
+
+    (1..20).each do |n|
+      break if Server.running?
+      raise 'server failed to start' if n == 20
+
+      sleep 0.5
+    end
+  end
+
+  def stop
+    puts 'stop server'
+    Server.quit!
+    @thread&.join
+  end
+end
+
+test_server = TestServer.new
+
 RSpec.configure do |config|
+  config.before(:suite) { test_server.start }
+
+  config.after(:suite) { test_server.stop }
+
   config.after { @driver&.quit }
 
   def start_session

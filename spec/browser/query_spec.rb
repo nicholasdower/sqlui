@@ -23,9 +23,8 @@ describe 'query' do
       )
     end
 
-    it 'loads expected results' do
-      wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
-                         ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+    it 'does not load any results' do
+      wait_until_no_results(wait)
     end
   end
 

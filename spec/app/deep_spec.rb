@@ -4,6 +4,17 @@ require_relative '../spec_helper'
 require_relative '../../app/deep'
 
 describe 'deep' do
+  describe '#deep_merge!' do
+    subject { target.deep_merge!(override) }
+
+    let(:target) { { a: { c: 'c' }, d: 2 } }
+    let(:override) { { a: { b: 'b' }, d: 3 } }
+
+    it 'merges' do
+      expect(subject).to eq({ a: { b: 'b', c: 'c' }, d: 3 })
+    end
+  end
+
   describe '#deep_transform_keys!' do
     subject { target.deep_transform_keys!(&transform) }
 

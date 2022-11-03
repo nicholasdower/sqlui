@@ -46,7 +46,10 @@ class Watcher
   def kill(signal)
     return unless @pid
 
-    Process.kill(signal, -Process.getpgid(@pid)) if @pid
+    Process.kill(signal, -Process.getpgid(@pid))
+  rescue Errno::ESRCH
+    # ignore
+  ensure
     @pid = nil
   end
 

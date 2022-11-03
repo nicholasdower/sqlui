@@ -6,9 +6,6 @@ RUN_IMAGE = $(RUN) $(IMAGE)
 
 RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --file client/resources/sqlui.css --file client/resources/sqlui.html --file development_config.yml
 
-DB_HOST ?= 127.0.0.1
-DB_PORT ?= 3306
-
 create-network:
 	@docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null
 
@@ -18,21 +15,26 @@ install: create-network
 update: create-network
 	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle update'
 
-update-local:
+nvm-use:
+	@./scripts/nvm-use
+
+update-local: nvm-use
 	npm update
 	bundle config set --local path vendor/bundle
 	bundle update
 
-# Make sure to run `nvm use 19` first.
-install-local:
+install-local: nvm-use
 	npm install
 	bundle config set --local path vendor/bundle
 	bundle install
 
+bash: create-network
+	$(RUN_IMAGE) bash
+
 build: create-network
 	$(RUN_IMAGE) make build-local
 
-build-local:
+build-local: nvm-use
 	rm -f client/resources/sqlui.js
 	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
 	chmod 444 client/resources/sqlui.js
@@ -41,7 +43,7 @@ lint: create-network
 	$(RUN_IMAGE) bundle exec rubocop
 	$(RUN_IMAGE) npx eslint client/*.js
 
-lint-local:
+lint-local: nvm-use
 	bundle exec rubocop
 	npx eslint client/*.js
 
@@ -49,7 +51,7 @@ lint-fix: create-network
 	$(RUN_IMAGE) bundle exec rubocop -A
 	$(RUN_IMAGE) npx eslint client/*.js --fix
 
-lint-fix-local:
+lint-fix-local: nvm-use
 	bundle exec rubocop -A
 	npx eslint client/*.js --fix
 
@@ -71,7 +73,7 @@ start-detached:
 
 stop:
 	docker compose down
-	docker network rm sqlui_default || true
+	@docker network rm sqlui_default 2> /dev/null || true
 
 start-db:
 	docker compose up db
@@ -104,7 +106,7 @@ start-server-detached:
 	docker compose up --detach server
 
 build-and-start-server-local: build-local
-	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) bundle exec ruby ./bin/sqlui development_config.yml
+	bundle exec ruby ./bin/sqlui development_config.yml
 
 start-server-local:
 	$(RERUN) -- make build-and-start-server-local
@@ -116,15 +118,15 @@ start-hub-detached:
 	docker compose up --detach hub node-chrome
 
 test: create-network
-	$(RUN_IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
+	$(RUN) --env DB_HOST=db --publish 9090:9090 --name test $(IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 watch-test:
-	$(RERUN) spec make test
+	$(RERUN) --dir spec make test
 
 test-local:
 	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 watch-test-local:
-	$(RERUN) spec make test-local
+	$(RERUN) --dir spec make test-local $(if $(ARGS),ARGS=$(ARGS),)
 
 start-test-stop: start-detached test stop

@@ -1,4 +1,6 @@
 name: Development
+port: 8080
+environment: development
 list_url_path: /sqlui
 databases:
   seinfeld:
@@ -10,5 +12,5 @@ databases:
       database:     seinfeld
       username:     newman
       password:     drakescoffeecake
-      port:         <%= Integer(ENV.fetch('DB_PORT')) %>
-      host:         <%= ENV.fetch('DB_HOST') %>
+      port:         3306
+      host:         <%= ENV.fetch('DB_HOST', '127.0.0.1') %>

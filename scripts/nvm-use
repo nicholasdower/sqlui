@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source $HOME/.nvm/nvm.sh;
+if [ "$(nvm current)" != "v19.0.0" ]; then
+  nvm use --silent
+fi

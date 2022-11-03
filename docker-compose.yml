@@ -19,7 +19,6 @@ services:
     build: .
     environment:
       DB_HOST: db
-      DB_PORT: 3306
     command: bash -c "cd /sqlui && make start-server-local"
     volumes:
       - .:/sqlui

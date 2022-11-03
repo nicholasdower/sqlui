@@ -32,6 +32,8 @@ list_url_path: /path # Absolute URL path used for the databases list.
 databases:
   development:
     name:        some_name   # User-facing name.
+    port:        8080        # App port.
+    environment: development # App environment.
     description: description # User-facing description.
     url_path:    development # Absolute URL path used to access this database.
     saved_path:  path/to/sql # Relative path to the directory containing saved SQL files.
@@ -118,7 +120,7 @@ See https://github.com/nvm-sh/nvm#installing-and-updating.
 #### Install Node
 
 ```shell
-nvm install 19
+nvm install 19.0.0
 ```
 
 #### Install Chromedriver
