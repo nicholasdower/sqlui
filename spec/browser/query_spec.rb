@@ -103,8 +103,7 @@ describe 'query' do
       end
 
       it 'displays an error and no results' do
-        wait_until_query_error(wait, /^error: You have an error in your SQL syntax;/)
-        wait_until_no_results(wait)
+        wait_until_no_results(wait, /^error: You have an error in your SQL syntax;/)
       end
     end
 
@@ -160,5 +159,26 @@ describe 'query' do
     let(:execute_all) { driver.find_element(id: 'submit-all-button').click }
 
     include_examples 'submitted queries'
+  end
+
+  %w[tab window].each do |tab_or_window|
+    context "when running all in a new #{tab_or_window}" do
+      before do
+        driver.get(url('/sqlui/seinfeld/query'))
+        editor = wait_until_editor(wait)
+        editor.send_keys('select id, name, description from characters order by id limit 2;')
+        element = driver.find_element(id: 'submit-all-button')
+        driver.action.key_down(tab_or_window == 'tab' ? :meta : :shift).click(element).perform
+      end
+
+      it "loads results in new window, not in current #{tab_or_window}" do
+        driver.switch_to.window(driver.window_handles.last)
+        wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
+                           ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+        driver.close
+        driver.switch_to.window(driver.window_handles.first)
+        wait_until_no_results(wait)
+      end
+    end
   end
 end

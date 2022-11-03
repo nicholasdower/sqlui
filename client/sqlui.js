@@ -416,16 +416,17 @@ function submitCurrent (target, event) {
 }
 
 function submit (target, event, selection = null) {
+  clearResult()
   const url = new URL(window.location)
   let sql = getValue().trim()
   sql = sql === '' ? null : sql
-  let file = null
+
+  url.searchParams.set('run', 'true')
+
   if (url.searchParams.has('file')) {
     if (window.metadata.saved[url.searchParams.get('file')].contents !== getValue()) {
       url.searchParams.delete('file')
       url.searchParams.set('sql', sql)
-    } else {
-      file = url.searchParams.get('file')
     }
   } else {
     let sqlParam = url.searchParams.get('sql')?.trim()
@@ -450,8 +451,6 @@ function submit (target, event, selection = null) {
     url.searchParams.delete('file')
     url.searchParams.delete('run')
   }
-
-  fetchResult(buildSqlFetch(sql, file, selection))
 
   route(target, event, url, true)
 }

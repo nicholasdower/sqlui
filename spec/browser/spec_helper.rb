@@ -16,6 +16,7 @@ def wait_until_editor(wait)
 end
 
 def wait_until_results(wait, *results)
+  wait_until_result_status(wait, "#{results.size} row#{results.size == 1 ? '' : 's'}")
   header_elements = wait.until do
     elements = driver.find_elements(css: '#result-box > table > thead > tr > th.cell')
     elements if elements.size == results[0].size && elements.all?(&:displayed?)
@@ -29,24 +30,20 @@ def wait_until_results(wait, *results)
   expect(rows).to eq(results)
 end
 
-def wait_until_no_results(wait)
+def wait_until_result_status(wait, status)
   wait.until do
-    element = driver.find_element(css: '#result-box')
-    element if element&.displayed?
+    element = driver.find_element(css: '#result-status')
+    element if element&.attribute('style') == 'display: flex;' && element.text.match(status)
   end
+end
+
+def wait_until_no_results(wait, status_matcher = '')
+  wait_until_result_status(wait, status_matcher)
   wait.until do
     driver.find_element(css: '#result-box > table')
   rescue Selenium::WebDriver::Error::NoSuchElementError
     true
   end
-end
-
-def wait_until_query_error(wait, error_matcher)
-  error_element = wait.until do
-    element = driver.find_element(css: '#status-box > #result-status')
-    element if element&.displayed?
-  end
-  expect(error_element.text).to match(error_matcher)
 end
 
 def url(path)

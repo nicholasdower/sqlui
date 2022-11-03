@@ -68,9 +68,6 @@ GEM
       tilt (~> 2.0)
     tilt (2.0.11)
     unicode-display_width (2.3.0)
-    watir (7.1.0)
-      regexp_parser (>= 1.2, < 3)
-      selenium-webdriver (~> 4.0)
     websocket (1.2.9)
 
 PLATFORMS
@@ -86,7 +83,6 @@ DEPENDENCIES
   rubocop (~> 1.0)
   selenium-webdriver (~> 4.0)
   sqlui!
-  watir (~> 7.0)
 
 BUNDLED WITH
    2.3.14

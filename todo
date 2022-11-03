@@ -44,3 +44,4 @@ resizable columns
 copy cell contents for really long cells that can't be highlighted
 the editor is too short on a large screen. it should be a percentage
 only show spinner and cancel after a delay to avoid flashes
+warn when closing the browser with unsaved changes? what do other sites do?
