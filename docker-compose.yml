@@ -47,7 +47,7 @@ services:
     container_name: sqlui_node_chrome
     image: selenium/node-chrome:latest
     environment:
-      SE_EVENT_BUS_HOST: hub
+      SE_EVENT_BUS_HOST: sqlui_hub
       SE_EVENT_BUS_PUBLISH_PORT: 4442
       SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
       SE_VNC_NO_PASSWORD: 1

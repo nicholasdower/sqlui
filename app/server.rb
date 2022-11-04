@@ -51,7 +51,7 @@ class Server < Sinatra::Base
         body @js
       end
 
-      get "#{database.url_path}/metadata" do
+      post "#{database.url_path}/metadata" do
         metadata = database.with_client do |client|
           {
             server: "#{config.name} - #{database.display_name}",

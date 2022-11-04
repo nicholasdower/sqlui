@@ -463,11 +463,17 @@ function clearResult () {
   }
   window.sqlFetch = null
 
+  clearSpinner()
   clearGraphBox()
   clearGraphStatus()
-
   clearResultBox()
   clearResultStatus()
+
+  if (window.tab === 'query') {
+    document.getElementById('result-box').style.display = 'flex'
+  } else if (window.tab === 'graph') {
+    document.getElementById('graph-box').style.display = 'flex'
+  }
 }
 
 function clearResultStatus () {
@@ -492,7 +498,21 @@ function clearGraphBox () {
   }
 }
 
-function fetchSql (sqlFetch, callback) {
+function fetchSql (sqlFetch) {
+  window.sqlFetch = sqlFetch
+
+  setTimeout(function () {
+    if (window.sqlFetch === sqlFetch && sqlFetch.state === 'pending') {
+      window.sqlFetch.spinner = 'always'
+      displaySqlFetch(sqlFetch)
+      setTimeout(function () {
+        if (window.sqlFetch === sqlFetch) {
+          window.sqlFetch.spinner = 'if_pending'
+          displaySqlFetch(sqlFetch)
+        }
+      }, 500) // If we display a spinner, ensure it is displayed for at least 500 ms
+    }
+  }, 500) // Don't display the spinner unless the response takes more than 500 ms
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -524,14 +544,14 @@ function fetchSql (sqlFetch, callback) {
               sqlFetch.error_message = 'failed to execute query'
             }
           }
-          callback(sqlFetch)
+          displaySqlFetch(sqlFetch)
         })
       } else {
         response.text().then((result) => {
           sqlFetch.state = 'error'
           sqlFetch.error_message = 'failed to execute query'
           sqlFetch.error_details = result
-          callback(sqlFetch)
+          displaySqlFetch(sqlFetch)
         })
       }
     })
@@ -541,7 +561,7 @@ function fetchSql (sqlFetch, callback) {
         sqlFetch.error_message = 'failed to execute query'
         sqlFetch.error_details = error
       }
-      callback(sqlFetch)
+      displaySqlFetch(sqlFetch)
     })
 }
 
@@ -567,8 +587,6 @@ function maybeFetchResult (internal) {
     throw new Error('You can only specify a file or sql, not both.')
   }
 
-  const sqlFetch = buildSqlFetch(sql, file, selection)
-
   const existingRequest = window.sqlFetch
   if (existingRequest) {
     const selectionMatches = selection === existingRequest.selection
@@ -587,10 +605,11 @@ function maybeFetchResult (internal) {
 
   clearResult()
 
+  const sqlFetch = buildSqlFetch(sql, file, selection)
   if (params.has('sql') || params.has('file')) {
     setValue(sqlFetch.sql)
     if (run) {
-      fetchResult(sqlFetch)
+      fetchSql(sqlFetch)
     }
   }
   if (params.has('selection')) {
@@ -603,7 +622,8 @@ function buildSqlFetch (sql, file, selection) {
   const sqlFetch = {
     fetchController: new AbortController(),
     state: 'pending',
-    started: (new Date()).getTime(),
+    startedAt: window.performance.now(),
+    spinner: 'never',
     finished: null,
     sql,
     file,
@@ -624,16 +644,16 @@ function buildSqlFetch (sql, file, selection) {
   return sqlFetch
 }
 
-function fetchResult (sqlFetch) {
-  window.sqlFetch = sqlFetch
-  displaySqlFetch(sqlFetch)
-  fetchSql(sqlFetch, displaySqlFetch)
-}
-
 function displaySqlFetchInResultTab (fetch) {
-  if (fetch.state === 'pending') {
+  if (fetch.state === 'pending' || fetch.spinner === 'always') {
     clearResultBox()
-    maybeDisplaySpinner(fetch)
+    if (fetch.spinner === 'never') {
+      document.getElementById('result-box').style.display = 'flex'
+      clearSpinner()
+    } else {
+      document.getElementById('result-box').style.display = 'none'
+      displaySpinner()
+    }
     return
   }
 
@@ -717,23 +737,26 @@ function displaySqlFetchError (statusElementId, message, details) {
   }
 }
 
-function maybeDisplaySpinner (fetch) {
-  const now = (new Date()).getTime()
-  if ((fetch.started - now) > 500) {
-    document.getElementById('cancel-button').style.display = 'flex'
-    document.getElementById('result-box').style.display = 'none'
-    document.getElementById('fetch-sql-box').style.display = 'flex'
-  } else {
-    document.getElementById('cancel-button').style.display = 'none'
-    document.getElementById('result-box').style.display = 'flex'
-    document.getElementById('fetch-sql-box').style.display = 'none'
-  }
+function clearSpinner () {
+  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('fetch-sql-box').style.display = 'none'
+}
+
+function displaySpinner () {
+  document.getElementById('cancel-button').style.display = 'flex'
+  document.getElementById('fetch-sql-box').style.display = 'flex'
 }
 
 function displaySqlFetchInGraphTab (fetch) {
-  if (fetch.state === 'pending') {
+  if (fetch.state === 'pending' || fetch.spinner === 'always') {
     clearGraphBox()
-    maybeDisplaySpinner(fetch)
+    if (fetch.spinner === 'never') {
+      document.getElementById('graph-box').style.display = 'flex'
+      clearSpinner()
+    } else {
+      document.getElementById('graph-box').style.display = 'none'
+      displaySpinner()
+    }
     return
   }
 
@@ -831,7 +854,7 @@ window.onload = function () {
       headers: {
         Accept: 'application/json'
       },
-      method: 'GET'
+      method: 'POST'
     })
   ])
     .then((results) => {
