@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e -u -o pipefail
+
+# Starts the specified service if a container with the same name is not already running.
+# Assumes containers and services have the same name.
+
+if [ $# -ne 1 ]; then
+  echo "fatal: you must specify a container/service" >&2
+  echo "usage: $0 <name>" >&2
+  exit 1
+fi
+
+name=$1
+
+result=`docker container inspect -f '{{if .State.Status}}{{.State.Status}}{{end}}' "$name" 2>/dev/null || true`
+if [ "$result" != "running" ]; then
+  docker compose up "$name" --detach
+fi

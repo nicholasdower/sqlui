@@ -34,12 +34,8 @@ jobs:
         run: make lint
       - name: Start Database
         run: make start-db-detached
-      - name: Start Hub
-        run: make start-hub-detached
-      - name: Start Node Chrome
-        run: make start-node-chrome-detached
-      - name: Start Server
-        run: make start-server-detached
+      - name: Start Selenium
+        run: make start-selenium-detached
       - name: Test
         run: make test
       - name: Kill

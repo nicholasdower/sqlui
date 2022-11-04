@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e -u -o pipefail
+
+if [ $# -ne 1 ]; then
+  echo "fatal: you must specify a container" >&2
+  echo "usage: $0 <container>" >&2
+  exit 1
+fi
+
+container=$1
+
+for i in $(seq 1 30); do
+  result="$(docker inspect --format='{{if .State.Health.Status}}{{print .State.Health.Status}}{{end}}' "$container" 2>&1 || true)"
+  [ "$result" != "" ] && echo "$container $result"
+  if [ "$result" = 'healthy' ]; then
+    exit 0
+  fi
+  if [ $i -eq 30 ]; then
+    echo "$container not healthy, aborting"
+    exit 1
+  fi
+  sleep 1
+done

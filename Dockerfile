@@ -8,4 +8,4 @@ RUN apt-get upgrade -qq
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
-ENV BUNDLE_APP_CONFIG /sqlui/.bundle
+ENV BUNDLE_APP_CONFIG /sqlui/.bundle-docker

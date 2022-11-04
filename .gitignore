@@ -1,6 +1,7 @@
-/.bundle
+/.bundle*
 /.idea
 /*.gem
 /node_modules
 /client/resources/sqlui.js
 /vendor
+/.install*

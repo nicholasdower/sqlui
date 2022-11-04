@@ -1,5 +1,5 @@
 services:
-  db:
+  sqlui_db:
     container_name: sqlui_db
     image: mysql/mysql-server:latest
     environment:
@@ -14,18 +14,18 @@ services:
       timeout: 2s
       retries: 10
       start_period: 10s
-  server:
+  sqlui_server:
     container_name: sqlui_server
     image: nicholasdower/sqlui:latest
     environment:
-      DB_HOST: db
-    command: bash -c "cd /sqlui && make start-server-local"
+      DB_HOST: sqlui_db
+    command: bash -c "cd /sqlui && make start-server-from-docker"
     volumes:
       - .:/sqlui
     ports:
       - "8080:8080"
     depends_on:
-      db:
+      sqlui_db:
         condition: service_healthy
     healthcheck:
       test: curl --silent --fail localhost:8080/-/health || exit 1
@@ -33,7 +33,7 @@ services:
       timeout: 1s
       retries: 5
       start_period: 10s
-  hub:
+  sqlui_hub:
     container_name: sqlui_hub
     image: selenium/hub:latest
     environment:
@@ -43,7 +43,7 @@ services:
       GRID_TIMEOUT: 10000
     ports:
       - "4444:4444"
-  node-chrome:
+  sqlui_node-chrome:
     container_name: sqlui_node_chrome
     image: selenium/node-chrome:latest
     environment:

@@ -79,12 +79,6 @@ By default all building, running and testing is done in Docker containers.
 
 See https://docs.docker.com/get-docker/
 
-#### Install & Build
-
-```shell
-make install build
-```
-
 #### Start the database and server
 
 ```shell
@@ -111,6 +105,7 @@ See https://rvm.io/rvm/install
 
 ```shell
 rvm install ruby-3.0.0
+rvm use
 ```
 
 #### Install nvm (Node Version Manager)
@@ -121,31 +116,20 @@ See https://github.com/nvm-sh/nvm#installing-and-updating.
 
 ```shell
 nvm install 19.0.0
+nvm use
 ```
+
+#### Start the database and server
+
+```shell
+make start-local
+```
+
+Visit http://localhost:8080/sqlui
 
 #### Install Chromedriver
 
 See https://chromedriver.chromium.org/getting-started
-
-#### Install & Build
-
-```shell
-make install-local build-local
-```
-
-#### Start the database (Uses Docker)
-
-```shell
-make start-db-detached
-```
-
-#### Start the server
-
-```shell
-make start-server-local
-```
-
-Visit http://localhost:8080/sqlui
 
 #### Run the tests
 

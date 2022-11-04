@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e -u -o pipefail
+
+expected_node=`cat .nvmrc`
+current_node=`node -v`
+
+if [ "$expected_node" != "$current_node" ]; then
+  echo "Node $expected_node required, see README.md" >&2
+  exit 1
+fi
+
+expected_ruby=`cat .ruby-version`
+current_ruby=`ruby -v`
+
+if [[ "$current_ruby" != "ruby $expected_ruby"* ]]; then
+  echo "Ruby $expected_ruby required, see README.md" >&2
+  exit 1
+fi

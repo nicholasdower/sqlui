@@ -6,7 +6,7 @@ require_relative '../../app/sqlui_config'
 
 LOCAL = %w[1 true].include?(ENV.fetch('LOCAL', 'false').strip.downcase)
 APP_PORT = 9090
-APP_HOST = LOCAL ? 'localhost' : 'test'
+APP_HOST = LOCAL ? 'localhost' : 'sqlui_test'
 CONFIG = SqluiConfig.new('development_config.yml', { port: APP_PORT, environment: 'test' })
 
 def wait_until_editor(wait)
@@ -92,7 +92,7 @@ RSpec.configure do |config|
     @driver = if LOCAL
                 Selenium::WebDriver.for(:chrome)
               else
-                Selenium::WebDriver.for(:remote, url: 'http://hub:4444/wd/hub', capabilities: :chrome)
+                Selenium::WebDriver.for(:remote, url: 'http://sqlui_hub:4444/wd/hub', capabilities: :chrome)
               end
   end
 end

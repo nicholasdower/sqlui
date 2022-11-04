@@ -603,6 +603,8 @@ function buildSqlFetch (sql, file, selection) {
   const sqlFetch = {
     fetchController: new AbortController(),
     state: 'pending',
+    started: (new Date()).getTime(),
+    finished: null,
     sql,
     file,
     selection
@@ -631,9 +633,7 @@ function fetchResult (sqlFetch) {
 function displaySqlFetchInResultTab (fetch) {
   if (fetch.state === 'pending') {
     clearResultBox()
-    document.getElementById('cancel-button').style.display = 'flex'
-    document.getElementById('result-box').style.display = 'none'
-    document.getElementById('fetch-sql-box').style.display = 'flex'
+    maybeDisplaySpinner(fetch)
     return
   }
 
@@ -717,12 +717,23 @@ function displaySqlFetchError (statusElementId, message, details) {
   }
 }
 
+function maybeDisplaySpinner (fetch) {
+  const now = (new Date()).getTime()
+  if ((fetch.started - now) > 500) {
+    document.getElementById('cancel-button').style.display = 'flex'
+    document.getElementById('result-box').style.display = 'none'
+    document.getElementById('fetch-sql-box').style.display = 'flex'
+  } else {
+    document.getElementById('cancel-button').style.display = 'none'
+    document.getElementById('result-box').style.display = 'flex'
+    document.getElementById('fetch-sql-box').style.display = 'none'
+  }
+}
+
 function displaySqlFetchInGraphTab (fetch) {
   if (fetch.state === 'pending') {
     clearGraphBox()
-    document.getElementById('cancel-button').style.display = 'flex'
-    document.getElementById('graph-box').style.display = 'none'
-    document.getElementById('fetch-sql-box').style.display = 'flex'
+    maybeDisplaySpinner(fetch)
     return
   }
 
