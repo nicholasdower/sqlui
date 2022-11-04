@@ -456,17 +456,14 @@ function submit (target, event, selection = null) {
 }
 
 function clearResult () {
-  const existingFetch = window.sqlFetch
-  window.sqlFetch = null
-
-  if (existingFetch?.state === 'pending' || existingFetch?.spinner === 'always') {
-    existingFetch.state = 'aborted'
-    existingFetch.spinner = 'never'
-    existingFetch.fetchController.abort()
-    displaySqlFetch(existingFetch)
+  if (window.sqlFetch?.state === 'pending' || window.sqlFetch?.spinner === 'always') {
+    window.sqlFetch.state = 'aborted'
+    window.sqlFetch.spinner = 'never'
+    window.sqlFetch.fetchController.abort()
+    displaySqlFetch(window.sqlFetch)
     return
   }
-
+  window.sqlFetch = null
   clearSpinner()
   clearGraphBox()
   clearGraphStatus()
@@ -496,9 +493,18 @@ function clearGraphBox () {
   }
 }
 
+function updateResultTime (sqlFetch) {
+  if (window.sqlFetch === sqlFetch) {
+    if (sqlFetch.state === 'pending' || sqlFetch.spinner === 'always') {
+      displaySqlFetch(sqlFetch)
+      setTimeout(() => { updateResultTime(sqlFetch) }, 500)
+    }
+  }
+}
+
 function fetchSql (sqlFetch) {
   window.sqlFetch = sqlFetch
-
+  updateResultTime(sqlFetch)
   setTimeout(function () {
     if (window.sqlFetch === sqlFetch && sqlFetch.state === 'pending') {
       window.sqlFetch.spinner = 'always'
@@ -650,7 +656,7 @@ function displaySqlFetchInResultTab (fetch) {
       clearSpinner()
     } else {
       document.getElementById('result-box').style.display = 'none'
-      displaySpinner()
+      displaySpinner(fetch)
     }
     return
   }
@@ -741,9 +747,27 @@ function clearSpinner () {
   document.getElementById('fetch-sql-box').style.display = 'none'
 }
 
-function displaySpinner () {
+function displaySpinner (fetch) {
   document.getElementById('cancel-button').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'flex'
+
+  const elapsed = window.performance.now() - fetch.startedAt
+  const seconds = Math.floor((elapsed / 1000) % 60)
+  const minutes = Math.floor((elapsed / 1000 / 60) % 60)
+  let display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  if (elapsed >= 1000 * 60 * 60) {
+    const hours = Math.floor((elapsed / 1000 / 60 / 60) % 24)
+    display = `${hours.toString().padStart(2, '0')}:${display}`
+    if (elapsed >= 1000 * 60 * 60 * 24) {
+      const days = Math.floor(elapsed / 1000 / 60 / 60 / 24)
+      if (days === 1) {
+        display = `${days} day ${display}`
+      } else {
+        display = `${days.toLocaleString()} days ${display}`
+      }
+    }
+  }
+  document.getElementById('result-time').innerText = display
 }
 
 function displaySqlFetchInGraphTab (fetch) {
@@ -754,7 +778,7 @@ function displaySqlFetchInGraphTab (fetch) {
       clearSpinner()
     } else {
       document.getElementById('graph-box').style.display = 'none'
-      displaySpinner()
+      displaySpinner(fetch)
     }
     return
   }

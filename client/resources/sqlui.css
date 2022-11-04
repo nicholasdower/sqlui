@@ -322,3 +322,9 @@ select {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.result-time {
+    font-family: monospace;
+    color: #333;
+    font-size: 14px;
+}
