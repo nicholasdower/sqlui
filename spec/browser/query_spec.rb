@@ -198,11 +198,18 @@ describe 'query' do
       driver.find_element(id: 'submit-all-button').click
     end
 
-    it 'displays a spinner before showing the results' do
+    it 'displays a spinner then results' do
       wait_until_spinner(wait)
       queue << 'execute_query'
       wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
                          ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+    end
+
+    it 'can be cancelled' do
+      wait_until_spinner(wait)
+      driver.find_element(id: 'cancel-button').click
+      queue << 'execute_query'
+      wait_until_no_results(wait, 'query cancelled')
     end
   end
 end

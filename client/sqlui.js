@@ -457,23 +457,21 @@ function submit (target, event, selection = null) {
 
 function clearResult () {
   const existingFetch = window.sqlFetch
-  if (existingFetch?.state === 'pending') {
-    existingFetch.state = 'aborted'
-    existingFetch.fetchController.abort()
-  }
   window.sqlFetch = null
+
+  if (existingFetch?.state === 'pending' || existingFetch?.spinner === 'always') {
+    existingFetch.state = 'aborted'
+    existingFetch.spinner = 'never'
+    existingFetch.fetchController.abort()
+    displaySqlFetch(existingFetch)
+    return
+  }
 
   clearSpinner()
   clearGraphBox()
   clearGraphStatus()
   clearResultBox()
   clearResultStatus()
-
-  if (window.tab === 'query') {
-    document.getElementById('result-box').style.display = 'flex'
-  } else if (window.tab === 'graph') {
-    document.getElementById('graph-box').style.display = 'flex'
-  }
 }
 
 function clearResultStatus () {
@@ -510,9 +508,9 @@ function fetchSql (sqlFetch) {
           window.sqlFetch.spinner = 'if_pending'
           displaySqlFetch(sqlFetch)
         }
-      }, 500) // If we display a spinner, ensure it is displayed for at least 500 ms
+      }, 400) // If we display a spinner, ensure it is displayed for at least 400 ms
     }
-  }, 500) // Don't display the spinner unless the response takes more than 500 ms
+  }, 300) // Don't display the spinner unless the response takes more than 300 ms
   fetch('query', {
     headers: {
       Accept: 'application/json',
@@ -663,6 +661,7 @@ function displaySqlFetchInResultTab (fetch) {
 
   if (fetch.state === 'aborted') {
     clearResultBox()
+    document.getElementById('result-status').innerText = 'query cancelled'
     return
   }
 
@@ -766,6 +765,7 @@ function displaySqlFetchInGraphTab (fetch) {
 
   if (fetch.state === 'aborted') {
     clearGraphBox()
+    document.getElementById('graph-status').innerText = 'query cancelled'
     return
   }
 
