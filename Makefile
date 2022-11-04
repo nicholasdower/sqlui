@@ -36,9 +36,17 @@ build: create-network
 	$(RUN_IMAGE) make build-local
 
 build-local: nvm-use
-	rm -f client/resources/sqlui.js
-	./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
-	chmod 444 client/resources/sqlui.js
+	@\
+  bash -c '\
+    if [ ! -f client/resources/sqlui.js ] || [ client/sqlui.js -nt client/resources/sqlui.js ]; then \
+      echo building...; \
+      rm -f client/resources/sqlui.js; \
+      ./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs; \
+      chmod 444 client/resources/sqlui.js; \
+    else \
+      echo nothing to build; \
+    fi \
+  '
 
 lint: create-network
 	$(RUN_IMAGE) bundle exec rubocop
