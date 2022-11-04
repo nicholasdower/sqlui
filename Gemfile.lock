@@ -3,8 +3,8 @@ PATH
   specs:
     sqlui (0.1.28)
       mysql2 (~> 0.0)
-      puma (~> 6.0)
       sinatra (~> 3.0)
+      webrick (~> 1.0)
 
 GEM
   remote: http://rubygems.org/
@@ -17,15 +17,9 @@ GEM
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     mysql2 (0.5.4)
-    nio4r (2.5.8)
-    nio4r (2.5.8-java)
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
-    puma (6.0.0)
-      nio4r (~> 2.0)
-    puma (6.0.0-java)
-      nio4r (~> 2.0)
     rack (2.2.4)
     rack-protection (3.0.2)
       rack
@@ -68,6 +62,7 @@ GEM
       tilt (~> 2.0)
     tilt (2.0.11)
     unicode-display_width (2.3.0)
+    webrick (1.7.0)
     websocket (1.2.9)
 
 PLATFORMS
@@ -76,7 +71,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  puma (~> 6.0)
   rspec-core (~> 3.0)
   rspec-expectations (~> 3.0)
   rspec-mocks (~> 3.0)

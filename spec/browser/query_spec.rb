@@ -181,4 +181,28 @@ describe 'query' do
       end
     end
   end
+
+  context 'when a query takes a while' do
+    queue = Queue.new
+    before do
+      config = CONFIG.database_configs[0]
+      original_with_client = config.method(:with_client)
+      allow(config).to receive(:with_client) do |&block|
+        queue.pop
+        original_with_client.call(&block)
+      end
+      queue << 'initialize'
+      driver.get(url('/sqlui/seinfeld/query'))
+      editor = wait_until_editor(wait)
+      editor.send_keys('select id, name, description from characters order by id limit 2;')
+      driver.find_element(id: 'submit-all-button').click
+    end
+
+    it 'displays a spinner before showing the results' do
+      wait_until_spinner(wait)
+      queue << 'execute_query'
+      wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
+                         ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+    end
+  end
 end

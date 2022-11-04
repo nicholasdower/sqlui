@@ -85,6 +85,7 @@ kill:
 	@docker kill sqlui_db || true
 	@docker kill sqlui_node_chrome || true
 	@docker kill sqlui_hub || true
+	@docker compose down || true
 	@docker network rm sqlui_default 2> /dev/null || true
 
 start-db:

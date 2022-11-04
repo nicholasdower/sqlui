@@ -7,11 +7,19 @@ require_relative '../../app/sqlui_config'
 LOCAL = %w[1 true].include?(ENV.fetch('LOCAL', 'false').strip.downcase)
 APP_PORT = 9090
 APP_HOST = LOCAL ? 'localhost' : 'test'
+CONFIG = SqluiConfig.new('development_config.yml', { port: APP_PORT, environment: 'test' })
 
 def wait_until_editor(wait)
   wait.until do
     element = driver.find_element(class: 'cm-content')
-    element if element.displayed?
+    element if element&.displayed?
+  end
+end
+
+def wait_until_spinner(wait)
+  wait.until do
+    element = driver.find_element(id: 'result-loader')
+    element if element&.displayed?
   end
 end
 
@@ -53,8 +61,8 @@ end
 class TestServer
   def start
     @thread = Thread.new do
-      config = SqluiConfig.new('development_config.yml', { port: APP_PORT, environment: 'test' })
-      Server.init_and_run(config, 'client/resources')
+      Server.set :server, 'webrick'
+      Server.init_and_run(CONFIG, 'client/resources')
     end
 
     (1..20).each do |n|
@@ -66,7 +74,6 @@ class TestServer
   end
 
   def stop
-    puts 'stop server'
     Server.quit!
     @thread&.join
   end

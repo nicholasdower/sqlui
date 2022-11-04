@@ -6,6 +6,6 @@ EXPECTED=`cat .nvmrc`
 CURRENT=`node -v`
 
 if [ "$EXPECTED" != "$CURRENT" ]; then
-  source $HOME/.nvm/nvm.sh;
-  nvm use --silent || (echo "failed to set node version to $EXPECTED"; exit 1)
+  echo "you must use Node #{EXPECTED}, please run nvm use" >&2
+  exit 1
 fi
