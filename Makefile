@@ -134,7 +134,8 @@ docker-run: create-network
 
 .PHONY: start
 start: build
-	docker compose up sqlui_db sqlui_server
+	./scripts/docker-compose-up-detach sqlui_db
+	docker compose up sqlui_server
 
 .PHONY: start-detached
 start-detached: install
@@ -172,6 +173,10 @@ start-selenium-detached:
 unit-test: build
 	$(RUN) --env DB_HOST=sqlui_db --publish 9090:9090 --name sqlui_test $(IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
 
+.PHONY: watch-unit-test
+watch-unit-test:
+	$(RERUN) --dir spec/app make uni-test $(if $(ARGS),$(ARGS),)
+
 .PHONY: test
 test: build start-db-detached start-selenium-detached
 	./scripts/await-healthy-container sqlui_db
@@ -179,11 +184,15 @@ test: build start-db-detached start-selenium-detached
 
 .PHONY: watch-test
 watch-test:
-	$(RERUN) --dir spec make test
+	$(RERUN) --dir spec make test $(if $(ARGS),$(ARGS),)
 
 .PHONY: unit-test-local
 unit-test-local: build-local
 	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
+
+.PHONY: watch-unit-test-local
+watch-unit-test-local:
+	$(RERUN) --dir spec/app make unit-test-local $(if $(ARGS),ARGS=$(ARGS),)
 
 .PHONY: test-local
 test-local: build-local start-db-detached start-selenium-detached
@@ -193,9 +202,6 @@ test-local: build-local start-db-detached start-selenium-detached
 .PHONY: watch-test-local
 watch-test-local:
 	$(RERUN) --dir spec make test-local $(if $(ARGS),ARGS=$(ARGS),)
-
-.PHONY: start-test-stop
-start-test-stop: test stop
 
 .PHONY: stop
 stop:
@@ -211,4 +217,3 @@ kill:
 	@docker kill sqlui_test 2> /dev/null || true
 	@docker compose down 2> /dev/null || true
 	@docker network rm sqlui_default 2> /dev/null || true
-
