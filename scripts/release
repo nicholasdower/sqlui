@@ -197,8 +197,23 @@ end
 puts
 
 # Relase the gem. Use system to allow for login.
-success = system("gem push #{gem_file}")
-fail('gem push failed') unless success
+loop do
+  break if system("gem push #{gem_file}")
+
+  begin
+    $stderr.print('Gem push failed. Try again? ')
+    unless %w[y yes ja yep].include?($stdin.gets.chomp.downcase)
+      puts 'Aborting'
+      reset
+      exit
+    end
+  rescue Interrupt
+    puts
+    puts 'Aborting'
+    reset
+    exit
+  end
+end
 
 # Commit the changes (version.rb and Gemfile.lock)
 puts
