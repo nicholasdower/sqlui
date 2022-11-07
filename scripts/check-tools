@@ -6,7 +6,7 @@ expected_node=`cat .nvmrc`
 current_node=`node -v`
 
 if [ "$expected_node" != "$current_node" ]; then
-  echo "Node $expected_node required, see README.md" >&2
+  echo "Node $expected_node required, you may need to run 'nvm use', see README.md" >&2
   exit 1
 fi
 

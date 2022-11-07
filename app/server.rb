@@ -86,6 +86,7 @@ class Server < Sinatra::Base
 
         full_sql = params[:sql]
         sql = params[:sql]
+        variables = params[:variables] || {}
         if params[:selection]
           selection = params[:selection]
           if selection.include?('-')
@@ -106,6 +107,9 @@ class Server < Sinatra::Base
         end
 
         result = database.with_client do |client|
+          variables.each do |name, value|
+            client.query("SET @#{name} = #{value};")
+          end
           execute_query(client, sql)
         end
 

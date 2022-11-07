@@ -7,12 +7,6 @@ describe 'query' do
   let(:driver) { start_session }
   let(:wait) { Selenium::WebDriver::Wait.new(timeout: 5) }
 
-  shared_examples_for 'a query result' do |results|
-    it 'loads expected results' do
-      wait_until_results(wait, results)
-    end
-  end
-
   context 'when sql specified in query parameter with run' do
     before do
       driver.get(
@@ -50,7 +44,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
                            ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
       end
     end
@@ -71,7 +65,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'])
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'])
       end
     end
 
@@ -90,7 +84,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+        wait_until_results(wait, %w[id name description], ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
       end
     end
 
@@ -123,7 +117,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+        wait_until_results(wait, %w[id name description], ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
       end
     end
 
@@ -142,7 +136,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
+        wait_until_results(wait, %w[id name description], ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
       end
     end
   end
@@ -173,7 +167,7 @@ describe 'query' do
 
       it "loads results in new window, not in current #{tab_or_window}" do
         driver.switch_to.window(driver.window_handles.last)
-        wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
                            ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
         driver.close
         driver.switch_to.window(driver.window_handles.first)
@@ -201,7 +195,7 @@ describe 'query' do
     it 'displays a spinner then results' do
       wait_until_spinner(wait)
       queue << 'execute_query'
-      wait_until_results(wait, ['1', 'Jerry', 'A funny guy.'],
+      wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
                          ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
     end
 
@@ -210,6 +204,19 @@ describe 'query' do
       driver.find_element(id: 'cancel-button').click
       queue << 'execute_query'
       wait_until_no_results(wait, 'query cancelled')
+    end
+  end
+
+  context 'when query variable specified via URL' do
+    before do
+      driver.get(url('/sqlui/seinfeld/query?_foo=99'))
+      editor = wait_until_editor(wait)
+      editor.send_keys('select @foo;')
+      driver.find_element(id: 'submit-all-button').click
+    end
+
+    it 'loads expected results' do
+      wait_until_results(wait, ['@foo'], ['99'])
     end
   end
 end

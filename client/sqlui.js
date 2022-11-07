@@ -525,7 +525,8 @@ function fetchSql (sqlFetch) {
     method: 'POST',
     body: JSON.stringify({
       sql: sqlFetch.sql,
-      selection: sqlFetch.selection
+      selection: sqlFetch.selection,
+      variables: sqlFetch.variables
     }),
     signal: sqlFetch.fetchController.signal
   })
@@ -569,6 +570,16 @@ function fetchSql (sqlFetch) {
     })
 }
 
+function parseSqlVariables (params) {
+  return Object.fromEntries(
+    Array.from(params).filter(([key]) => {
+      return key.match(/^_.+/)
+    }).map(([key, value]) => {
+      return [key.replace(/^_/, ''), value]
+    })
+  )
+}
+
 function maybeFetchResult (internal) {
   const url = new URL(window.location)
   const params = url.searchParams
@@ -576,6 +587,7 @@ function maybeFetchResult (internal) {
   const file = params.get('file')
   const selection = params.get('selection')
   const hasSqluiReferrer = document.referrer && new URL(document.referrer).origin === url.origin
+  const variables = parseSqlVariables(params)
 
   // Only allow auto-run if coming from another SQLUI page. The idea here is to let the app link to URLs with run=true
   // but not other apps. This allows meta/shift-clicking to run a query.
@@ -596,8 +608,9 @@ function maybeFetchResult (internal) {
     const selectionMatches = selection === existingRequest.selection
     const sqlMatches = params.has('sql') && sql === existingRequest.sql
     const fileMatches = params.has('file') && file === existingRequest.file
+    const variablesMatch = variables === existingRequest.variables
     const queryMatches = sqlMatches || fileMatches
-    if (selectionMatches && queryMatches) {
+    if (selectionMatches && queryMatches && variablesMatch) {
       displaySqlFetch(existingRequest)
       if (params.has('selection')) {
         focus()
@@ -609,7 +622,7 @@ function maybeFetchResult (internal) {
 
   clearResult()
 
-  const sqlFetch = buildSqlFetch(sql, file, selection)
+  const sqlFetch = buildSqlFetch(sql, file, variables, selection)
   if (params.has('sql') || params.has('file')) {
     setValue(sqlFetch.sql)
     if (run) {
@@ -622,7 +635,7 @@ function maybeFetchResult (internal) {
   }
 }
 
-function buildSqlFetch (sql, file, selection) {
+function buildSqlFetch (sql, file, variables, selection) {
   const sqlFetch = {
     fetchController: new AbortController(),
     state: 'pending',
@@ -631,7 +644,8 @@ function buildSqlFetch (sql, file, selection) {
     finished: null,
     sql,
     file,
-    selection
+    selection,
+    variables
   }
 
   if (file) {

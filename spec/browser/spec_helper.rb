@@ -24,18 +24,20 @@ def wait_until_spinner(wait)
 end
 
 def wait_until_results(wait, *results)
-  wait_until_result_status(wait, "#{results.size} row#{results.size == 1 ? '' : 's'}")
+  expected_headers = results[0]
+  expected_rows = results[1..]
+  wait_until_result_status(wait, "#{expected_rows.size} row#{expected_rows.size == 1 ? '' : 's'}")
   header_elements = wait.until do
     elements = driver.find_elements(css: '#result-box > table > thead > tr > th.cell')
-    elements if elements.size == results[0].size && elements.all?(&:displayed?)
+    elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
   end
   headers = header_elements.map(&:text)
-  expect(headers).to eq(%w[id name description])
+  expect(headers).to eq(expected_headers)
   row_elements = wait.until { driver.find_elements(css: '#result-box > table > tbody > tr') }
   rows = row_elements.map do |row_element|
     row_element.find_elements(css: 'td.cell').map(&:text)
   end
-  expect(rows).to eq(results)
+  expect(rows).to eq(expected_rows)
 end
 
 def wait_until_result_status(wait, status)

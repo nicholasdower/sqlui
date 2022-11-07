@@ -21,18 +21,18 @@ install: .install
 update:
 	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle config set --local path vendor/bundle-docker && bundle update'
 
-.PHONY: tools-check
-tools-check:
-	@./scripts/tools-check
+.PHONY: check-tools
+check-tools:
+	@./scripts/check-tools
 
 .PHONY: update-local
-update-local: tools-check
+update-local: check-tools
 	npm update
 	bundle config set --local path vendor/bundle-local
 	bundle update
 
 .install-local: Gemfile Gemfile.lock
-	@make tools-check
+	@make check-tools
 	npm install
 	bundle config set --local path vendor/bundle-local
 	bundle install
@@ -54,7 +54,7 @@ build-from-docker: .install-from-docker
 	./scripts/build
 
 .PHONY: build-local
-build-local: tools-check install-local
+build-local: check-tools install-local
 	./scripts/build
 
 .PHONY: lint
@@ -63,7 +63,7 @@ lint:
 	$(RUN_IMAGE) npx eslint client/*.js
 
 .PHONY: lint-local
-lint-local: tools-check
+lint-local: check-tools
 	bundle exec rubocop
 	npx eslint client/*.js
 
@@ -73,7 +73,7 @@ lint-fix:
 	$(RUN_IMAGE) npx eslint client/*.js --fix
 
 .PHONY: lint-fix-local
-lint-fix-local: tools-check
+lint-fix-local: check-tools
 	bundle exec rubocop -A
 	npx eslint client/*.js --fix
 
