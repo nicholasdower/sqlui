@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e -u -o pipefail
+
+scripts_dir=$(dirname $0)
+root_dir=$(cd $scripts_dir/.. && pwd)
+
+$scripts_dir/create-docker-network
+
+interactive=$([ -t 0 ] && echo --tty --interactive)
+docker run --rm $interactive --network sqlui_default --volume $root_dir:/sqlui --workdir /sqlui $@

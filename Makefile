@@ -1,13 +1,8 @@
-INTERACTIVE := $(shell [ -t 0 ] && echo --tty --interactive)
-RUN = docker run --rm $(INTERACTIVE) --network sqlui_default --volume `pwd`:/sqlui --workdir /sqlui
+RUN = ./scripts/docker-run
 IMAGE = nicholasdower/sqlui
 RUN_IMAGE = $(RUN) $(IMAGE)
 
 RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --file client/resources/sqlui.css --file client/resources/sqlui.html --file development_config.yml
-
-.PHONY: create-network
-create-network:
-	@docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null
 
 .install-from-docker:
 	npm install
@@ -17,14 +12,13 @@ create-network:
 	@touch .install-from-docker
 
 .install: Gemfile Gemfile.lock
-	@make create-network
 	$(RUN_IMAGE) make .install-from-docker
 
 .PHONY: install
 install: .install
 
 .PHONY: update
-update: create-network
+update:
 	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle config set --local path vendor/bundle-docker && bundle update'
 
 .PHONY: tools-check
@@ -48,11 +42,11 @@ update-local: tools-check
 install-local: .install-local
 
 .PHONY: bash
-bash: create-network
+bash:
 	$(RUN_IMAGE) bash
 
 .PHONY: build
-build: install create-network
+build: install
 	$(RUN_IMAGE) ./scripts/build
 
 .PHONY: build-from-docker
@@ -64,7 +58,7 @@ build-local: tools-check install-local
 	./scripts/build
 
 .PHONY: lint
-lint: create-network
+lint:
 	$(RUN_IMAGE) bundle exec rubocop
 	$(RUN_IMAGE) npx eslint client/*.js
 
@@ -74,7 +68,7 @@ lint-local: tools-check
 	npx eslint client/*.js
 
 .PHONY: lint-fix
-lint-fix: create-network
+lint-fix:
 	$(RUN_IMAGE) bundle exec rubocop -A
 	$(RUN_IMAGE) npx eslint client/*.js --fix
 
@@ -114,22 +108,18 @@ stop-db:
 
 .PHONY: seed-db
 seed-db:
-	docker exec --interactive sqlui_db mysql --host=db --protocol=tcp --user=root --password=root < sql/init.sql
-
-.PHONY: seed-db-local
-seed-db-local:
-	mysql --protocol=tcp --user=root --password=root < sql/init.sql
+	docker exec --interactive sqlui_db mysql --user=root --password=root < sql/init.sql
 
 .PHONY: mysql
 mysql:
-	docker exec --interactive --tty sqlui_db mysql --user=root --password=root $(if $(QUERY),--execute "$(QUERY)",)
+	docker exec --interactive --tty sqlui_db mysql --user=root --password=root $(if $(ARGS),$(ARGS),)
 
 .PHONY: mysql-local
 mysql-local:
-	mysql --user=root --password=root $(if $(QUERY),--execute "$(QUERY)",)
+	mysql --protocol=tcp --user=root --password=root $(if $(ARGS),$(ARGS),)
 
 .PHONY: docker-run
-docker-run: create-network
+docker-run:
 	@$(RUN_IMAGE) $(CMD)
 
 .PHONY: start

@@ -1,3 +1,4 @@
+drop database if exists seinfeld;
 create database seinfeld;
 
 create table seinfeld.characters(

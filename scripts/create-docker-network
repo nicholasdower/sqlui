@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e -u -o pipefail
+
+docker network inspect sqlui_default >/dev/null 2>&1 || docker network create --driver bridge sqlui_default > /dev/null

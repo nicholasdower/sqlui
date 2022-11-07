@@ -12,7 +12,6 @@ cache js, css and html at class level instead of instance
 use weak references to keep track of all clients. close connections on server shutdown?
 display error on structure tab if no schemas are returned
 show a helpful message when no saved files are found or when the directory doesn't exist
-make it possible to rerun seed-db. can't figure out how to recreate users
 switch to typescript
 add prometheus metrics
 add error reporting
@@ -46,7 +45,6 @@ copy cell contents for really long cells that can't be highlighted
 the editor is too short on a large screen. it should be a percentage
 warn when closing the browser with unsaved changes? what do other sites do?
 notify user if a query completes while on the saved or structure tab
-docker run script
 remove all containers script
 move from docker make targets into own Makefile
 move local make targets into own Makefile
@@ -58,8 +56,8 @@ run test coverage
 write a better SQL parser
 does the server have to be static?
 shutting down via ctrl-c messes up the console
-refresh page if server restarts?
 move logs to file during test
 use sqlui version as query param to css and js. Send in all json requests. Return an error if versions mismatch and tell the user to restart.
 In development use version plus timestamp when server starts. Add a heartbeat to the app which autoreloads on version mismatch.
 check whether current master is green before releasing
+display how long query took in status
