@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.31
 - Fix bug in saved query description newlines.
 
 version: 0.1.30

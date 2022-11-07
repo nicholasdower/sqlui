@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.31
+
+- Fix bug in saved query description newlines.
+
 ## 0.1.30
 
 - Display query execution time in status.
