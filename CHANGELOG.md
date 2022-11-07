@@ -1,5 +1,10 @@
 # Changes
 
+## 0.1.30
+
+- Display query execution time in status.
+- Add support for setting SQL variables with query params.
+
 ## 0.1.29
 
 - Move port and environment into config. No more environment variables.
