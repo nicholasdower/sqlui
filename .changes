@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.29
 - Move port and environment into config. No more environment variables.
 - Fix bug preventing running queries unless referrer set.
 - Better spinner display logic.

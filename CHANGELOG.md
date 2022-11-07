@@ -1,5 +1,13 @@
 # Changes
 
+## 0.1.29
+
+- Move port and environment into config. No more environment variables.
+- Fix bug preventing running queries unless referrer set.
+- Better spinner display logic.
+- Fix broken cancel button. Was resulting in a missing status bar.
+- Display a timer when waiting for results.
+
 ## 0.1.28
 
 - Use APP_ENV and APP_PORT instead of SERVER_ENV and SERVER_PORT.
