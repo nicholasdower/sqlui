@@ -145,9 +145,8 @@ execute('make lint')
 
 # Run tests
 puts 'Testing'
-execute('make start-detached')
 execute('make test')
-execute('make stop')
+execute('make kill')
 
 # Update the version in .version
 puts 'Updating .version'
