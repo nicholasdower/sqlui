@@ -35,6 +35,19 @@ describe 'query' do
   end
 
   shared_examples_for 'submitted queries' do
+    context 'when sql specified in query parameter' do
+      before do
+        driver.get(
+          url('/sqlui/seinfeld/query?sql=select+id%2C+name%2C+description+from+characters+order+by+id+limit+1%3B')
+        )
+        execute
+      end
+
+      it 'loads expected results' do
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'])
+      end
+    end
+
     context 'when single editor query specified' do
       before do
         driver.get(url('/sqlui/seinfeld/query'))
@@ -142,15 +155,35 @@ describe 'query' do
   end
 
   context 'when keyboarding' do
-    let(:execute) { driver.find_element(class: 'cm-content').send_keys(%i[control enter]) }
-    let(:execute_all) { driver.find_element(class: 'cm-content').send_keys(%i[shift control enter]) }
+    let(:execute) do
+      wait.until do
+        element = driver.find_element(class: 'cm-content')
+        element if element&.displayed?
+      end.send_keys(%i[control enter])
+    end
+    let(:execute_all) do
+      wait.until do
+        element = driver.find_element(class: 'cm-content')
+        element if element&.displayed?
+      end.send_keys(%i[shift control enter])
+    end
 
     include_examples 'submitted queries'
   end
 
   context 'when mousing' do
-    let(:execute) { driver.find_element(id: 'submit-current-button').click }
-    let(:execute_all) { driver.find_element(id: 'submit-all-button').click }
+    let(:execute) do
+      wait.until do
+        element = driver.find_element(id: 'submit-current-button')
+        element if element&.displayed?
+      end.click
+    end
+    let(:execute_all) do
+      wait.until do
+        element = driver.find_element(id: 'submit-all-button')
+        element if element&.displayed?
+      end.click
+    end
 
     include_examples 'submitted queries'
   end

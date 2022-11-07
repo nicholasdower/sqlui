@@ -47,6 +47,13 @@ def wait_until_result_status(wait, status)
   end
 end
 
+def wait_until_saved_status(wait, status)
+  wait.until do
+    element = driver.find_element(css: '#saved-status')
+    element if element&.attribute('style') == 'display: flex;' && element.text.match(status)
+  end
+end
+
 def wait_until_no_results(wait, status_matcher = '')
   wait_until_result_status(wait, status_matcher)
   wait.until do

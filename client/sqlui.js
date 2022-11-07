@@ -608,7 +608,7 @@ function maybeFetchResult (internal) {
     const selectionMatches = selection === existingRequest.selection
     const sqlMatches = params.has('sql') && sql === existingRequest.sql
     const fileMatches = params.has('file') && file === existingRequest.file
-    const variablesMatch = variables === existingRequest.variables
+    const variablesMatch = JSON.stringify(variables) === JSON.stringify(existingRequest.variables)
     const queryMatches = sqlMatches || fileMatches
     if (selectionMatches && queryMatches && variablesMatch) {
       displaySqlFetch(existingRequest)
@@ -701,7 +701,7 @@ function displaySqlFetchInResultTab (fetch) {
   }
 
   clearResultBox()
-  displaySqlFetchResultStatus('result-status', fetch.result)
+  displaySqlFetchResultStatus('result-status', fetch)
 
   const tableElement = document.createElement('table')
   tableElement.id = 'result-table'
@@ -817,7 +817,7 @@ function displaySqlFetchInGraphTab (fetch) {
     throw new Error(`unexpected fetch sql request status: ${fetch.status}`)
   }
   clearGraphBox()
-  displaySqlFetchResultStatus('graph-status', fetch.result)
+  displaySqlFetchResultStatus('graph-status', fetch)
 
   if (!fetch.result.rows) {
     return
@@ -856,13 +856,15 @@ function displaySqlFetchInGraphTab (fetch) {
   chart.draw(dataTable, options)
 }
 
-function displaySqlFetchResultStatus (statusElementId, result) {
+function displaySqlFetchResultStatus (statusElementId, sqlFetch) {
+  const result = sqlFetch.result
   const statusElement = document.getElementById(statusElementId)
+  const elapsed = Math.round(100 * (window.performance.now() - sqlFetch.startedAt) / 1000.0) / 100
 
   if (result.total_rows === 1) {
-    statusElement.innerText = `${result.total_rows} row`
+    statusElement.innerText = `${result.total_rows} row (${elapsed}s)`
   } else {
-    statusElement.innerText = `${result.total_rows} rows`
+    statusElement.innerText = `${result.total_rows} rows (${elapsed}s)`
   }
 
   if (result.total_rows > result.rows.length) {

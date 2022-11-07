@@ -26,7 +26,6 @@ make "check console" a link that opens the console?
 add keyboard focus order
 maybe move db list into app
 test:
- - shift and meta navigation
  - executing when viewing a file after changing selection
  - executing when viewing a file after changing query
  - back clears query and updates tab
@@ -59,5 +58,4 @@ move logs to file during test
 use sqlui version as query param to css and js. Send in all json requests. Return an error if versions mismatch and tell the user to restart.
 In development use version plus timestamp when server starts. Add a heartbeat to the app which autoreloads on version mismatch.
 check whether current master is green before releasing
-display how long query took in status
 allow a sql result to link to sqlui urls. maybe this is the start of some built-in functions.
