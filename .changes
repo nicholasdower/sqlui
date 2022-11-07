@@ -1,4 +1,6 @@
 version: next
+- Display query execution time in status.
+- Add support for setting SQL variables with query params.
 
 version: 0.1.29
 - Move port and environment into config. No more environment variables.
