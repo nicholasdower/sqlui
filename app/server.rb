@@ -81,7 +81,6 @@ class Server < Sinatra::Base
       end
 
       post "#{database.url_path}/query" do
-        sleep 5
         params.merge!(JSON.parse(request.body.read, symbolize_names: true))
         break client_error('missing sql') unless params[:sql]
 
