@@ -63,7 +63,7 @@ class Server < Sinatra::Base
                 l.start_with?('--')
               end
               filename = File.basename(path)
-              description = comment_lines.map { |l| l.sub(/^-- */, '') }.join
+              description = comment_lines.map { |l| l.sub(/^-- */, '') }.join("\n")
               [
                 filename,
                 {

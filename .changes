@@ -1,4 +1,5 @@
 version: next
+- Fix bug in saved query description newlines.
 
 version: 0.1.30
 - Display query execution time in status.
