@@ -7,5 +7,8 @@ root_dir=$(cd $scripts_dir/.. && pwd)
 
 $scripts_dir/create-docker-network
 
-interactive=$([ -t 0 ] && echo --tty --interactive)
+interactive=""
+if [ -t 0 ]; then
+  interactive="--tty --interactive"
+fi
 docker run --rm $interactive --network sqlui_default --volume $root_dir:/sqlui --workdir /sqlui $@
