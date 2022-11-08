@@ -12,10 +12,12 @@ end
 
 Signal.trap('INT') do
   reset
+  exit(1)
 end
 
 Signal.trap('TERM') do
   reset
+  exit(1)
 end
 
 def fail(msg)
