@@ -4,18 +4,15 @@ RUN_IMAGE = $(RUN) $(IMAGE)
 
 RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --file client/resources/sqlui.css --file client/resources/sqlui.html --file development_config.yml
 
-.install-from-docker:
+.install-from-docker: Gemfile Gemfile.lock
 	npm install
 	bundle config set --local path vendor/bundle-docker
 	bundle install
-	@touch .install
 	@touch .install-from-docker
 
-.install: Gemfile Gemfile.lock
-	$(RUN_IMAGE) make .install-from-docker
-
 .PHONY: install
-install: .install
+install:
+	@$(RUN_IMAGE) make .install-from-docker
 
 .PHONY: update
 update:
@@ -24,22 +21,6 @@ update:
 .PHONY: check-tools
 check-tools:
 	@./scripts/check-tools
-
-.PHONY: update-local
-update-local: check-tools
-	npm update
-	bundle config set --local path vendor/bundle-local
-	bundle update
-
-.install-local: Gemfile Gemfile.lock
-	@make check-tools
-	npm install
-	bundle config set --local path vendor/bundle-local
-	bundle install
-	@touch .install-local
-
-.PHONY: install-local
-install-local: .install-local
 
 .PHONY: bash
 bash:
@@ -53,29 +34,15 @@ build: install
 build-from-docker: .install-from-docker
 	./scripts/build
 
-.PHONY: build-local
-build-local: check-tools install-local
-	./scripts/build
-
 .PHONY: lint
 lint:
 	$(RUN_IMAGE) bundle exec rubocop
 	$(RUN_IMAGE) npx eslint client/*.js
 
-.PHONY: lint-local
-lint-local: check-tools
-	bundle exec rubocop
-	npx eslint client/*.js
-
 .PHONY: lint-fix
 lint-fix:
 	$(RUN_IMAGE) bundle exec rubocop -A
 	$(RUN_IMAGE) npx eslint client/*.js --fix
-
-.PHONY: lint-fix-local
-lint-fix-local: check-tools
-	bundle exec rubocop -A
-	npx eslint client/*.js --fix
 
 .PHONY: build-docker-image
 build-docker-image:
@@ -114,10 +81,6 @@ seed-db:
 mysql:
 	docker exec --interactive --tty sqlui_db mysql --user=root --password=root $(if $(ARGS),$(ARGS),)
 
-.PHONY: mysql-local
-mysql-local:
-	mysql --protocol=tcp --user=root --password=root $(if $(ARGS),$(ARGS),)
-
 .PHONY: docker-run
 docker-run:
 	@$(RUN_IMAGE) $(CMD)
@@ -140,15 +103,6 @@ build-and-start-server-from-docker: build-from-docker
 .PHONY: start-server-from-docker
 start-server-from-docker:
 	$(RERUN) -- make build-and-start-server-from-docker
-
-.PHONY: build-and-start-server-local
-build-and-start-server-local: build-local
-	bundle exec ruby ./bin/sqlui development_config.yml
-
-.PHONY: start-local
-start-local: start-db-detached
-	./scripts/await-healthy-container sqlui_db
-	$(RERUN) -- make build-and-start-server-local
 
 .PHONY: start-selenium
 start-selenium:
@@ -176,23 +130,6 @@ test: build start-db-detached start-selenium-detached
 watch-test:
 	$(RERUN) --dir spec make test $(if $(ARGS),$(ARGS),)
 
-.PHONY: unit-test-local
-unit-test-local: build-local
-	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
-
-.PHONY: watch-unit-test-local
-watch-unit-test-local:
-	$(RERUN) --dir spec/app make unit-test-local $(if $(ARGS),ARGS=$(ARGS),)
-
-.PHONY: test-local
-test-local: build-local start-db-detached start-selenium-detached
-	./scripts/await-healthy-container sqlui_db
-	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)
-
-.PHONY: watch-test-local
-watch-test-local:
-	$(RERUN) --dir spec make test-local $(if $(ARGS),ARGS=$(ARGS),)
-
 .PHONY: stop
 stop:
 	docker compose down
@@ -207,3 +144,5 @@ kill:
 	@docker kill sqlui_test 2> /dev/null || true
 	@docker compose down 2> /dev/null || true
 	@docker network rm sqlui_default 2> /dev/null || true
+
+include Makefile.local
