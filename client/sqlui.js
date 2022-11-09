@@ -1,35 +1,30 @@
 import { EditorView } from 'codemirror'
-import { defaultKeymap, history, historyKeymap, standardKeymap } from '@codemirror/commands'
-import { EditorState } from '@codemirror/state'
-import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap
-} from '@codemirror/autocomplete'
+import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { MySQL, sql } from '@codemirror/lang-sql'
 import {
   bracketMatching,
   defaultHighlightStyle,
-  foldGutter, foldKeymap,
+  foldGutter,
+  foldKeymap,
   indentOnInput,
   syntaxHighlighting
 } from '@codemirror/language'
-import {
-  lintKeymap
-} from '@codemirror/lint'
-import {
-  highlightSelectionMatches, searchKeymap
-} from '@codemirror/search'
+import { lintKeymap } from '@codemirror/lint'
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
+import { EditorState } from '@codemirror/state'
 import {
   crosshairCursor,
-  drawSelection, dropCursor, highlightActiveLine,
+  drawSelection,
+  dropCursor,
+  highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
   keymap,
   lineNumbers,
-  placeholder, rectangularSelection
+  placeholder,
+  rectangularSelection
 } from '@codemirror/view'
-import { MySQL, sql } from '@codemirror/lang-sql'
 
 /* global google */
 
@@ -61,7 +56,11 @@ function init (parent, onSubmit, onShiftSubmit) {
   document.getElementById('submit-all-button').value = `run (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
 
   const fixedHeightEditor = EditorView.theme({
-    '.cm-scroller': { height: '200px', overflow: 'auto', resize: 'vertical' }
+    '.cm-scroller': {
+      height: '200px',
+      overflow: 'auto',
+      resize: 'vertical'
+    }
   })
   const schemas = Object.entries(window.metadata.schemas)
   const editorSchema = {}
@@ -81,8 +80,18 @@ function init (parent, onSubmit, onShiftSubmit) {
     return keymap
   })
   const editorKeymap = keymap.of([
-    { key: 'Cmd-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
-    { key: 'Ctrl-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
+    {
+      key: 'Cmd-Enter',
+      run: onSubmit,
+      preventDefault: true,
+      shift: onShiftSubmit
+    },
+    {
+      key: 'Ctrl-Enter',
+      run: onSubmit,
+      preventDefault: true,
+      shift: onShiftSubmit
+    },
     ...closeBracketsKeymap,
     ...customDefaultKeymap,
     ...searchKeymap,
@@ -118,7 +127,7 @@ function init (parent, onSubmit, onShiftSubmit) {
           schema: editorSchema
         }),
         fixedHeightEditor,
-        placeholder("Let's query!")
+        placeholder('Let\'s query!')
       ]
     }),
     parent
@@ -146,7 +155,12 @@ function setSelection (selection) {
     anchor = Math.min(parseInt(selection), window.editorView.state.doc.length)
     head = anchor
   }
-  window.editorView.dispatch({ selection: { anchor, head } })
+  window.editorView.dispatch({
+    selection: {
+      anchor,
+      head
+    }
+  })
 }
 
 function focus () {
@@ -573,7 +587,9 @@ function updateResultTime (sqlFetch) {
   if (window.sqlFetch === sqlFetch) {
     if (sqlFetch.state === 'pending' || sqlFetch.spinner === 'always') {
       displaySqlFetch(sqlFetch)
-      setTimeout(() => { updateResultTime(sqlFetch) }, 500)
+      setTimeout(() => {
+        updateResultTime(sqlFetch)
+      }, 500)
     }
   }
 }
@@ -826,7 +842,7 @@ function displaySqlFetchError (statusElementId, message, details) {
   const statusElement = document.getElementById(statusElementId)
   let statusMessage = 'error: ' + message
   if (statusMessage.length > 90) {
-    statusMessage = message.substring(0, 90) + '…'
+    statusMessage = statusMessage.substring(0, 90) + '…'
   }
   if (details) {
     console.log(`${message}\n${details}`)
