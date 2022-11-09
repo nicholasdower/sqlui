@@ -40,14 +40,14 @@ class Server < Sinatra::Base
       get "#{database.url_path}/sqlui.css" do
         @css ||= File.read(File.join(resources_dir, 'sqlui.css'))
         status 200
-        headers 'Content-Type' => 'text/css'
+        headers 'Content-Type' => 'text/css; charset=utf-8'
         body @css
       end
 
       get "#{database.url_path}/sqlui.js" do
         @js ||= File.read(File.join(resources_dir, 'sqlui.js'))
         status 200
-        headers 'Content-Type' => 'text/javascript'
+        headers 'Content-Type' => 'text/javascript; charset=utf-8'
         body @js
       end
 
@@ -76,7 +76,7 @@ class Server < Sinatra::Base
           }
         end
         status 200
-        headers 'Content-Type' => 'application/json'
+        headers 'Content-Type' => 'application/json; charset=utf-8'
         body metadata.to_json
       end
 
@@ -117,21 +117,21 @@ class Server < Sinatra::Base
         result[:query] = full_sql
 
         status 200
-        headers 'Content-Type' => 'application/json'
+        headers 'Content-Type' => 'application/json; charset=utf-8'
         body result.to_json
       end
 
       get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
         @html ||= File.read(File.join(resources_dir, 'sqlui.html'))
         status 200
-        headers 'Content-Type' => 'text/html'
+        headers 'Content-Type' => 'text/html; charset=utf-8'
         body @html
       end
     end
 
     error do |e|
       status 500
-      headers 'Content-Type' => 'application/json'
+      headers 'Content-Type' => 'application/json; charset=utf-8'
       message = e.message.lines.first&.strip || 'unexpected error'
       message = "#{message[0..80]}…" if message.length > 80
       result = {
@@ -148,7 +148,7 @@ class Server < Sinatra::Base
 
   def client_error(message, stacktrace: nil)
     status(400)
-    headers 'Content-Type' => 'application/json'
+    headers 'Content-Type' => 'application/json; charset=utf-8'
     body({ error: message, stacktrace: stacktrace }.compact.to_json)
   end
 

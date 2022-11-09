@@ -1,8 +1,35 @@
-import { basicSetup, EditorView } from 'codemirror'
-import { defaultKeymap } from '@codemirror/commands'
+import { EditorView } from 'codemirror'
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { EditorState } from '@codemirror/state'
-import { keymap, placeholder } from '@codemirror/view'
-import { sql } from '@codemirror/lang-sql'
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap
+} from '@codemirror/autocomplete'
+import {
+  bracketMatching,
+  defaultHighlightStyle,
+  foldGutter, foldKeymap,
+  indentOnInput,
+  syntaxHighlighting
+} from '@codemirror/language'
+import {
+  lintKeymap
+} from '@codemirror/lint'
+import {
+  highlightSelectionMatches, searchKeymap
+} from '@codemirror/search'
+import {
+  crosshairCursor,
+  drawSelection, dropCursor, highlightActiveLine,
+  highlightActiveLineGutter,
+  highlightSpecialChars,
+  keymap,
+  lineNumbers,
+  placeholder, rectangularSelection
+} from '@codemirror/view'
+import { MySQL, sql } from '@codemirror/lang-sql'
 
 /* global google */
 
@@ -32,15 +59,49 @@ function init (parent, onSubmit, onShiftSubmit) {
   const fixedHeightEditor = EditorView.theme({
     '.cm-scroller': { height: '200px', overflow: 'auto', resize: 'vertical' }
   })
+  const schemas = Object.entries(window.metadata.schemas)
+  const editorSchema = {}
+  schemas.forEach(([schemaName, schema]) => {
+    Object.entries(schema.tables).forEach(([tableName, table]) => {
+      const qualifiedTableName = schemas.length === 1 ? tableName : `${schemaName}.${tableName}`
+      editorSchema[qualifiedTableName] = Object.keys(table.columns)
+    })
+  })
   window.editorView = new EditorView({
     state: EditorState.create({
       extensions: [
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        highlightSpecialChars(),
+        history(),
+        foldGutter(),
+        drawSelection(),
+        dropCursor(),
+        EditorState.allowMultipleSelections.of(true),
+        indentOnInput(),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+        bracketMatching(),
+        closeBrackets(),
+        autocompletion(),
+        rectangularSelection(),
+        crosshairCursor(),
+        highlightActiveLine(),
+        highlightSelectionMatches(),
         keymap.of([
           { key: 'Ctrl-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
-          ...defaultKeymap
+          ...closeBracketsKeymap,
+          ...defaultKeymap,
+          ...searchKeymap,
+          ...historyKeymap,
+          ...foldKeymap,
+          ...completionKeymap,
+          ...lintKeymap
         ]),
-        basicSetup,
-        sql(),
+        sql({
+          dialect: MySQL,
+          upperCaseKeywords: true,
+          schema: editorSchema
+        }),
         fixedHeightEditor,
         placeholder('Ctrl-Enter to submit')
       ]

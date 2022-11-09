@@ -1,70 +1,71 @@
-<head>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SQLUI</title>
+    <script src="sqlui.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="sqlui.css">
+  </head>
 
-  <title>SQLUI</title>
-
-  <script src="sqlui.js"></script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <link rel="stylesheet" href="sqlui.css">
-</head>
-
-<body>
-  <div id="loading-box" class="loading-box">
-  </div>
-
-  <div id="main-box" class="main-box" style="display:none">
-    <div class="tabs-box">
-      <h1 class="header"><a id="header-link">SQLUI</a></h1>
-      <h1 id="server-name" class="server-name"></h1>
-      <a id="query-tab-button" class="tab-button">Query</a>
-      <a id="graph-tab-button" class="tab-button">Graph</a>
-      <a id="saved-tab-button" class="tab-button">Saved</a>
-      <a id="structure-tab-button" class="tab-button">Structure</a>
+  <body>
+    <div id="loading-box" class="loading-box">
     </div>
 
-    <div id="query-box" class="query-box tab-content-element graph-element query-element" style="display: none;">
-      <div id="query" class="query"></div>
-    </div>
+    <div id="main-box" class="main-box" style="display:none">
+      <div class="tabs-box">
+        <h1 class="header"><a id="header-link">SQLUI</a></h1>
+        <h1 id="server-name" class="server-name"></h1>
+        <a id="query-tab-button" class="tab-button">Query</a>
+        <a id="graph-tab-button" class="tab-button">Graph</a>
+        <a id="saved-tab-button" class="tab-button">Saved</a>
+        <a id="structure-tab-button" class="tab-button">Structure</a>
+      </div>
 
-    <div id="submit-box" class="submit-box tab-content-element graph-element query-element" style="display: none;">
-      <input id="cancel-button" class="submit-button" type="button" value="cancel"></input>
-      <div class="submit-fill"></div>
-      <input id="submit-current-button" class="submit-button" type="button" value="run selection (ctrl-enter)"></input>
-      <input id="submit-all-button" class="submit-button" type="button" value="run (ctrl-shift-enter)"></input>
-    </div>
+      <div id="query-box" class="query-box tab-content-element graph-element query-element" style="display: none;">
+        <div id="query" class="query"></div>
+      </div>
 
-    <div id="result-box" class="result-box tab-content-element query-element" style="display: none;">
-    </div>
+      <div id="submit-box" class="submit-box tab-content-element graph-element query-element" style="display: none;">
+        <input id="cancel-button" class="submit-button" type="button" value="cancel"></input>
+        <div class="submit-fill"></div>
+        <input id="submit-current-button" class="submit-button" type="button" value="run selection (ctrl-enter)"></input>
+        <input id="submit-all-button" class="submit-button" type="button" value="run (ctrl-shift-enter)"></input>
+      </div>
 
-    <div id="graph-box" class="graph-box tab-content-element graph-element" style="display: none;">
-    </div>
+      <div id="result-box" class="result-box tab-content-element query-element" style="display: none;">
+      </div>
 
-    <div id="fetch-sql-box" class="fetch-sql-box tab-content-element graph-element query-element" style="display: none;">
-      <div id="result-loader" class="loader"></div>
-      <p id="result-time" class="result-time"></p>
-    </div>
+      <div id="graph-box" class="graph-box tab-content-element graph-element" style="display: none;">
+      </div>
 
-    <div id="saved-box" class="saved-box tab-content-element saved-element" style="display: none;">
-    </div>
+      <div id="fetch-sql-box" class="fetch-sql-box tab-content-element graph-element query-element" style="display: none;">
+        <div id="result-loader" class="loader"></div>
+        <p id="result-time" class="result-time"></p>
+      </div>
 
-    <div id="structure-box" class="structure-box tab-content-element structure-element" style="display: none;">
-      <div style="display: flex; flex: 1; flex-direction: row; align-items: stretch;">
-        <select id="schemas" class="schemas" size="4">
-        </select>
-        <select id="tables" class="tables" size="4">
-        </select>
-        <div id="table-info" class="table-info">
-          <div id="columns" class="columns">
-          </div>
-          <div id="indexes" class="indexes">
+      <div id="saved-box" class="saved-box tab-content-element saved-element" style="display: none;">
+      </div>
+
+      <div id="structure-box" class="structure-box tab-content-element structure-element" style="display: none;">
+        <div style="display: flex; flex: 1; flex-direction: row; align-items: stretch;">
+          <select id="schemas" class="schemas" size="4">
+          </select>
+          <select id="tables" class="tables" size="4">
+          </select>
+          <div id="table-info" class="table-info">
+            <div id="columns" class="columns">
+            </div>
+            <div id="indexes" class="indexes">
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div id="status-box" class="status-box">
-      <div id="result-status" class="status tab-content-element query-element"></div>
-      <div id="graph-status" class="status tab-content-element graph-element"></div>
-      <div id="saved-status" class="status tab-content-element saved-element"></div>
+      <div id="status-box" class="status-box">
+        <div id="result-status" class="status tab-content-element query-element"></div>
+        <div id="graph-status" class="status tab-content-element graph-element"></div>
+        <div id="saved-status" class="status tab-content-element saved-element"></div>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
+</html>
