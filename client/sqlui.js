@@ -824,12 +824,15 @@ function displaySqlFetch (fetch) {
 
 function displaySqlFetchError (statusElementId, message, details) {
   const statusElement = document.getElementById(statusElementId)
+  let statusMessage = 'error: ' + message
+  if (statusMessage.length > 90) {
+    statusMessage = message.substring(0, 90) + '…'
+  }
   if (details) {
     console.log(`${message}\n${details}`)
-    statusElement.innerText = `error: ${message} (check console)`
-  } else {
-    statusElement.innerText = `error: ${message}`
+    statusMessage += ' (check console)'
   }
+  statusElement.innerText = statusMessage
 }
 
 function clearSpinner () {

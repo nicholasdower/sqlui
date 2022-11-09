@@ -133,7 +133,6 @@ class Server < Sinatra::Base
       status 500
       headers 'Content-Type' => 'application/json; charset=utf-8'
       message = e.message.lines.first&.strip || 'unexpected error'
-      message = "#{message[0..80]}…" if message.length > 80
       result = {
         error: message,
         stacktrace: e.backtrace.map { |b| b }.join("\n")
