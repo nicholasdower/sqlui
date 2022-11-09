@@ -1,5 +1,14 @@
 # Changes
 
+## 0.1.32
+
+- Use Cmd-Enter to submit on Mac.
+- Add binding for Shift-Enter to insert a new line.
+- Display entire server error in console.
+- Add autocomplete for tables and columns.
+- Fix folding bug where strange characters were displayed.
+- Autocapitalize and use MySQL sytax instead of default SQL.
+
 ## 0.1.31
 
 - Fix bug in saved query description newlines.

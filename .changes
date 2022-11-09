@@ -1,4 +1,6 @@
 version: next
+
+version: 0.1.32
 - Use Cmd-Enter to submit on Mac.
 - Add binding for Shift-Enter to insert a new line.
 - Display entire server error in console.

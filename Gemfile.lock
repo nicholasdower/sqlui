@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqlui (0.1.31)
+    sqlui (0.1.32)
       mysql2 (~> 0.0)
       sinatra (~> 3.0)
       webrick (~> 1.0)
