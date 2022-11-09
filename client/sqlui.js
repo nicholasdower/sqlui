@@ -1,5 +1,5 @@
 import { EditorView } from 'codemirror'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, standardKeymap } from '@codemirror/commands'
 import { EditorState } from '@codemirror/state'
 import {
   autocompletion,
@@ -56,6 +56,10 @@ function init (parent, onSubmit, onShiftSubmit) {
     clearResult()
   })
 
+  const isMac = navigator.userAgent.includes('Mac')
+  document.getElementById('submit-current-button').value = `run selection (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
+  document.getElementById('submit-all-button').value = `run (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
+
   const fixedHeightEditor = EditorView.theme({
     '.cm-scroller': { height: '200px', overflow: 'auto', resize: 'vertical' }
   })
@@ -67,6 +71,26 @@ function init (parent, onSubmit, onShiftSubmit) {
       editorSchema[qualifiedTableName] = Object.keys(table.columns)
     })
   })
+  // I prefer to use Cmd-Enter/Ctrl-Enter to submit the query. Here I am replacing the default mapping.
+  // See https://codemirror.net/docs/ref/#commands.defaultKeymap
+  // See https://github.com/codemirror/commands/blob/6aa9989f38fe3c7dbc9b72c5015a3db97370c07a/src/commands.ts#L891
+  const customDefaultKeymap = defaultKeymap.map(keymap => {
+    if (keymap.key === 'Mod-Enter') {
+      keymap.key = 'Shift-Enter'
+    }
+    return keymap
+  })
+  const editorKeymap = keymap.of([
+    { key: 'Cmd-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
+    { key: 'Ctrl-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
+    ...closeBracketsKeymap,
+    ...customDefaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    ...completionKeymap,
+    ...lintKeymap
+  ])
   window.editorView = new EditorView({
     state: EditorState.create({
       extensions: [
@@ -87,23 +111,14 @@ function init (parent, onSubmit, onShiftSubmit) {
         crosshairCursor(),
         highlightActiveLine(),
         highlightSelectionMatches(),
-        keymap.of([
-          { key: 'Ctrl-Enter', run: onSubmit, preventDefault: true, shift: onShiftSubmit },
-          ...closeBracketsKeymap,
-          ...defaultKeymap,
-          ...searchKeymap,
-          ...historyKeymap,
-          ...foldKeymap,
-          ...completionKeymap,
-          ...lintKeymap
-        ]),
+        editorKeymap,
         sql({
           dialect: MySQL,
           upperCaseKeywords: true,
           schema: editorSchema
         }),
         fixedHeightEditor,
-        placeholder('Ctrl-Enter to submit')
+        placeholder("Let's query!")
       ]
     }),
     parent

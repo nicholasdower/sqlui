@@ -18,7 +18,6 @@ add a second database
 cache saved files
 add padding inside select list, longest name overlaps scrollbar
 put current structure table and schema in url params?
-make cmd-enter work
 add github action to update deps or enable dependabot
 make status have a tooltip with the full error.
 add a tooltip to execute buttons ;)
