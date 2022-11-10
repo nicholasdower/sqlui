@@ -107,8 +107,6 @@ release_id=$(curl \
   "https://api.github.com/repos/nicholasdower/sqlui/releases" \
   -d "{\"tag_name\":\"v$new_version\",\"target_commitish\":\"$target_commit\",\"name\":\"v$new_version Release\",\"body\":\"$notes\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}" | tr -d '\n' | grep -E -o '"id": *[0-9]+' | head -n 1 | sed 's/"id": *//g')
 
-echo "Release ID: $release_id"
-
 echo 'Uploading release asset'
 curl \
   -sS \
