@@ -1,5 +1,3 @@
-# Changes
-
 ## 0.1.32
 
 - Use Cmd-Enter to submit on Mac.
