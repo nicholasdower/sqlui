@@ -9,18 +9,19 @@ APP_PORT = 9090
 APP_HOST = LOCAL ? 'localhost' : 'sqlui_test'
 CONFIG = SqluiConfig.new('development_config.yml', { port: APP_PORT, environment: 'test' })
 
-def wait_until_editor(wait)
+def wait_until_displayed(wait, *args)
   wait.until do
-    element = driver.find_element(class: 'cm-content')
+    element = driver.find_element(*args)
     element if element&.displayed?
   end
 end
 
+def wait_until_editor(wait)
+  wait_until_displayed(wait, class: 'cm-content')
+end
+
 def wait_until_spinner(wait)
-  wait.until do
-    element = driver.find_element(id: 'result-loader')
-    element if element&.displayed?
-  end
+  wait_until_displayed(wait, id: 'result-loader')
 end
 
 def wait_until_results(wait, *results)

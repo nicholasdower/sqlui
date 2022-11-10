@@ -173,16 +173,11 @@ describe 'query' do
 
   context 'when mousing' do
     let(:execute) do
-      wait.until do
-        element = driver.find_element(id: 'submit-current-button')
-        element if element&.displayed?
-      end.click
+      wait_until_displayed(wait, id: 'submit-button-current').click
     end
     let(:execute_all) do
-      wait.until do
-        element = driver.find_element(id: 'submit-all-button')
-        element if element&.displayed?
-      end.click
+      wait_until_displayed(wait, id: 'submit-dropdown-button').click
+      wait_until_displayed(wait, id: 'submit-dropdown-button-all').click
     end
 
     include_examples 'submitted queries'
@@ -194,7 +189,8 @@ describe 'query' do
         driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
         editor.send_keys('select id, name, description from characters order by id limit 2;')
-        element = driver.find_element(id: 'submit-all-button')
+        wait_until_displayed(wait, id: 'submit-dropdown-button').click
+        element = wait_until_displayed(wait, id: 'submit-dropdown-button-all')
         driver.action.key_down(tab_or_window == 'tab' ? :meta : :shift).click(element).perform
       end
 
@@ -222,7 +218,7 @@ describe 'query' do
       driver.get(url('/sqlui/seinfeld/query'))
       editor = wait_until_editor(wait)
       editor.send_keys('select id, name, description from characters order by id limit 2;')
-      driver.find_element(id: 'submit-all-button').click
+      driver.find_element(id: 'submit-button-current').click
     end
 
     it 'displays a spinner then results' do
@@ -245,7 +241,7 @@ describe 'query' do
       driver.get(url('/sqlui/seinfeld/query?_foo=99'))
       editor = wait_until_editor(wait)
       editor.send_keys('select @foo;')
-      driver.find_element(id: 'submit-all-button').click
+      driver.find_element(id: 'submit-button-current').click
     end
 
     it 'loads expected results' do

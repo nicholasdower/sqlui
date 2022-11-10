@@ -26,10 +26,20 @@
       </div>
 
       <div id="submit-box" class="submit-box tab-content-element graph-element query-element" style="display: none;">
-        <input id="cancel-button" class="submit-button" type="button" value="cancel"></input>
+        <input id="cancel-button" class="cancel-button" type="button" value="cancel"></input>
         <div class="submit-fill"></div>
-        <input id="submit-current-button" class="submit-button" type="button" value="run selection (ctrl-enter)"></input>
-        <input id="submit-all-button" class="submit-button" type="button" value="run (ctrl-shift-enter)"></input>
+        <div style="position: relative;">
+          <div class="submit-button-wrapper">
+            <input id="submit-button-all" class="submit-button" type="button"></input>
+            <input id="submit-button-current" class="submit-button submit-button-show" type="button"></input>
+            <input id="submit-dropdown-button" class="submit-dropdown-button" type="button", value="▼"></input>
+          </div>
+          <div id="submit-dropdown-content" class="submit-dropdown-content">
+            <input id="submit-dropdown-button-current" class="submit-dropdown-content-button" type="button"></input>
+            <input id="submit-dropdown-button-all" class="submit-dropdown-content-button" type="button"></input>
+            <input id="submit-dropdown-button-toggle" class="submit-dropdown-content-button" type="button" value="toggle default"></input>
+          </div>
+        </div>
       </div>
 
       <div id="result-box" class="result-box tab-content-element query-element" style="display: none;">

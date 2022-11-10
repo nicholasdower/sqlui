@@ -70,12 +70,10 @@ p {
 
 .tab-button, .selected-tab-button {
     border: none;
-    outline: none;
     text-decoration: none;
     cursor: pointer;
     width: 150px;
-    padding: 2px;
-    margin: 0;
+    margin: 0 2px;
     display: flex;
     justify-content: center;
     background-color: #fff;
@@ -113,6 +111,7 @@ p {
     display: flex;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    padding: 5px;
 }
 
 .submit-fill {
@@ -120,14 +119,93 @@ p {
     flex: 1
 }
 
-.submit-button {
+.cancel-button {
     cursor: pointer;
-    margin: 5px;
-    border: 1px solid #888;
+    margin: 0px;
     background: none;
-    padding: 5px;
-    font-size: 18px;
     color: #333;
+    border: 1px solid #888;
+    height: 32px;
+    font-size: 18px;
+}
+
+.submit-button-wrapper {
+    cursor: pointer;
+    border: 1px solid #888;
+    height: 32px;
+    display: flex;
+    flex-direction: row;
+}
+
+.submit-button, .submit-dropdown-button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: #333;
+    height: 100%;
+    margin: 0px;
+}
+
+.submit-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    overflow: auto;
+    border-left: 1px solid #888;
+    border-right: 1px solid #888;
+    border-bottom: 1px solid #888;
+    z-index: 200;
+    flex-direction: column;
+    left: 0px;
+    right: 0px;
+}
+
+.submit-dropdown-button {
+    font-size: 14px;
+    padding: 0px 3px;
+}
+
+.submit-dropdown-content-show {
+    display: flex;
+}
+
+.submit-button {
+    display: none;
+    border-right: 1px solid #888;
+    font-size: 18px;
+    padding: 0px 5px;
+    width: 250px;
+    text-align: left;
+}
+
+.submit-button-show {
+    display: flex;
+}
+
+.submit-dropdown-content-button {
+    display: flex;
+    border: none;
+    color: #333;
+    background: none;
+    margin: 0;
+    padding: 7px 5px;
+    font-size: 18px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    text-align: left;
+}
+
+.submit-dropdown-content-button:hover {
+    background-color: #efefef;
+}
+
+.submit-dropdown-content-button:active, .submit-button:active, .cancel-button:active, .submit-dropdown-button:active {
+    background-color: #e6e6e6;
+    outline: none
+}
+
+.submit-dropdown-content-button:last-child {
+    border: none;
 }
 
 .status {

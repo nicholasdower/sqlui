@@ -29,31 +29,53 @@ import {
 /* global google */
 
 function init (parent, onSubmit, onShiftSubmit) {
-  document.getElementById('query-tab-button').addEventListener('click', function (event) {
-    selectTab(event, 'query')
-  })
-  document.getElementById('saved-tab-button').addEventListener('click', function (event) {
-    selectTab(event, 'saved')
-  })
-  document.getElementById('structure-tab-button').addEventListener('click', function (event) {
-    selectTab(event, 'structure')
-  })
-  document.getElementById('graph-tab-button').addEventListener('click', function (event) {
-    selectTab(event, 'graph')
-  })
-  document.getElementById('submit-all-button').addEventListener('click', function (event) {
-    submitAll(event.target, event)
-  })
-  document.getElementById('submit-current-button').addEventListener('click', function (event) {
-    submitCurrent(event.target, event)
-  })
-  document.getElementById('cancel-button').addEventListener('click', function (event) {
-    clearResult()
-  })
+  addClickListener(document.getElementById('query-tab-button'), (event) => selectTab(event, 'query'))
+  addClickListener(document.getElementById('saved-tab-button'), (event) => selectTab(event, 'saved'))
+  addClickListener(document.getElementById('structure-tab-button'), (event) => selectTab(event, 'structure'))
+  addClickListener(document.getElementById('graph-tab-button'), (event) => selectTab(event, 'graph'))
+  addClickListener(document.getElementById('cancel-button'), (event) => clearResult())
+
+  const dropdownContent = document.getElementById('submit-dropdown-content')
+  const dropdownButton = document.getElementById('submit-dropdown-button')
+  addClickListener(dropdownButton, () => dropdownContent.classList.toggle('submit-dropdown-content-show'))
 
   const isMac = navigator.userAgent.includes('Mac')
-  document.getElementById('submit-current-button').value = `run selection (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
-  document.getElementById('submit-all-button').value = `run (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
+  const runCurrentLabel = `run selection (${isMac ? '⌘' : 'Ctrl'}-Enter)`
+  const runAllLabel = `run all (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
+
+  const submitButtonCurrent = document.getElementById('submit-button-current')
+  submitButtonCurrent.value = runCurrentLabel
+  addClickListener(submitButtonCurrent, (event) => submitCurrent(event.target, event))
+
+  const submitButtonAll = document.getElementById('submit-button-all')
+  submitButtonAll.value = runAllLabel
+  addClickListener(submitButtonAll, (event) => submitAll(event.target, event))
+
+  const dropdownButtonCurrent = document.getElementById('submit-dropdown-button-current')
+  dropdownButtonCurrent.value = runCurrentLabel
+  addClickListener(dropdownButtonCurrent, (event) => submitCurrent(event.target, event))
+
+  const dropdownAllButton = document.getElementById('submit-dropdown-button-all')
+  dropdownAllButton.value = runAllLabel
+  addClickListener(dropdownAllButton, (event) => submitAll(event.target, event))
+
+  const dropdownToggleButton = document.getElementById('submit-dropdown-button-toggle')
+  addClickListener(dropdownToggleButton, () => {
+    submitButtonCurrent.classList.toggle('submit-button-show')
+    submitButtonAll.classList.toggle('submit-button-show')
+    focus(getSelection())
+  })
+
+  document.addEventListener('click', function (event) {
+    if (event.target !== dropdownButton) {
+      dropdownContent.classList.remove('submit-dropdown-content-show')
+    }
+  })
+  dropdownContent.addEventListener('focusout', function (event) {
+    if (!dropdownContent.contains(event.relatedTarget)) {
+      dropdownContent.classList.remove('submit-dropdown-content-show')
+    }
+  })
 
   const fixedHeightEditor = EditorView.theme({
     '.cm-scroller': {
@@ -134,6 +156,13 @@ function init (parent, onSubmit, onShiftSubmit) {
   })
 }
 
+function addClickListener (element, func) {
+  element.addEventListener('click', function (event) {
+    console.log(event)
+    func(event)
+  })
+}
+
 function getSelection () {
   const anchor = window.editorView.state.selection.main.anchor
   const head = window.editorView.state.selection.main.head
@@ -163,8 +192,9 @@ function setSelection (selection) {
   })
 }
 
-function focus () {
+function focus (selection) {
   window.editorView.focus()
+  setSelection(selection)
 }
 
 function getValue () {
@@ -413,9 +443,7 @@ function selectGraphTab (internal) {
   document.getElementById('cancel-button').style.display = 'none'
   maybeFetchResult(internal)
 
-  const selection = getSelection()
-  focus()
-  setSelection(selection)
+  focus(getSelection())
 }
 
 function selectResultTab (internal) {
@@ -425,9 +453,7 @@ function selectResultTab (internal) {
   document.getElementById('result-status').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.display = 'none'
-  const selection = getSelection()
-  focus()
-  setSelection(selection)
+  focus(getSelection())
   maybeFetchResult(internal)
 }
 
@@ -456,7 +482,7 @@ function selectSavedTab () {
     viewLinkElement.classList.add('view-link')
     viewLinkElement.innerText = 'view'
     viewLinkElement.href = viewUrl.pathname + viewUrl.search
-    viewLinkElement.addEventListener('click', function (event) {
+    addClickListener(viewLinkElement, (event) => {
       clearResult()
       route(event.target, event, viewUrl, true)
     })
@@ -470,8 +496,9 @@ function selectSavedTab () {
     runLinkElement.classList.add('run-link')
     runLinkElement.innerText = 'run'
     runLinkElement.href = runUrl.pathname + runUrl.search
-    runLinkElement.addEventListener('click', function (event) {
+    addClickListener(runLinkElement, (event) => {
       clearResult()
+      route(event.target, event, viewUrl, true)
       route(event.target, event, runUrl, true)
     })
 
@@ -506,6 +533,9 @@ function submitCurrent (target, event) {
 }
 
 function submit (target, event, selection = null) {
+  if (!target || !event) {
+    throw new Error('you must specify target and event')
+  }
   clearResult()
   const url = new URL(window.location)
   let sql = getValue().trim()
@@ -705,8 +735,7 @@ function maybeFetchResult (internal) {
     if (selectionMatches && queryMatches && variablesMatch) {
       displaySqlFetch(existingRequest)
       if (params.has('selection')) {
-        focus()
-        setSelection(selection)
+        focus(selection)
       }
       return
     }
@@ -722,8 +751,7 @@ function maybeFetchResult (internal) {
     }
   }
   if (params.has('selection')) {
-    focus()
-    setSelection(selection)
+    focus(selection)
   }
 }
 

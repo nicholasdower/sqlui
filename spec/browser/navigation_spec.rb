@@ -22,7 +22,7 @@ describe 'navigation' do
       driver.get(url('/sqlui/seinfeld/query'))
       editor = wait_until_editor(wait)
       editor.send_keys('select id, name, description from characters order by id limit 2;')
-      driver.find_element(id: 'submit-all-button').click
+      wait_until_displayed(wait, id: 'submit-button-current').click
       wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
                          ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
       driver.find_element(id: 'saved-tab-button').click
