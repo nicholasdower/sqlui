@@ -117,6 +117,6 @@ curl \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Content-Type: application/x-tar" \
   "https://uploads.github.com/repos/nicholasdower/sqlui/releases/$release_id/assets?name=$gem_file" \
-  --data-binary @"$gem_file"
+  --data-binary @"$gem_file" > /dev/null
 
 echo "Version v$new_version successfully released"
