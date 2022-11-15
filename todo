@@ -34,6 +34,7 @@ test:
  - a db config without a table lists all tables in the structure tab and can be queried
  - test params for file queries
  - tabbing between tabs, the editor and the various buttons
+ - copy to clipboard, first js unit test
 maybe add support for tags on database config to easily see production vs staging for instance
 add a help tab
 send client errors to the server, at least log them
@@ -61,3 +62,4 @@ In development use version plus timestamp when server starts. Add a heartbeat to
 check whether current master is green before releasing
 allow a sql result to link to sqlui urls. maybe this is the start of some built-in functions.
 set a cookie for current default submit button
+favicon

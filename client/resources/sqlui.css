@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    overflow: hidden;
 }
 
 h1 {
@@ -58,6 +59,9 @@ p {
     flex: 1;
     padding-left: 15px;
     font-weight: normal;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
 }
 
 .tabs-box {
@@ -121,7 +125,7 @@ p {
 
 .cancel-button {
     cursor: pointer;
-    margin: 0px;
+    margin: 0;
     background: none;
     color: #333;
     border: 1px solid #888;
@@ -143,7 +147,7 @@ p {
     background: none;
     color: #333;
     height: 100%;
-    margin: 0px;
+    margin: 0;
 }
 
 .submit-dropdown-content {
@@ -156,13 +160,24 @@ p {
     border-bottom: 1px solid #888;
     z-index: 200;
     flex-direction: column;
-    left: 0px;
-    right: 0px;
+    left: 0;
+    right: 0;
+}
+
+.submit-dropdown-content-section {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ddd;
+}
+
+.submit-dropdown-content-section:last-child {
+    border-bottom: none;
+    border-bottom: none;
 }
 
 .submit-dropdown-button {
     font-size: 14px;
-    padding: 0px 3px;
+    width: 35px;
 }
 
 .submit-dropdown-content-show {
@@ -173,7 +188,7 @@ p {
     display: none;
     border-right: 1px solid #888;
     font-size: 18px;
-    padding: 0px 5px;
+    padding: 0 5px;
     width: 250px;
     text-align: left;
 }
@@ -190,7 +205,6 @@ p {
     margin: 0;
     padding: 7px 5px;
     font-size: 18px;
-    border-bottom: 1px solid #ddd;
     cursor: pointer;
     text-align: left;
 }
@@ -202,10 +216,6 @@ p {
 .submit-dropdown-content-button:active, .submit-button:active, .cancel-button:active, .submit-dropdown-button:active {
     background-color: #e6e6e6;
     outline: none
-}
-
-.submit-dropdown-content-button:last-child {
-    border: none;
 }
 
 .status {
@@ -355,6 +365,14 @@ thead {
     outline: none !important;
 }
 
+.structure-wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+}
+
 .schemas, .tables {
     border: none;
     display: flex;
@@ -397,8 +415,12 @@ select {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .result-time {

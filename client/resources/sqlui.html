@@ -35,9 +35,15 @@
             <input id="submit-dropdown-button" class="submit-dropdown-button" type="button", value="▼"></input>
           </div>
           <div id="submit-dropdown-content" class="submit-dropdown-content">
-            <input id="submit-dropdown-button-current" class="submit-dropdown-content-button" type="button"></input>
-            <input id="submit-dropdown-button-all" class="submit-dropdown-content-button" type="button"></input>
-            <input id="submit-dropdown-button-toggle" class="submit-dropdown-content-button" type="button" value="toggle default"></input>
+            <div class="submit-dropdown-content-section">
+              <input id="submit-dropdown-button-current" class="submit-dropdown-content-button" type="button"></input>
+              <input id="submit-dropdown-button-all" class="submit-dropdown-content-button" type="button"></input>
+              <input id="submit-dropdown-button-toggle" class="submit-dropdown-content-button" type="button" value="toggle default"></input>
+            </div>
+            <div class="submit-dropdown-content-section">
+              <input id="submit-dropdown-button-copy-csv" class="submit-dropdown-content-button" type="button" value="copy to clipboard (csv)"></input>
+              <input id="submit-dropdown-button-copy-tsv" class="submit-dropdown-content-button" type="button" value="copy to clipboard (tsv)"></input>
+            </div>
           </div>
         </div>
       </div>
@@ -57,7 +63,7 @@
       </div>
 
       <div id="structure-box" class="structure-box tab-content-element structure-element" style="display: none;">
-        <div style="display: flex; flex: 1; flex-direction: row; align-items: stretch;">
+        <div class="structure-wrapper">
           <select id="schemas" class="schemas" size="4">
           </select>
           <select id="tables" class="tables" size="4">

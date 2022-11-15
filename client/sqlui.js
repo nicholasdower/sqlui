@@ -66,6 +66,39 @@ function init (parent, onSubmit, onShiftSubmit) {
     focus(getSelection())
   })
 
+  const copyListenerFactory = (delimiter) => {
+    return () => {
+      if (
+        !window.sqlFetch?.result
+      ) {
+        return
+      }
+      const type = 'text/plain'
+      let text = window.sqlFetch.result.columns.map((header) => {
+        console.log(header.includes(delimiter))
+        if (typeof header === 'string' && (header.includes('"') || header.includes(delimiter))) {
+          return `"${header.replaceAll('"', '""')}"`
+        } else {
+          return header
+        }
+      }).join(delimiter) + '\n'
+      text += window.sqlFetch.result.rows.map((row) => {
+        return row.map((cell) => {
+          if (typeof cell === 'string' && (cell.includes('"') || cell.includes(delimiter))) {
+            return `"${cell.replaceAll('"', '""')}"`
+          } else {
+            return cell
+          }
+        }).join(delimiter)
+      }).join('\n')
+      console.log(text)
+      const blob = new Blob([text], { type })
+      navigator.clipboard.write([new window.ClipboardItem({ [type]: blob })])
+    }
+  }
+  addClickListener(document.getElementById('submit-dropdown-button-copy-csv'), copyListenerFactory(','))
+  addClickListener(document.getElementById('submit-dropdown-button-copy-tsv'), copyListenerFactory('\t'))
+
   document.addEventListener('click', function (event) {
     if (event.target !== dropdownButton) {
       dropdownContent.classList.remove('submit-dropdown-content-show')
@@ -157,10 +190,7 @@ function init (parent, onSubmit, onShiftSubmit) {
 }
 
 function addClickListener (element, func) {
-  element.addEventListener('click', function (event) {
-    console.log(event)
-    func(event)
-  })
+  element.addEventListener('click', (event) => func(event))
 }
 
 function getSelection () {

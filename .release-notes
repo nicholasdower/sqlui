@@ -1,1 +1,4 @@
-- No changes.
+- Fix bug where structure tab overflowed.
+- Fix bug where title wrapped.
+- Make run button a dropdown.
+- Add copy to clipboard (CSV or TSV).
