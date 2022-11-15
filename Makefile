@@ -4,7 +4,7 @@ RUN_IMAGE = $(RUN) $(IMAGE)
 
 RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --file client/resources/sqlui.css --file client/resources/sqlui.html --file development_config.yml
 
-.install-from-docker: Gemfile Gemfile.lock
+.install-from-docker: Gemfile Gemfile.lock .version
 	npm install
 	bundle config set --local path vendor/bundle-docker
 	bundle install

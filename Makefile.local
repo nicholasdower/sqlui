@@ -4,7 +4,7 @@ update-local: check-tools
 	bundle config set --local path vendor/bundle-local
 	bundle update
 
-.install-local: Gemfile Gemfile.lock
+.install-local: Gemfile Gemfile.lock .version
 	@make check-tools
 	npm install
 	bundle config set --local path vendor/bundle-local

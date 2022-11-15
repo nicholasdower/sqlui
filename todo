@@ -63,3 +63,4 @@ check whether current master is green before releasing
 allow a sql result to link to sqlui urls. maybe this is the start of some built-in functions.
 set a cookie for current default submit button
 favicon
+better 404 page
