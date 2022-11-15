@@ -1,3 +1,7 @@
+## 0.1.38
+
+- Stop logging content copied to clipboard.
+
 ## 0.1.37
 
 - No changes.
