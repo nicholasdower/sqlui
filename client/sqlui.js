@@ -91,7 +91,6 @@ function init (parent, onSubmit, onShiftSubmit) {
           }
         }).join(delimiter)
       }).join('\n')
-      console.log(text)
       const blob = new Blob([text], { type })
       navigator.clipboard.write([new window.ClipboardItem({ [type]: blob })])
     }
