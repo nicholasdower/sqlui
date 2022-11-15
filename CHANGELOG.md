@@ -1,3 +1,10 @@
+## 0.1.36
+
+- Fix bug where structure tab overflowed.
+- Fix bug where title wrapped.
+- Make run button a dropdown.
+- Add copy to clipboard (CSV or TSV).
+
 ## 0.1.35
 
 - No changes.
