@@ -8,17 +8,9 @@ on:
       - '**'
       - '!**/*.md'
       - '!/todo'
-      - '!/.changes'
+      - '!/.release-notes'
       - '!/LICENSE.txt'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - '**'
-      - '!**/*.md'
-      - '!/todo'
-      - '!/.changes'
-      - '!/LICENSE.txt'
+      - '!/.github/dependabot.yml'
 
 jobs:
   test:
