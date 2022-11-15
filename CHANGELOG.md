@@ -1,3 +1,7 @@
+## 0.1.37
+
+- No changes.
+
 ## 0.1.36
 
 - Fix bug where structure tab overflowed.
