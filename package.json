@@ -10,7 +10,7 @@
     "@codemirror/lang-sql": "^6.3.0",
     "@codemirror/language": "^6.3.0",
     "@codemirror/lint": "^6.0.0",
-    "@codemirror/search": "^6.2.2",
+    "@codemirror/search": "^6.2.3",
     "@codemirror/state": "^6.1.2",
     "@codemirror/view": "^6.1.2",
     "codemirror": "^6.0.1"
