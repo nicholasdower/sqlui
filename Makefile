@@ -157,4 +157,14 @@ kill:
 	@docker compose down 2> /dev/null || true
 	@docker network rm sqlui_default 2> /dev/null || true
 
+.PHONY: remvove-containers
+remove-containers:
+	docker ps --format='{{.ID}}' | while read id; do docker kill "$$id"; done
+	docker system prune -f
+	docker volume ls -q | while read volume; do docker volume rm -f "$$volume"; done
+
+.PHONY: remove-images
+remove-images:
+	docker images --format '{{ .Repository }}:{{ .Tag }}' | while read image; do docker rmi "$$image"; done
+
 include Makefile.local
