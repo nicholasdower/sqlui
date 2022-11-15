@@ -14,9 +14,15 @@ RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --f
 install:
 	@$(RUN_IMAGE) make .install-from-docker
 
+.PHONY: bundle-update
+	$(RUN_IMAGE) /bin/bash -c 'bundle config set --local path vendor/bundle-docker && bundle update'
+
+.PHONY: npm-update
+npm-update:
+	$(RUN_IMAGE) npm update
+
 .PHONY: update
-update:
-	$(RUN_IMAGE) /bin/bash -c 'npm update && bundle config set --local path vendor/bundle-docker && bundle update'
+update: bundle-update npm-update
 
 .PHONY: check-tools
 check-tools:

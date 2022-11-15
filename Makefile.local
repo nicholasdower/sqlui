@@ -1,8 +1,14 @@
-.PHONY: update-local
-update-local: check-tools
-	npm update
+.PHONY: bundle-update-local
+bundle-update-local:
 	bundle config set --local path vendor/bundle-local
 	bundle update
+
+.PHONY: npm-update-local
+npm-update-local:
+	npm update
+
+.PHONY: update-local
+update-local: bundle-update-local npm-update-local
 
 .install-local: Gemfile Gemfile.lock .version
 	@make check-tools
