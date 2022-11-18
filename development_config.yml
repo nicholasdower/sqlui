@@ -11,6 +11,7 @@ databases:
     table_aliases:
       friends.characters: fc
     client_params:
+      adapter:  mysql2
       username: root
       password: root
       port:     3306
@@ -21,6 +22,7 @@ databases:
     url_path:     /sqlui/seinfeld
     saved_path:   sql/seinfeld
     client_params:
+      adapter:  mysql2
       database: seinfeld
       username: newman
       password: drakescoffeecake
@@ -38,6 +40,7 @@ databases:
       - label: 'actors to characters'
         apply: 'actors a ON a.id = c.actor_id'
     client_params:
+      adapter:  mysql2
       database: friends
       username: heckles
       password: keepitdown

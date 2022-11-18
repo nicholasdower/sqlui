@@ -2,15 +2,18 @@
 
 require 'json'
 require 'mysql2'
+require 'active_record'
 require 'set'
 
 require_relative 'args'
+require_relative 'connection_holder'
 
 # Config for a single database.
 class DatabaseConfig
-  attr_reader :display_name, :description, :url_path, :joins, :saved_path, :table_aliases, :client_params
+  attr_reader :env, :display_name, :description, :url_path, :joins, :saved_path, :table_aliases, :client_params
 
-  def initialize(hash)
+  def initialize(env, hash)
+    @env = env
     @display_name = Args.fetch_non_empty_string(hash, :display_name).strip
     @description = Args.fetch_non_empty_string(hash, :description).strip
     @url_path = Args.fetch_non_empty_string(hash, :url_path).strip
@@ -37,15 +40,10 @@ class DatabaseConfig
     end
 
     @client_params = Args.fetch_non_empty_hash(hash, :client_params)
+    @connection_pool = ConnectionHolder.connection_pool_for(env, @client_params)
   end
 
-  def with_client(&block)
-    client = Mysql2::Client.new(@client_params)
-    result = block.call(client)
-    client.close
-    client = nil
-    result
-  ensure
-    client&.close
+  def with_connection(&block)
+    @connection_pool.with_connection(&block)
   end
 end

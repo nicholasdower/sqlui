@@ -13,9 +13,6 @@ class Sqlui
 
     @config = SqluiConfig.new(config_file)
     @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'client', 'resources')
-
-    # Connect to each database to verify each can be connected to.
-    @config.database_configs.each { |database| database.with_client { |client| client } }
   end
 
   def run
