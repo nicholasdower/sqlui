@@ -1,3 +1,7 @@
+## 0.1.40
+
+- No changes.
+
 ## 0.1.39
 
 - Add support for default table aliases.
