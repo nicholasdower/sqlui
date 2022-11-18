@@ -11,7 +11,7 @@ class SqluiConfig
   attr_reader :name, :port, :environment, :list_url_path, :database_configs
 
   def initialize(filename, overrides = {})
-    config = YAML.safe_load(ERB.new(File.read(filename)).result).deep_merge!(overrides)
+    config = YAML.safe_load(ERB.new(File.read(filename)).result, aliases: true).deep_merge!(overrides)
     config.deep_symbolize_keys!
     @name = Args.fetch_non_empty_string(config, :name).strip
     @port = Args.fetch_non_empty_int(config, :port)
