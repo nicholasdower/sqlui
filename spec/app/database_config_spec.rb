@@ -211,4 +211,49 @@ describe DatabaseConfig do
       end
     end
   end
+
+  describe '#with_client' do
+    subject { database_config.with_client(&block) }
+
+    let(:client) { instance_double(Mysql2::Client) }
+
+    before do
+      allow(Mysql2::Client).to receive(:new).with(config_hash[:client_params]).and_return(client)
+      allow(client).to receive(:close).exactly(1).time
+    end
+
+    context 'when the specified block does not raise' do
+      let(:block) do
+        proc { :some_result }
+      end
+
+      it 'returns the result' do
+        expect(subject).to equal(:some_result)
+      end
+
+      it 'closes the client' do
+        expect(client).to receive(:close).exactly(1).time
+        subject
+      end
+    end
+
+    context 'when the specified block raises' do
+      let(:block) do
+        proc { raise 'some error' }
+      end
+
+      it 'raises' do
+        expect { subject }.to raise_error(RuntimeError, 'some error')
+      end
+
+      it 'closes the client' do
+        expect(client).to receive(:close).exactly(1).time
+        begin
+          subject
+        rescue StandardError
+          nil
+        end
+      end
+    end
+  end
 end

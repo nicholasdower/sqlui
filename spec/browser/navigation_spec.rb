@@ -11,12 +11,12 @@ describe 'navigation' do
     before do
       queue = %w[initialize execute]
       config = CONFIG.database_configs[0]
-      original_with_connection = config.method(:with_connection)
-      allow(config).to receive(:with_connection) do |&block|
+      original_with_client = config.method(:with_client)
+      allow(config).to receive(:with_client) do |&block|
         raise if queue.empty?
 
         queue.shift
-        original_with_connection.call(&block)
+        original_with_client.call(&block)
       end
 
       driver.get(url('/sqlui/seinfeld/query'))

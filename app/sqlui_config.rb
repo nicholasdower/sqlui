@@ -23,8 +23,8 @@ class SqluiConfig
     end
 
     databases = Args.fetch_non_empty_hash(config, :databases)
-    @database_configs = databases.map do |env, current|
-      DatabaseConfig.new(env, current)
+    @database_configs = databases.map do |_, current|
+      DatabaseConfig.new(current)
     end
   end
 

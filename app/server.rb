@@ -52,11 +52,11 @@ class Server < Sinatra::Base
       end
 
       post "#{database.url_path}/metadata" do
-        metadata = database.with_connection do |connection|
+        metadata = database.with_client do |client|
           {
             server: "#{config.name} - #{database.display_name}",
             list_url_path: config.list_url_path,
-            schemas: DatabaseMetadata.lookup(connection, database),
+            schemas: DatabaseMetadata.lookup(client, database),
             table_aliases: database.table_aliases,
             joins: database.joins,
             saved: Dir.glob("#{database.saved_path}/*.sql").to_h do |path|
@@ -108,11 +108,11 @@ class Server < Sinatra::Base
           break client_error("can't find query at selection") unless sql
         end
 
-        result = database.with_connection do |connection|
+        result = database.with_client do |client|
           variables.each do |name, value|
-            connection.execute("SET @#{name} = #{value};")
+            client.query("SET @#{name} = #{value};")
           end
-          execute_query(connection, sql)
+          execute_query(client, sql)
         end
 
         result[:selection] = params[:selection]
@@ -153,18 +153,20 @@ class Server < Sinatra::Base
     body({ error: message, stacktrace: stacktrace }.compact.to_json)
   end
 
-  def execute_query(connection, sql)
+  def execute_query(client, sql)
     queries = if sql.include?(';')
                 sql.split(/(?<=;)/).map(&:strip).reject(&:empty?)
               else
                 [sql]
               end
-    results = queries.map { |current| connection.execute(current) }
+    results = queries.map { |current| client.query(current) }
     result = results[-1]
+    # NOTE: the call to result.field_types must go before any other interaction with the result. Otherwise you will
+    # get a seg fault. Seems to be a bug in Mysql2.
     if result
       column_types = MysqlTypes.map_to_google_charts_types(result.field_types)
-      rows = result.to_a
-      columns = result.fields
+      rows = result.map(&:values)
+      columns = result.first&.keys || []
     else
       column_types = []
       rows = []

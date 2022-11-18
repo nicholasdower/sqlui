@@ -209,10 +209,10 @@ describe 'query' do
     queue = Queue.new
     before do
       config = CONFIG.database_configs.find { |c| c.display_name == 'Seinfeld' }
-      original_with_connection = config.method(:with_connection)
-      allow(config).to receive(:with_connection) do |&block|
+      original_with_client = config.method(:with_client)
+      allow(config).to receive(:with_client) do |&block|
         queue.pop
-        original_with_connection.call(&block)
+        original_with_client.call(&block)
       end
       queue << 'initialize'
       driver.get(url('/sqlui/seinfeld/query'))
