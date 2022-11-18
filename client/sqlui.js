@@ -1,5 +1,12 @@
 import { EditorView } from 'codemirror'
-import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completeFromList,
+  completionKeymap,
+  ifNotIn
+} from '@codemirror/autocomplete'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import {
   keywordCompletionSource,
@@ -194,13 +201,34 @@ function init (parent, onSubmit, onShiftSubmit) {
     schema: editorSchema,
     tables
   }
-  const scs = schemaCompletionSource(sqlConfig)
+  const originalSchemaCompletionSource = schemaCompletionSource(sqlConfig)
+  const originalKeywordCompletionSource = keywordCompletionSource(MySQL, true)
+  const keywordCompletions = []
+  window.metadata.joins.forEach((join) => {
+    ['JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'CROSS JOIN'].forEach((type) => {
+      keywordCompletions.push({ label: `${type} ${join.label}`, apply: `${type} ${join.apply}` })
+    })
+  })
+  let combinedKeywordCompletionSource
+  if (keywordCompletions.length > 0) {
+    const customKeywordCompletionSource = ifNotIn(['QuotedIdentifier', 'SpecialVar', 'String', 'LineComment', 'BlockComment', '.'], completeFromList(keywordCompletions))
+    combinedKeywordCompletionSource = function (context) {
+      const original = originalKeywordCompletionSource(context)
+      const custom = customKeywordCompletionSource(context)
+      if (original?.options && custom?.options) {
+        original.options = original.options.concat(custom.options)
+      }
+      return original
+    }
+  } else {
+    combinedKeywordCompletionSource = originalKeywordCompletionSource
+  }
   const sqlExtension = new LanguageSupport(
     MySQL.language,
     [
       MySQL.language.data.of({
         autocomplete: (context) => {
-          const result = scs(context)
+          const result = originalSchemaCompletionSource(context)
           if (!hasTableAliases || !result?.options) return result
 
           const tree = syntaxTree(context.state)
@@ -286,7 +314,7 @@ function init (parent, onSubmit, onShiftSubmit) {
         }
       }),
       MySQL.language.data.of({
-        autocomplete: keywordCompletionSource(MySQL, true)
+        autocomplete: combinedKeywordCompletionSource
       })
     ]
   )

@@ -24,21 +24,40 @@ grant all privileges on seinfeld.* to 'newman'@'%';
 drop database if exists friends;
 create database friends;
 
+create table friends.actors(
+  id int auto_increment primary key,
+  name varchar(255)
+);
+
+insert into friends.actors
+  (id, name)
+values
+  (1, 'Courteney Cox'),
+  (2, 'Matthew Perry'),
+  (3, 'Jennifer Aniston'),
+  (4, 'David Schwimmer'),
+  (5, 'Lisa Kudrow'),
+  (6, 'Matt LeBlanc');
+
 create table friends.characters(
   id int auto_increment primary key,
   name varchar(255),
-  description varchar(255)
+  description varchar(255),
+  actor_id int,
+  foreign key (actor_id)
+    references friends.actors(id)
+    on delete cascade
 );
 
 insert into friends.characters
-  (name, description)
+  (name, description, actor_id)
 values
-  ('Monica',   'A neat freak.'),
-  ('Chandler', 'A clown.'),
-  ('Rachel',   'A spoiled brat.'),
-  ('Ross',     'A know-it-all.'),
-  ('Phoebe',   'A ditz.'),
-  ('Joey',     'A moron.');
+  ('Monica',   'A neat freak.',   1),
+  ('Chandler', 'A clown.',        2),
+  ('Rachel',   'A spoiled brat.', 3),
+  ('Ross',     'A know-it-all.',  4),
+  ('Phoebe',   'A ditz.',         5),
+  ('Joey',     'A moron.',        6);
 
 create user if not exists 'heckles'@'%' identified by 'keepitdown';
 grant usage on friends.* to 'heckles'@'%';
