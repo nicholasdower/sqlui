@@ -32,6 +32,11 @@ import {
 
 /* global google */
 
+function unquoteSqlId (identifier) {
+  const match = identifier.match(/^`(.*)`$/)
+  return match ? match[1] : identifier
+}
+
 function init (parent, onSubmit, onShiftSubmit) {
   addClickListener(document.getElementById('query-tab-button'), (event) => selectTab(event, 'query'))
   addClickListener(document.getElementById('saved-tab-button'), (event) => selectTab(event, 'saved'))
@@ -126,16 +131,17 @@ function init (parent, onSubmit, onShiftSubmit) {
   schemas.forEach(([schemaName, schema]) => {
     Object.entries(schema.tables).forEach(([tableName, table]) => {
       const qualifiedTableName = schemas.length === 1 ? tableName : `${schemaName}.${tableName}`
+      const quotedQualifiedTableName = schemas.length === 1 ? `\`${tableName}\`` : `\`${schemaName}\`.\`${tableName}\``
       const columns = Object.keys(table.columns)
       editorSchema[qualifiedTableName] = columns
-      const alias = window.metadata.table_aliases[tableName]
+      const alias = window.metadata.table_aliases[qualifiedTableName]
       if (alias) {
         editorSchema[alias] = columns
         tables.push({
           label: qualifiedTableName,
           detail: alias,
           alias_type: 'with',
-          quoted: '`' + qualifiedTableName + '` ' + alias,
+          quoted: `${quotedQualifiedTableName} \`${alias}\``,
           unquoted: `${qualifiedTableName} ${alias}`
         })
         tables.push({
@@ -199,29 +205,49 @@ function init (parent, onSubmit, onShiftSubmit) {
 
           const tree = syntaxTree(context.state)
           let node = tree.resolveInner(context.pos, -1)
+          if (!node) return result
 
           // We are trying to identify the case where we are autocompleting a table name after "from" or "join"
+
           // TODO: we don't handle the case where a user typed "select table.foo from". In that case we probably
           // shouldn't autocomplete the alias. Though, if the user typed "select table.foo, t.bar", we won't know
-          // what to do.
+          // what to do. Maybe it is ok to force users to simply delete the alias after autocompleting.
+
           // TODO: if table aliases aren't enabled, we don't need to override autocomplete.
 
-          if (node?.name === 'Statement') {
+          let foundSchema
+          if (node.name === 'Statement') {
             // The node can be a Statement if the cursor is at the end of "from " and there is a complete
             // statement in the editor (semicolon present). In that case we want to find the node just before the
             // current position so that we can check whether it is "from" or "join".
             node = node.childBefore(context.pos)
-          } else if (node?.name === 'Script') {
+          } else if (node.name === 'Script') {
             // It seems the node can sometimes be a Script if the cursor is at the end of the last statement in the
             // editor and the statement doesn't end in a semicolon. In that case we can find the last statement in the
             // Script so that we can check whether it is "from" or "join".
             node = node.lastChild?.childBefore(context.pos)
-          } else if (['Identifier', 'QuotedIdentifier', 'Keyword'].includes(node?.name)) {
+          } else if (['Identifier', 'QuotedIdentifier', 'Keyword', '.'].includes(node.name)) {
             // If the node is an Identifier, we might be in the middle of typing the table name. If the node is a
             // Keyword but isn't "from" or "join", we might be in the middle of typing a table name that is similar
             // to a Keyword, for instance "orders" or "selections" or "fromages". In these cases, look for the previous
-            // sibling so that we can check whether it is "from" or "join".
-            node = node.prevSibling
+            // sibling so that we can check whether it is "from" or "join". If we found a '.' or if the previous
+            // sibling is a '.', we might be in the middle of typing something like "schema.table" or
+            // "`schema`.table" or "`schema`.`table`". In these cases we need to record the schema used so that we
+            // can autocomplete table names with aliases.
+            if (node.name !== '.') {
+              node = node.prevSibling
+            }
+
+            if (node?.name === '.') {
+              node = node.prevSibling
+              if (['Identifier', 'QuotedIdentifier'].includes(node?.name)) {
+                foundSchema = unquoteSqlId(context.state.doc.sliceString(node.from, node.to))
+                node = node.parent
+                if (node?.name === 'CompositeIdentifier') {
+                  node = node.prevSibling
+                }
+              }
+            }
           }
 
           const nodeText = node ? context.state.doc.sliceString(node.from, node.to).toLowerCase() : null
@@ -244,6 +270,14 @@ function init (parent, onSubmit, onShiftSubmit) {
                 option.apply = option.quoted
               } else {
                 option.apply = option.unquoted
+              }
+            }
+            if (foundSchema) {
+              const unquotedLabel = unquoteSqlId(option.label)
+              const quoted = unquotedLabel !== option.label
+              const alias = window.metadata.table_aliases[`${foundSchema}.${unquotedLabel}`]
+              if (alias) {
+                option = { label: quoted ? `\`${unquotedLabel}\` \`${alias}\`` : `${option.label} ${alias}` }
               }
             }
             return option

@@ -8,6 +8,8 @@ databases:
     description:  Some databases about nothing.
     url_path:     /sqlui/shows
     saved_path:   sql/shows
+    table_aliases:
+      seinfeld.characters: sc
     client_params:
       username:     root
       password:     root
@@ -31,8 +33,6 @@ databases:
     description:  Another database about nothing.
     url_path:     /sqlui/friends
     saved_path:   sql/friends
-    table_aliases:
-      characters: c
     client_params:
       database:     friends
       username:     heckles

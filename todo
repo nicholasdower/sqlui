@@ -64,5 +64,6 @@ set a cookie for current default submit button
 favicon
 better 404 page
 custom autocomplete, think joining subs with orders with payments, etc.
-custom column name matchers which cause cells to by hyperlinked.
-autocomplete with alias isn't going to work with schema prefix. need to handle dot
+custom column name matchers which cause cells to by hyperlinked
+the case where a user types "select table.foo from table t". the alias breaks the select
+if table aliases aren't enabled, we don't need to override autocomplete
