@@ -48,7 +48,7 @@ describe 'structure' do
     headers = header_elements.map(&:text)
     expect(headers).to eq(expected_headers)
 
-    expected_column_names = %w[description id name]
+    expected_column_names = %w[id name description]
     column_name_elements = wait.until do
       elements = driver.find_elements(
         css: '#structure-box > * > #table-info > #columns > table > tbody > tr > td:first-child'

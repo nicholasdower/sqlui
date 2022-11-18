@@ -12,6 +12,11 @@ require_relative 'sqlui'
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
   def self.init_and_run(config, resources_dir)
+    Mysql2::Client.default_query_options[:as] = :array
+    Mysql2::Client.default_query_options[:cast_booleans] = true
+    Mysql2::Client.default_query_options[:database_timezone] = :utc
+    Mysql2::Client.default_query_options[:cache_rows] = false
+
     set :logging,         true
     set :bind,            '0.0.0.0'
     set :port,            config.port
