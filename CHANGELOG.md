@@ -1,3 +1,11 @@
+## 0.1.41
+
+- Add support for canned joins.
+- Add support for duplicate columns in results.
+- Sort columns in structure by ordinal_position.
+- Allow aliases in config YAML.
+- Autocomplete qualified table names with aliases.
+
 ## 0.1.40
 
 - No changes.
