@@ -165,8 +165,8 @@ class Server < Sinatra::Base
     # get a seg fault. Seems to be a bug in Mysql2.
     if result
       column_types = MysqlTypes.map_to_google_charts_types(result.field_types)
-      rows = result.map(&:values)
-      columns = result.first&.keys || []
+      rows = result.to_a
+      columns = result.fields
     else
       column_types = []
       rows = []

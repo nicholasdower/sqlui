@@ -11,6 +11,11 @@ class Sqlui
     raise 'you must specify a configuration file' unless config_file
     raise 'configuration file does not exist' unless File.exist?(config_file)
 
+    Mysql2::Client.default_query_options[:as] = :array
+    Mysql2::Client.default_query_options[:cast_booleans] = true
+    Mysql2::Client.default_query_options[:database_timezone] = :utc
+    Mysql2::Client.default_query_options[:cache_rows] = false
+
     @config = SqluiConfig.new(config_file)
     @resources_dir = File.join(File.expand_path('..', File.dirname(__FILE__)), 'client', 'resources')
 

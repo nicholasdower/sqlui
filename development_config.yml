@@ -37,6 +37,8 @@ databases:
     joins:
       - label: 'actors to characters'
         apply: 'actors a ON a.id = c.actor_id'
+      - label: 'characters to actors'
+        apply: 'characters c ON c.actor_id = a.id'
     client_params:
       database: friends
       username: heckles

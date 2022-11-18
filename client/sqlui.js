@@ -206,7 +206,7 @@ function init (parent, onSubmit, onShiftSubmit) {
   const keywordCompletions = []
   window.metadata.joins.forEach((join) => {
     ['JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'CROSS JOIN'].forEach((type) => {
-      keywordCompletions.push({ label: `${type} ${join.label}`, apply: `${type} ${join.apply}` })
+      keywordCompletions.push({ label: `${type} ${join.label}`, apply: `${type} ${join.apply}`, type: 'keyword' })
     })
   })
   let combinedKeywordCompletionSource
