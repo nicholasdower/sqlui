@@ -16,7 +16,7 @@ upgrade-local:
 	npm update
 	bundle outdated
 
-.install-local: Gemfile Gemfile.lock .version
+.install-local: Gemfile Gemfile.lock .version sqlui.gemspec
 	@make check-tools
 	npm install
 	bundle config set --local path vendor/bundle-local

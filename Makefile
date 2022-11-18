@@ -4,7 +4,7 @@ RUN_IMAGE = $(RUN) $(IMAGE)
 
 RERUN = ./scripts/rerun --dir bin --dir app --dir sql --file client/sqlui.js --file client/resources/sqlui.css --file client/resources/sqlui.html --file development_config.yml
 
-.install-from-docker: Gemfile Gemfile.lock .version
+.install-from-docker: Gemfile Gemfile.lock .version sqlui.gemspec
 	npm install
 	bundle config set --local path vendor/bundle-docker
 	bundle install
@@ -15,6 +15,7 @@ install:
 	@$(RUN_IMAGE) make .install-from-docker
 
 .PHONY: bundle-update
+bundle-update:
 	$(RUN_IMAGE) /bin/bash -c 'bundle config set --local path vendor/bundle-docker && bundle update'
 
 .PHONY: npm-update
