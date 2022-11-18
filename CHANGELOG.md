@@ -1,3 +1,8 @@
+## 0.1.39
+
+- Add support for default table aliases.
+- Fix bug where tables/columns not cleared when changing schemas in structure tab.
+
 ## 0.1.38
 
 - Stop logging content copied to clipboard.
