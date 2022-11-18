@@ -38,7 +38,7 @@ class DatabaseMetadata
             extra
           from information_schema.columns
           #{where_clause}
-          order by table_schema, table_name, column_name, ordinal_position;
+          order by table_schema, table_name, ordinal_position;
         SQL
       )
       column_result.to_a.each do |row|
