@@ -37,6 +37,6 @@ describe 'saved' do
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
     run_link_elements.first.click
-    wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'])
+    wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'])
   end
 end

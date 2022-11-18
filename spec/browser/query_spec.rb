@@ -44,7 +44,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'])
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'])
       end
     end
 
@@ -57,7 +57,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'],
                            ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
       end
     end
@@ -78,7 +78,7 @@ describe 'query' do
       end
 
       it 'loads expected results' do
-        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'])
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'])
       end
     end
 
@@ -196,7 +196,7 @@ describe 'query' do
 
       it "loads results in new window, not in current #{tab_or_window}" do
         driver.switch_to.window(driver.window_handles.last)
-        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
+        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'],
                            ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
         driver.close
         driver.switch_to.window(driver.window_handles.first)
@@ -208,7 +208,7 @@ describe 'query' do
   context 'when a query takes a while' do
     queue = Queue.new
     before do
-      config = CONFIG.database_configs[0]
+      config = CONFIG.database_configs.find { |c| c.display_name == 'Seinfeld' }
       original_with_client = config.method(:with_client)
       allow(config).to receive(:with_client) do |&block|
         queue.pop
@@ -224,7 +224,7 @@ describe 'query' do
     it 'displays a spinner then results' do
       wait_until_spinner(wait)
       queue << 'execute_query'
-      wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A funny guy.'],
+      wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'],
                          ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
     end
 

@@ -3,14 +3,39 @@ port: 8080
 environment: development
 list_url_path: /sqlui
 databases:
+  shows:
+    display_name: Shows
+    description:  Some databases about nothing.
+    url_path:     /sqlui/shows
+    saved_path:   sql/shows
+    client_params:
+      username:     root
+      password:     root
+      port:         3306
+      host:         <%= ENV.fetch('DB_HOST', '127.0.0.1') %>
   seinfeld:
     display_name: Seinfeld
     description:  A database about nothing.
     url_path:     /sqlui/seinfeld
     saved_path:   sql/seinfeld
+    table_aliases:
+      characters: c
     client_params:
       database:     seinfeld
       username:     newman
       password:     drakescoffeecake
+      port:         3306
+      host:         <%= ENV.fetch('DB_HOST', '127.0.0.1') %>
+  friends:
+    display_name: Friends
+    description:  Another database about nothing.
+    url_path:     /sqlui/friends
+    saved_path:   sql/friends
+    table_aliases:
+      characters: c
+    client_params:
+      database:     friends
+      username:     heckles
+      password:     keepitdown
       port:         3306
       host:         <%= ENV.fetch('DB_HOST', '127.0.0.1') %>

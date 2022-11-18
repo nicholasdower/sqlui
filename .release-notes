@@ -1,1 +1,2 @@
 - Add support for default table aliases.
+- Fix bug where tables/columns not cleared when changing schemas in structure tab.

@@ -465,6 +465,12 @@ function selectStructureTab () {
       while (tablesElement.firstChild) {
         tablesElement.removeChild(tablesElement.firstChild)
       }
+      while (columnsElement.firstChild) {
+        columnsElement.removeChild(columnsElement.firstChild)
+      }
+      while (indexesElement.firstChild) {
+        indexesElement.removeChild(indexesElement.firstChild)
+      }
       const schemaName = schemasElement.value
       const schema = window.metadata.schemas[schemaName]
       const tableNames = Object.keys(schema.tables)

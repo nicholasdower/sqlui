@@ -14,7 +14,6 @@ show a helpful message when no saved files are found or when the directory doesn
 switch to typescript
 add prometheus metrics
 add error reporting
-add a second database
 cache saved files
 add padding inside select list, longest name overlaps scrollbar
 put current structure table and schema in url params?
