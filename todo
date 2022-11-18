@@ -64,3 +64,6 @@ allow a sql result to link to sqlui urls. maybe this is the start of some built-
 set a cookie for current default submit button
 favicon
 better 404 page
+custom autocomplete, think joining subs with orders with payments, etc.
+custom column name matchers which cause cells to by hyperlinked.
+autocomplete with alias isn't going to work with schema prefix. need to handle dot

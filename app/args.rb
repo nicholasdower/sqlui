@@ -20,13 +20,21 @@ class Args
     value
   end
 
+  def self.fetch_optional_hash(hash, key)
+    fetch_optional(hash, key, Hash)
+  end
+
   def self.fetch_non_nil(hash, key, *classes)
     raise ArgumentError, "required parameter #{key} missing" unless hash.key?(key)
 
-    value = hash[key]
-    raise ArgumentError, "required parameter #{key} null" if value.nil?
+    raise ArgumentError, "required parameter #{key} null" if hash[key].nil?
 
-    if classes.size.positive? && !classes.find { |clazz| value.is_a?(clazz) }
+    fetch_optional(hash, key, *classes)
+  end
+
+  def self.fetch_optional(hash, key, *classes)
+    value = hash[key]
+    if value && classes.size.positive? && !classes.find { |clazz| value.is_a?(clazz) }
       if classes.size != 1
         raise ArgumentError, "required parameter #{key} not #{classes.map(&:to_s).map(&:downcase).join(' or ')}"
       end

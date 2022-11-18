@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'erb'
 require_relative 'args'
 require_relative 'database_config'
 require_relative 'deep'

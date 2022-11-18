@@ -146,6 +146,70 @@ describe DatabaseConfig do
         end
       end
     end
+
+    context 'table_aliases' do
+      context 'when table_aliases is not specified' do
+        before { config_hash[:client_params] = nil }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params null')
+        end
+      end
+
+      context 'when table_aliases is specified' do
+        before do
+          config_hash[:table_aliases] = table_aliases
+        end
+
+        context 'when nil' do
+          let(:table_aliases) { nil }
+
+          it 'returns the expected aliases' do
+            expect(subject.table_aliases).to eq({})
+          end
+        end
+
+        context 'when not a hash' do
+          let(:table_aliases) { 'foo' }
+
+          it 'raises' do
+            expect { subject }.to raise_error(ArgumentError, 'required parameter table_aliases not a hash')
+          end
+        end
+
+        context 'when alias is a string' do
+          let(:table_aliases) { { name: 'n' } }
+
+          it 'returns the expected aliases' do
+            expect(subject.table_aliases).to eq({ name: 'n' })
+          end
+        end
+
+        context 'when alias is a non-string' do
+          let(:table_aliases) { { name: 1 } }
+
+          it 'raises' do
+            expect { subject }.to raise_error(ArgumentError, 'invalid alias for table name (1), expected string')
+          end
+        end
+
+        context 'when multiple aliases specified' do
+          let(:table_aliases) { { name: 'n', other_name: 'o' } }
+
+          it 'returns the expected aliases' do
+            expect(subject.table_aliases).to eq({ name: 'n', other_name: 'o' })
+          end
+        end
+
+        context 'when duplicate aliases specified' do
+          let(:table_aliases) { { name: 'n', other_name: 'n' } }
+
+          it 'raises' do
+            expect { subject }.to raise_error(ArgumentError, 'duplicate table aliases: n')
+          end
+        end
+      end
+    end
   end
 
   describe '#with_client' do
