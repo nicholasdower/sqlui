@@ -9,6 +9,8 @@ on:
       - '!**/*.md'
       - '!/todo'
       - '!/.release-notes'
+      - '!/scripts/release'
+      - '!/scripts/rerun'
       - '!/LICENSE.txt'
       - '!/.github/dependabot.yml'
 

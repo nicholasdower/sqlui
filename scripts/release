@@ -47,6 +47,7 @@ fi
 
 new_version="$major_version.$minor_version.$patch_version"
 notes=$(cat .release-notes)
+single_line_notes=$(cat .release-notes | sed 's/$/\\r\\n/g' | tr -d '\n');
 gem_file=sqlui-$new_version.gem
 
 echo "Old version: v$old_version"
@@ -98,7 +99,6 @@ echo "Pushing gem"
 export GEM_HOST_API_KEY=$RUBYGEMS_API_KEY
 gem push $gem_file
 
-single_line_notes=$(echo $notes | sed 's/$/<br \/>/g' | tr -d '\n');
 echo 'Creating GitHub release'
 release_id=$(curl \
   -X POST \
