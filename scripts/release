@@ -98,13 +98,14 @@ echo "Pushing gem"
 export GEM_HOST_API_KEY=$RUBYGEMS_API_KEY
 gem push $gem_file
 
+single_line_notes=$(echo $notes | sed 's/$/\\\\n/g' | tr -d '\n');
 echo 'Creating GitHub release'
 release_id=$(curl \
   -X POST \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   "https://api.github.com/repos/nicholasdower/sqlui/releases" \
-  -d "{\"tag_name\":\"v$new_version\",\"target_commitish\":\"$target_commit\",\"name\":\"v$new_version Release\",\"body\":\"$notes\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}" | tr -d '\n' | grep -E -o '"id": *[0-9]+' | head -n 1 | sed 's/"id": *//g')
+  -d "{\"tag_name\":\"v$new_version\",\"target_commitish\":\"$target_commit\",\"name\":\"v$new_version Release\",\"body\":\"$single_line_notes\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}" | tr -d '\n' | grep -E -o '"id": *[0-9]+' | head -n 1 | sed 's/"id": *//g')
 
 echo 'Uploading release asset'
 curl \
