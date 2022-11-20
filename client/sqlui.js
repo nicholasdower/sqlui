@@ -1243,7 +1243,7 @@ function displaySqlFetchResultStatus (statusElementId, sqlFetch) {
   if (result.total_rows === 1) {
     statusElement.innerText = `${result.total_rows} row (${elapsed}s)`
   } else {
-    statusElement.innerText = `${result.total_rows} rows (${elapsed}s)`
+    statusElement.innerText = `${result.total_rows.toLocaleString()} rows (${elapsed}s)`
   }
 
   if (result.total_rows > result.rows.length) {

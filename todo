@@ -70,3 +70,4 @@ if table aliases aren't enabled, we don't need to override autocomplete
 specify a list of frequently used tables so that their sort can be boosted, maintain order with different boosts
 make query endpoint a get and use same encoding as download
 stream query results like we do for download and render as rows are returned
+the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
