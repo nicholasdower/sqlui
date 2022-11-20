@@ -67,3 +67,4 @@ custom autocomplete, think joining subs with orders with payments, etc.
 custom column name matchers which cause cells to by hyperlinked
 the case where a user types "select table.foo from table t". the alias breaks the select
 if table aliases aren't enabled, we don't need to override autocomplete
+specify a list of frequently used tables so that their sort can be boosted, maintain order with different boosts
