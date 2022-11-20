@@ -1,3 +1,9 @@
+## 0.1.42
+
+- Add ability to download query results.
+- Increase max rows to 10,000.
+- Fix formatting on row count, use commas.
+
 ## 0.1.41
 
 - Add support for canned joins.
