@@ -138,7 +138,7 @@ class Server < Sinatra::Base
           stream do |out|
             out << CSV::Row.new(query_result.fields, query_result.fields, header_row: true).to_s.strip
             query_result.each do |row|
-              out << "\n" + CSV::Row.new(query_result.fields, row).to_s.strip
+              out << "\n#{CSV::Row.new(query_result.fields, row).to_s.strip}"
             end
           end
         end
