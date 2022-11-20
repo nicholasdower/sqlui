@@ -44,6 +44,31 @@ function unquoteSqlId (identifier) {
   return match ? match[1] : identifier
 }
 
+function base64Encode (str) {
+  // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+    function toSolidBytes (match, p1) {
+      return String.fromCharCode(Number(`0x${p1}`))
+    }))
+}
+
+function getSqlFromUrl (url) {
+  const params = url.searchParams
+  if (params.has('file') && params.has('sql')) {
+    // TODO: show an error.
+    throw new Error('You can only specify a file or sql param, not both.')
+  }
+  if (params.has('sql')) {
+    return params.get('sql')
+  } else if (params.has('file')) {
+    const file = params.get('file')
+    const fileDetails = window.metadata.saved[file]
+    if (!fileDetails) throw new Error(`no such file: ${file}`)
+    return fileDetails.contents
+  }
+  throw new Error('You must specify a file or sql param')
+}
+
 function init (parent, onSubmit, onShiftSubmit) {
   addClickListener(document.getElementById('query-tab-button'), (event) => selectTab(event, 'query'))
   addClickListener(document.getElementById('saved-tab-button'), (event) => selectTab(event, 'saved'))
@@ -84,9 +109,7 @@ function init (parent, onSubmit, onShiftSubmit) {
 
   const copyListenerFactory = (delimiter) => {
     return () => {
-      if (
-        !window.sqlFetch?.result
-      ) {
+      if (!window.sqlFetch?.result) {
         return
       }
       const type = 'text/plain'
@@ -112,6 +135,21 @@ function init (parent, onSubmit, onShiftSubmit) {
   }
   addClickListener(document.getElementById('submit-dropdown-button-copy-csv'), copyListenerFactory(','))
   addClickListener(document.getElementById('submit-dropdown-button-copy-tsv'), copyListenerFactory('\t'))
+  addClickListener(document.getElementById('submit-dropdown-button-download-csv'), () => {
+    if (!window.sqlFetch?.result) return
+
+    const url = new URL(window.location)
+    url.searchParams.set('sql', base64Encode(getSqlFromUrl(url)))
+    url.searchParams.delete('file')
+    setActionInUrl(url, 'download_csv')
+
+    const link = document.createElement('a')
+    link.setAttribute('download', 'result.csv')
+    link.setAttribute('href', url.href)
+    link.click()
+
+    focus(getSelection())
+  })
 
   document.addEventListener('click', function (event) {
     if (event.target !== dropdownButton) {
@@ -400,8 +438,8 @@ function setValue (value) {
   })
 }
 
-function setTabInUrl (url, tab) {
-  url.pathname = url.pathname.replace(/\/[^/]+$/, `/${tab}`)
+function setActionInUrl (url, action) {
+  url.pathname = url.pathname.replace(/\/[^/]+$/, `/${action}`)
 }
 
 function getTabFromUrl (url) {
@@ -415,19 +453,19 @@ function getTabFromUrl (url) {
 
 function updateTabs () {
   const url = new URL(window.location)
-  setTabInUrl(url, 'graph')
+  setActionInUrl(url, 'graph')
   document.getElementById('graph-tab-button').href = url.pathname + url.search
-  setTabInUrl(url, 'saved')
+  setActionInUrl(url, 'saved')
   document.getElementById('saved-tab-button').href = url.pathname + url.search
-  setTabInUrl(url, 'structure')
+  setActionInUrl(url, 'structure')
   document.getElementById('structure-tab-button').href = url.pathname + url.search
-  setTabInUrl(url, 'query')
+  setActionInUrl(url, 'query')
   document.getElementById('query-tab-button').href = url.pathname + url.search
 }
 
 function selectTab (event, tab) {
   const url = new URL(window.location)
-  setTabInUrl(url, tab)
+  setActionInUrl(url, tab)
   route(event.target, event, url, true)
 }
 
@@ -636,6 +674,7 @@ function selectGraphTab (internal) {
   document.getElementById('graph-status').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.display = 'none'
+  updateDownloadButtons(window?.sqlFetch)
   maybeFetchResult(internal)
 
   focus(getSelection())
@@ -670,7 +709,7 @@ function selectSavedTab () {
   setSavedStatus(`${numFiles} file${numFiles === 1 ? '' : 's'}`)
   Object.values(saved).forEach(file => {
     const viewUrl = new URL(window.location.origin + window.location.pathname)
-    setTabInUrl(viewUrl, 'query')
+    setActionInUrl(viewUrl, 'query')
     viewUrl.searchParams.set('file', file.filename)
 
     const viewLinkElement = document.createElement('a')
@@ -683,7 +722,7 @@ function selectSavedTab () {
     })
 
     const runUrl = new URL(window.location.origin + window.location.pathname)
-    setTabInUrl(runUrl, 'query')
+    setActionInUrl(runUrl, 'query')
     runUrl.searchParams.set('file', file.filename)
     runUrl.searchParams.set('run', 'true')
 
@@ -784,6 +823,7 @@ function clearResult () {
   clearGraphStatus()
   clearResultBox()
   clearResultStatus()
+  disableDownloadButtons()
 }
 
 function clearResultStatus () {
@@ -1053,7 +1093,28 @@ function displaySqlFetchInResultTab (fetch) {
   })
 }
 
+function disableDownloadButtons () {
+  document.getElementById('submit-dropdown-button-download-csv').classList.add('disabled')
+  document.getElementById('submit-dropdown-button-copy-csv').classList.add('disabled')
+  document.getElementById('submit-dropdown-button-copy-tsv').classList.add('disabled')
+}
+
+function enableDownloadButtons () {
+  document.getElementById('submit-dropdown-button-download-csv').classList.remove('disabled')
+  document.getElementById('submit-dropdown-button-copy-csv').classList.remove('disabled')
+  document.getElementById('submit-dropdown-button-copy-tsv').classList.remove('disabled')
+}
+
+function updateDownloadButtons (fetch) {
+  if (fetch?.state === 'success') {
+    enableDownloadButtons()
+  } else {
+    disableDownloadButtons()
+  }
+}
+
 function displaySqlFetch (fetch) {
+  updateDownloadButtons(fetch)
   if (window.tab === 'query') {
     displaySqlFetchInResultTab(fetch)
   } else if (window.tab === 'graph') {

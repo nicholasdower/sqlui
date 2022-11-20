@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require 'base64'
+require 'csv'
 require 'erb'
 require 'json'
 require 'sinatra/base'
 require 'uri'
+require 'webrick/log'
 require_relative 'database_metadata'
 require_relative 'mysql_types'
 require_relative 'sql_parser'
@@ -23,6 +26,8 @@ class Server < Sinatra::Base
     set :environment,     config.environment
     set :raise_errors,    false
     set :show_exceptions, false
+
+    logger = WEBrick::Log.new
 
     get '/-/health' do
       status 200
@@ -91,41 +96,52 @@ class Server < Sinatra::Base
         params.merge!(JSON.parse(request.body.read, symbolize_names: true))
         break client_error('missing sql') unless params[:sql]
 
-        full_sql = params[:sql]
-        sql = params[:sql]
         variables = params[:variables] || {}
-        if params[:selection]
-          selection = params[:selection]
-          if selection.include?('-')
-            # sort because the selection could be in either direction
-            selection = params[:selection].split('-').map { |v| Integer(v) }.sort
-          else
-            selection = Integer(selection)
-            selection = [selection, selection]
-          end
-
-          sql = if selection[0] == selection[1]
-                  SqlParser.find_statement_at_cursor(params[:sql], selection[0])
-                else
-                  full_sql[selection[0], selection[1]]
-                end
-
-          break client_error("can't find query at selection") unless sql
-        end
+        sql = find_selected_query(params[:sql], params[:selection])
 
         result = database.with_client do |client|
-          variables.each do |name, value|
-            client.query("SET @#{name} = #{value};")
-          end
-          execute_query(client, sql)
+          query_result = execute_query(client, variables, sql)
+          # NOTE: the call to result.field_types must go before other interaction with the result. Otherwise you will
+          # get a seg fault. Seems to be a bug in Mysql2.
+          # TODO: stream this and render results on the client as they are returned?
+          {
+            columns: query_result.fields,
+            column_types: MysqlTypes.map_to_google_charts_types(query_result.field_types),
+            total_rows: query_result.size,
+            rows: (query_result.to_a || []).take(Sqlui::MAX_ROWS)
+          }
         end
 
         result[:selection] = params[:selection]
-        result[:query] = full_sql
+        result[:query] = params[:sql]
 
         status 200
         headers 'Content-Type' => 'application/json; charset=utf-8'
         body result.to_json
+      end
+
+      get "#{database.url_path}/download_csv" do
+        break client_error('missing sql') unless params[:sql]
+
+        sql = Base64.decode64(params[:sql]).force_encoding('UTF-8')
+        logger.info "sql: #{sql}"
+        variables = params.map { |k, v| k[0] == '_' ? [k, v] : nil }.compact.to_h
+        sql = find_selected_query(sql, params[:selection])
+        logger.info "sql: #{sql}"
+
+        content_type 'application/csv; charset=utf-8'
+        attachment 'result.csv'
+        status 200
+
+        database.with_client do |client|
+          query_result = execute_query(client, variables, sql)
+          stream do |out|
+            out << CSV::Row.new(query_result.fields, query_result.fields, header_row: true).to_s.strip
+            query_result.each do |row|
+              out << "\n" + CSV::Row.new(query_result.fields, row).to_s.strip
+            end
+          end
+        end
       end
 
       get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
@@ -158,30 +174,33 @@ class Server < Sinatra::Base
     body({ error: message, stacktrace: stacktrace }.compact.to_json)
   end
 
-  def execute_query(client, sql)
+  def find_selected_query(full_sql, selection)
+    return full_sql unless selection
+
+    if selection.include?('-')
+      # sort because the selection could be in either direction
+      selection = selection.split('-').map { |v| Integer(v) }.sort
+    else
+      selection = Integer(selection)
+      selection = [selection, selection]
+    end
+
+    if selection[0] == selection[1]
+      SqlParser.find_statement_at_cursor(full_sql, selection[0])
+    else
+      full_sql[selection[0], selection[1]]
+    end
+  end
+
+  def execute_query(client, variables, sql)
+    variables.each do |name, value|
+      client.query("SET @#{name} = #{value};")
+    end
     queries = if sql.include?(';')
                 sql.split(/(?<=;)/).map(&:strip).reject(&:empty?)
               else
                 [sql]
               end
-    results = queries.map { |current| client.query(current) }
-    result = results[-1]
-    # NOTE: the call to result.field_types must go before any other interaction with the result. Otherwise you will
-    # get a seg fault. Seems to be a bug in Mysql2.
-    if result
-      column_types = MysqlTypes.map_to_google_charts_types(result.field_types)
-      rows = result.to_a
-      columns = result.fields
-    else
-      column_types = []
-      rows = []
-      columns = []
-    end
-    {
-      columns: columns,
-      column_types: column_types,
-      total_rows: rows.size,
-      rows: rows.take(Sqlui::MAX_ROWS)
-    }
+    queries.map { |current| client.query(current) }.last
   end
 end

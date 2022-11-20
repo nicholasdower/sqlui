@@ -218,6 +218,15 @@ p {
     outline: none
 }
 
+.submit-dropdown-content-button.disabled {
+    color: #888 !important;
+    cursor: auto !important;
+}
+
+.submit-dropdown-content-button.disabled:hover {
+    background: none !important;
+}
+
 .status {
     display: flex;
     justify-content: center;
