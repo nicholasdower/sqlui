@@ -1,3 +1,7 @@
+## 0.1.43
+
+- No changes.
+
 ## 0.1.42
 
 - Add ability to download query results.
