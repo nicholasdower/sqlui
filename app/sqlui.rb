@@ -6,6 +6,7 @@ require_relative 'server'
 # Main entry point.
 class Sqlui
   MAX_ROWS = 10_000
+  MAX_BYTES = 10 * 1_024 * 1_024
 
   def initialize(config_file)
     raise 'you must specify a configuration file' unless config_file

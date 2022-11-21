@@ -6,7 +6,6 @@ require 'erb'
 require 'json'
 require 'sinatra/base'
 require 'uri'
-require 'webrick/log'
 require_relative 'database_metadata'
 require_relative 'mysql_types'
 require_relative 'sql_parser'
@@ -14,6 +13,10 @@ require_relative 'sqlui'
 
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
+  def self.logger
+    @logger ||= WEBrick::Log.new
+  end
+
   def self.init_and_run(config, resources_dir)
     Mysql2::Client.default_query_options[:as] = :array
     Mysql2::Client.default_query_options[:cast_booleans] = true
@@ -26,8 +29,6 @@ class Server < Sinatra::Base
     set :environment,     config.environment
     set :raise_errors,    false
     set :show_exceptions, false
-
-    logger = WEBrick::Log.new
 
     get '/-/health' do
       status 200
@@ -99,35 +100,45 @@ class Server < Sinatra::Base
         variables = params[:variables] || {}
         sql = find_selected_query(params[:sql], params[:selection])
 
-        result = database.with_client do |client|
-          query_result = execute_query(client, variables, sql)
-          # NOTE: the call to result.field_types must go before other interaction with the result. Otherwise you will
-          # get a seg fault. Seems to be a bug in Mysql2.
-          # TODO: stream this and render results on the client as they are returned?
-          {
-            columns: query_result.fields,
-            column_types: MysqlTypes.map_to_google_charts_types(query_result.field_types),
-            total_rows: query_result.size,
-            rows: (query_result.to_a || []).take(Sqlui::MAX_ROWS)
-          }
-        end
-
-        result[:selection] = params[:selection]
-        result[:query] = params[:sql]
-
         status 200
         headers 'Content-Type' => 'application/json; charset=utf-8'
-        body result.to_json
+
+        database.with_client do |client|
+          query_result = execute_query(client, variables, sql)
+          stream do |out|
+            json = <<~RES.chomp
+              {
+                "columns": #{query_result.fields.to_json},
+                "column_types": #{MysqlTypes.map_to_google_charts_types(query_result.field_types).to_json},
+                "total_rows": #{query_result.size.to_json},
+                "selection": #{params[:selection].to_json},
+                "query": #{params[:sql].to_json},
+                "rows": [
+            RES
+            out << json
+            bytes = json.bytesize
+            query_result.each_with_index do |row, i|
+              json = "#{i.zero? ? '' : ','}\n    #{row.to_json}"
+              bytes += json.bytesize
+              break if i == Sqlui::MAX_ROWS || bytes > Sqlui::MAX_BYTES
+
+              out << json
+            end
+            out << <<~RES
+
+                ]
+              }
+            RES
+          end
+        end
       end
 
       get "#{database.url_path}/download_csv" do
         break client_error('missing sql') unless params[:sql]
 
         sql = Base64.decode64(params[:sql]).force_encoding('UTF-8')
-        logger.info "sql: #{sql}"
         variables = params.map { |k, v| k[0] == '_' ? [k, v] : nil }.compact.to_h
         sql = find_selected_query(sql, params[:selection])
-        logger.info "sql: #{sql}"
 
         content_type 'application/csv; charset=utf-8'
         attachment 'result.csv'

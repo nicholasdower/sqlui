@@ -34,6 +34,7 @@ test:
  - test params for file queries
  - tabbing between tabs, the editor and the various buttons
  - copy to clipboard, first js unit test
+ - downloading
 maybe add support for tags on database config to easily see production vs staging for instance
 add a help tab
 send client errors to the server, at least log them
@@ -69,5 +70,6 @@ the case where a user types "select table.foo from table t". the alias breaks th
 if table aliases aren't enabled, we don't need to override autocomplete
 specify a list of frequently used tables so that their sort can be boosted, maintain order with different boosts
 make query endpoint a get and use same encoding as download
-stream query results like we do for download and render as rows are returned
+render streamed results as they are returned
 the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
+get rid of max rows on the server in favor of max bytes. Have the client paginate the results to avoid a huge dom
