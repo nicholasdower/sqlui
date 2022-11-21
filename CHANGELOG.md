@@ -1,3 +1,8 @@
+## 0.1.47
+
+- Results are now streamed to the browser.
+- Add ability to boost a table in autocomplete.
+
 ## 0.1.46
 
 - No changes.
