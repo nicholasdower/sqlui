@@ -8,8 +8,10 @@ databases:
     description:  Some databases about nothing.
     url_path:     /sqlui/shows
     saved_path:   sql/shows
-    table_aliases:
-      friends.characters: fc
+    tables:
+      friends.characters:
+        alias: c
+        boost: 1
     client_params:
       username: root
       password: root
@@ -31,9 +33,12 @@ databases:
     description:  Another database about nothing.
     url_path:     /sqlui/friends
     saved_path:   sql/friends
-    table_aliases:
-      characters: c
-      actors: a
+    tables:
+      characters:
+        alias: c
+        boost: 1
+      actors:
+        alias: a
     joins:
       - label: 'actors to characters'
         apply: 'actors a ON a.id = c.actor_id'

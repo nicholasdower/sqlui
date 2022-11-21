@@ -8,7 +8,7 @@ require_relative 'args'
 
 # Config for a single database.
 class DatabaseConfig
-  attr_reader :display_name, :description, :url_path, :joins, :saved_path, :table_aliases, :client_params
+  attr_reader :display_name, :description, :url_path, :joins, :saved_path, :tables, :client_params
 
   def initialize(hash)
     @display_name = Args.fetch_non_empty_string(hash, :display_name).strip
@@ -27,12 +27,25 @@ class DatabaseConfig
 
       raise ArgumentError, "invalid join #{join.to_json}"
     end
-    @table_aliases = Args.fetch_optional_hash(hash, :table_aliases) || {}
-    @table_aliases = @table_aliases.each do |table, a|
-      raise ArgumentError, "invalid alias for table #{table} (#{a}), expected string" unless a.is_a?(String)
+    @tables = Args.fetch_optional_hash(hash, :tables) || {}
+    @tables = @tables.each do |table, table_config|
+      unless table_config.is_a?(Hash)
+        raise ArgumentError, "invalid table config for #{table} (#{table_config}), expected hash"
+      end
+
+      table_alias = table_config[:alias]
+      if table_alias && !table_alias.is_a?(String)
+        raise ArgumentError, "invalid table alias for #{table} (#{table_alias}), expected string"
+      end
+
+      table_boost = table_config[:boost]
+      if table_boost && !table_boost.is_a?(Integer)
+        raise ArgumentError, "invalid table boost for #{table} (#{table_boost}), expected int"
+      end
     end
-    duplicate_aliases = @table_aliases.reject { |(_, v)| @table_aliases.values.count(v) == 1 }.to_h.values.to_set
-    if @table_aliases.values.to_set.size < @table_aliases.values.size
+    aliases = @tables.map { |_table, table_config| table_config[:alias] }.compact
+    if aliases.to_set.size < aliases.size
+      duplicate_aliases = aliases.reject { |a| aliases.count(a) == 1 }.to_set
       raise ArgumentError, "duplicate table aliases: #{duplicate_aliases.join(', ')}"
     end
 

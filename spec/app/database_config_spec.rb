@@ -147,66 +147,72 @@ describe DatabaseConfig do
       end
     end
 
-    context 'table_aliases' do
-      context 'when table_aliases is not specified' do
-        before { config_hash[:client_params] = nil }
+    context 'tables' do
+      before do
+        config_hash[:tables] = tables
+      end
 
-        it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params null')
+      context 'when nil' do
+        let(:tables) { nil }
+
+        it 'returns an empty hash' do
+          expect(subject.tables).to eq({})
         end
       end
 
-      context 'when table_aliases is specified' do
-        before do
-          config_hash[:table_aliases] = table_aliases
+      context 'when not a hash' do
+        let(:tables) { 'foo' }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'required parameter tables not a hash')
         end
+      end
 
-        context 'when nil' do
-          let(:table_aliases) { nil }
+      context 'when alias is a string' do
+        let(:tables) { { table: { alias: 'n' } } }
 
-          it 'returns the expected aliases' do
-            expect(subject.table_aliases).to eq({})
-          end
+        it 'returns the expected aliases' do
+          expect(subject.tables).to eq({ table: { alias: 'n' } })
         end
+      end
 
-        context 'when not a hash' do
-          let(:table_aliases) { 'foo' }
+      context 'when alias is not a string' do
+        let(:tables) { { table: { alias: 1 } } }
 
-          it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, 'required parameter table_aliases not a hash')
-          end
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid table alias for table (1), expected string')
         end
+      end
 
-        context 'when alias is a string' do
-          let(:table_aliases) { { name: 'n' } }
+      context 'when multiple aliases specified' do
+        let(:tables) { { table: { alias: 'n' }, other_table: { alias: 'o' } } }
 
-          it 'returns the expected aliases' do
-            expect(subject.table_aliases).to eq({ name: 'n' })
-          end
+        it 'returns the expected aliases' do
+          expect(subject.tables).to eq({ table: { alias: 'n' }, other_table: { alias: 'o' } })
         end
+      end
 
-        context 'when alias is a non-string' do
-          let(:table_aliases) { { name: 1 } }
+      context 'when duplicate aliases specified' do
+        let(:tables) { { table: { alias: 'n' }, other_table: { alias: 'n' } } }
 
-          it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, 'invalid alias for table name (1), expected string')
-          end
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'duplicate table aliases: n')
         end
+      end
 
-        context 'when multiple aliases specified' do
-          let(:table_aliases) { { name: 'n', other_name: 'o' } }
+      context 'when boost is an int' do
+        let(:tables) { { table: { boost: 1 } } }
 
-          it 'returns the expected aliases' do
-            expect(subject.table_aliases).to eq({ name: 'n', other_name: 'o' })
-          end
+        it 'returns the expected aliases' do
+          expect(subject.tables).to eq({ table: { boost: 1 } })
         end
+      end
 
-        context 'when duplicate aliases specified' do
-          let(:table_aliases) { { name: 'n', other_name: 'n' } }
+      context 'when boost is not an int' do
+        let(:tables) { { table: { boost: '1' } } }
 
-          it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, 'duplicate table aliases: n')
-          end
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid table boost for table (1), expected int')
         end
       end
     end

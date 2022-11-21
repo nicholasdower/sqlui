@@ -172,19 +172,20 @@ function init (parent, onSubmit, onShiftSubmit) {
   const schemas = Object.entries(window.metadata.schemas)
   const editorSchema = {}
   const tables = []
-  const hasTableAliases = Object.keys(window.metadata.table_aliases).length > 0
   schemas.forEach(([schemaName, schema]) => {
     Object.entries(schema.tables).forEach(([tableName, table]) => {
       const qualifiedTableName = schemas.length === 1 ? tableName : `${schemaName}.${tableName}`
       const quotedQualifiedTableName = schemas.length === 1 ? `\`${tableName}\`` : `\`${schemaName}\`.\`${tableName}\``
       const columns = Object.keys(table.columns)
       editorSchema[qualifiedTableName] = columns
-      const alias = window.metadata.table_aliases[qualifiedTableName]
+      const alias = window.metadata.tables[qualifiedTableName]?.alias
+      const boost = window.metadata.tables[qualifiedTableName]?.boost
       if (alias) {
         editorSchema[alias] = columns
         tables.push({
           label: qualifiedTableName,
           detail: alias,
+          boost,
           alias_type: 'with',
           quoted: `${quotedQualifiedTableName} \`${alias}\``,
           unquoted: `${qualifiedTableName} ${alias}`
@@ -192,6 +193,7 @@ function init (parent, onSubmit, onShiftSubmit) {
         tables.push({
           label: qualifiedTableName,
           detail: alias,
+          boost,
           alias_type: 'only',
           quoted: '`' + alias + '`',
           unquoted: alias
@@ -267,7 +269,7 @@ function init (parent, onSubmit, onShiftSubmit) {
       MySQL.language.data.of({
         autocomplete: (context) => {
           const result = originalSchemaCompletionSource(context)
-          if (!hasTableAliases || !result?.options) return result
+          if (!result?.options) return result
 
           const tree = syntaxTree(context.state)
           let node = tree.resolveInner(context.pos, -1)
@@ -341,10 +343,19 @@ function init (parent, onSubmit, onShiftSubmit) {
             if (foundSchema) {
               const unquotedLabel = unquoteSqlId(option.label)
               const quoted = unquotedLabel !== option.label
-              const alias = window.metadata.table_aliases[`${foundSchema}.${unquotedLabel}`]
-              if (alias) {
-                option = { label: quoted ? `\`${unquotedLabel}\` \`${alias}\`` : `${option.label} ${alias}` }
+              const tableConfig = window.metadata.tables[`${foundSchema}.${unquotedLabel}`]
+              const alias = tableConfig?.alias
+              const boost = tableConfig?.boost || -1
+              const optionOverride = {
+                label: option.label
               }
+              if (alias) {
+                optionOverride.label = quoted ? `\`${unquotedLabel}\` \`${alias}\`` : `${option.label} ${alias}`
+              }
+              if (boost) {
+                optionOverride.boost = boost
+              }
+              if (alias || boost) return optionOverride
             }
             return option
           })
