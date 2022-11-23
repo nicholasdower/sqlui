@@ -3,121 +3,230 @@
 require_relative '../spec_helper'
 require_relative '../../app/sql_parser'
 
+def test_find_statement_at_cursor(context:, sql:, cursor:, it:, expected: sql) # rubocop:disable Naming/MethodParameterName
+  context context do
+    it it do
+      expect(SqlParser.find_statement_at_cursor(sql, cursor)).to eq(expected)
+    end
+  end
+end
+
 describe SqlParser do
   describe '.find_statement_at_cursor' do
-    subject { SqlParser.find_statement_at_cursor(sql, cursor) }
-
     context 'when input contains only one query' do
-      let(:sql) do
-        <<~SQL
-          select * from characters;
-        SQL
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is at the beginning',
+        sql: "select * from characters;\n",
+        cursor: 0,
+        it: 'returns the only query'
+      )
 
-      context 'and cursor is at the beginning' do
-        let(:cursor) { 0 }
+      test_find_statement_at_cursor(
+        context: 'and cursor is at the end',
+        sql: "select * from characters;\n",
+        cursor: "select * from characters;\n".length,
+        it: 'returns the only query'
+      )
 
-        it 'returns the only query' do
-          expect(subject).to eq('select * from characters;')
-        end
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is outside the bounds',
+        sql: "select * from characters;\n",
+        cursor: "select * from characters;\n".length + 1,
+        it: 'returns the only query'
+      )
 
-      context 'and cursor is at the end' do
-        let(:cursor) { sql.length }
-
-        it 'returns the only query' do
-          expect(subject).to eq('select * from characters;')
-        end
-      end
-
-      context 'and cursor is outside the bounds' do
-        let(:cursor) { sql.length + 1 }
-
-        it 'returns the only query' do
-          expect(subject).to eq('select * from characters;')
-        end
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is in multiline trailing whitespace',
+        sql: "select * from characters; \t \n \t \n \t \n",
+        cursor: "select * from characters; \t \n \t".length,
+        it: 'returns the only query'
+      )
     end
 
     context 'when input contains two queries' do
-      let(:query_one) { 'select * from characters limit 1;' }
-      let(:query_two) { 'select * from characters limit 2;' }
-      let(:sql) do
-        <<~SQL
-          #{query_one}
+      test_find_statement_at_cursor(
+        context: 'and cursor is at the beginning of the first query',
+        sql: "select * from characters limit 1;\nselect * from characters limit 2;\n",
+        cursor: 0,
+        it: 'returns the only query',
+        expected: 'select * from characters limit 1;'
+      )
 
-          #{query_two}
-        SQL
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is in the end of the first query',
+        sql: "select * from characters limit 1;\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1;'.length,
+        it: 'returns the first query',
+        expected: 'select * from characters limit 1;'
+      )
 
-      context 'and cursor is at the beginning of the first query' do
-        let(:cursor) { 0 }
+      test_find_statement_at_cursor(
+        context: 'and cursor is at the beginning of the second query',
+        sql: "select * from characters limit 1;\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1;'.length + 1,
+        it: 'returns the second query',
+        expected: "\nselect * from characters limit 2;\n"
+      )
 
-        it 'returns the first query' do
-          expect(subject).to eq(query_one)
-        end
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is in the middle of the second query',
+        sql: "select * from characters limit 1;\nselect * from characters limit 2;\n",
+        cursor: 40,
+        it: 'returns the second query',
+        expected: "\nselect * from characters limit 2;\n"
+      )
 
-      context 'and cursor is in the middle of the second query' do
-        let(:cursor) { 3 }
+      test_find_statement_at_cursor(
+        context: 'and cursor is at the end',
+        sql: "select * from characters limit 1;\nselect * from characters limit 2;\n",
+        cursor: "select * from characters limit 1;\nselect * from characters limit 2;\n".length,
+        it: 'returns the second query',
+        expected: "\nselect * from characters limit 2;\n"
+      )
 
-        it 'returns the second query' do
-          expect(subject).to eq(query_one)
-        end
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is outside the bounds',
+        sql: "select * from characters limit 1;\nselect * from characters limit 2;\n",
+        cursor: 1_000,
+        it: 'returns the second query',
+        expected: "\nselect * from characters limit 2;\n"
+      )
 
-      context 'and cursor is at the end of the first query' do
-        let(:cursor) { query_one.length }
-
-        it 'returns the first query' do
-          expect(subject).to eq(query_one)
-        end
-      end
-
-      context 'and cursor is at the beginning of the second query' do
-        let(:cursor) { query_one.length + 2 }
-
-        it 'returns the first query' do
-          expect(subject).to eq(query_two)
-        end
-      end
-
-      context 'and cursor is in the middle of the second query' do
-        let(:cursor) { sql.length - 3 }
-
-        it 'returns the second query' do
-          expect(subject).to eq(query_two)
-        end
-      end
-
-      context 'and cursor is at the end' do
-        let(:cursor) { sql.length }
-
-        it 'returns the second query' do
-          expect(subject).to eq(query_two)
-        end
-      end
-
-      context 'and cursor is outside the bounds' do
-        let(:cursor) { sql.length + 1 }
-
-        it 'returns the second query' do
-          expect(subject).to eq(query_two)
-        end
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor is in multiline trailing whitespace after first query',
+        sql: "select * from characters limit 1; \t \n \t \nselect * from characters limit 2;\n",
+        cursor: "select * from characters limit 1; \t \n".length,
+        it: 'returns the first query',
+        expected: "select * from characters limit 1; \t \n \t "
+      )
     end
 
-    context 'when input contains zero queries' do
-      let(:sql) do
-        <<~SQL
-          foo
-        SQL
-      end
-      let(:cursor) { 0 }
+    context 'when query ends in -- comment' do
+      test_find_statement_at_cursor(
+        context: 'and cursor at end of comment',
+        sql: "select * from characters limit 1; -- foo\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1; -- foo'.length,
+        it: 'returns the preceding query',
+        expected: 'select * from characters limit 1; -- foo'
+      )
 
-      it 'returns the input unchanged' do
-        expect(subject).to eq(sql)
-      end
+      test_find_statement_at_cursor(
+        context: 'and cursor on next line',
+        sql: "select * from characters limit 1; -- foo\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1; -- foo'.length + 1,
+        it: 'returns the preceding query',
+        expected: "\nselect * from characters limit 2;\n"
+      )
+
+      test_find_statement_at_cursor(
+        context: "and comment isn't actually a comment",
+        sql: "select * from characters limit 1; --foo\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1; --foo'.length,
+        it: 'returns the second statement',
+        expected: " --foo\nselect * from characters limit 2;\n"
+      )
+    end
+
+    context 'when query ends in # comment' do
+      test_find_statement_at_cursor(
+        context: 'and cursor at end of comment',
+        sql: "select * from characters limit 1; # foo\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1; # foo'.length,
+        it: 'returns the preceding query',
+        expected: 'select * from characters limit 1; # foo'
+      )
+
+      test_find_statement_at_cursor(
+        context: 'and cursor on next line',
+        sql: "select * from characters limit 1; -- foo\nselect * from characters limit 2;\n",
+        cursor: 'select * from characters limit 1; -- foo'.length + 1,
+        it: 'returns the preceding query',
+        expected: "\nselect * from characters limit 2;\n"
+      )
+    end
+
+    context 'when sql contains a semicolon' do
+      test_find_statement_at_cursor(
+        context: 'in double quotes',
+        sql: 'select ";"; select 2',
+        cursor: 0,
+        it: 'ignores the semicolon',
+        expected: 'select ";";'
+      )
+
+      test_find_statement_at_cursor(
+        context: 'in single quotes',
+        sql: "select ';';",
+        cursor: 0,
+        it: 'ignores the semicolon',
+        expected: "select ';';"
+      )
+
+      test_find_statement_at_cursor(
+        context: 'in single quotes with escaped quote',
+        sql: "select ''';';",
+        cursor: 0,
+        it: 'ignores the semicolon',
+        expected: "select ''';';"
+      )
+
+      test_find_statement_at_cursor(
+        context: 'in -- comment',
+        sql: 'select 1; -- foo; bar',
+        cursor: 0,
+        it: 'ignores the semicolon',
+        expected: 'select 1; -- foo; bar'
+      )
+
+      test_find_statement_at_cursor(
+        context: 'in # comment',
+        sql: 'select 1; # foo; bar',
+        cursor: 0,
+        it: 'ignores the semicolon',
+        expected: 'select 1; # foo; bar'
+      )
+
+      test_find_statement_at_cursor(
+        context: 'in multi line comment',
+        sql: 'select /* foo;bar */1;',
+        cursor: 0,
+        it: 'ignores the semicolon',
+        expected: 'select /* foo;bar */1;'
+      )
+    end
+
+    test_find_statement_at_cursor(
+      context: 'when input contains zero queries',
+      sql: "foo\n",
+      cursor: 0,
+      it: 'returns the input unchanged',
+      expected: "foo\n"
+    )
+
+    context 'when input contains multiple queries on one line' do
+      test_find_statement_at_cursor(
+        context: 'and cursor at end of first query',
+        sql: "select 1;  select 2\n",
+        cursor: 'select 1;'.length,
+        it: 'returns the first query',
+        expected: 'select 1;'
+      )
+
+      test_find_statement_at_cursor(
+        context: 'and cursor past end of first query',
+        sql: "select 1;  select 2\n",
+        cursor: 'select 1;'.length + 1,
+        it: 'returns the first query',
+        expected: "  select 2\n"
+      )
+
+      test_find_statement_at_cursor(
+        context: 'and cursor in uncompleted final query',
+        sql: "select 1; select\n",
+        cursor: 16,
+        it: 'returns the uncompleted query',
+        expected: " select\n"
+      )
     end
   end
 end
