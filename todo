@@ -63,11 +63,8 @@ allow a sql result to link to sqlui urls. maybe this is the start of some built-
 set a cookie for current default submit button
 favicon
 better 404 page
-custom autocomplete, think joining subs with orders with payments, etc.
 custom column name matchers which cause cells to by hyperlinked
 the case where a user types "select table.foo from table t". the alias breaks the select
-if table aliases aren't enabled, we don't need to override autocomplete
-specify a list of frequently used tables so that their sort can be boosted, maintain order with different boosts
 make query endpoint a get and use same encoding as download
 render streamed results as they are returned
 the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
