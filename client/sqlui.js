@@ -1,6 +1,9 @@
-import { createEditor } from './editor.js'
 import { EditorView } from 'codemirror'
+
 import { base64Encode } from './base64.js'
+import { copyTextToClipboard } from './clipboard.js'
+import { toCsv, toTsv } from './csv.js'
+import { createEditor } from './editor.js'
 
 /* global google */
 
@@ -59,34 +62,16 @@ function init (parent, onSubmit, onShiftSubmit) {
     focus(getSelection())
   })
 
-  const copyListenerFactory = (delimiter) => {
-    return () => {
-      if (!window.sqlFetch?.result) {
-        return
-      }
-      const type = 'text/plain'
-      let text = window.sqlFetch.result.columns.map((header) => {
-        if (typeof header === 'string' && (header.includes('"') || header.includes(delimiter))) {
-          return `"${header.replaceAll('"', '""')}"`
-        } else {
-          return header
-        }
-      }).join(delimiter) + '\n'
-      text += window.sqlFetch.result.rows.map((row) => {
-        return row.map((cell) => {
-          if (typeof cell === 'string' && (cell.includes('"') || cell.includes(delimiter))) {
-            return `"${cell.replaceAll('"', '""')}"`
-          } else {
-            return cell
-          }
-        }).join(delimiter)
-      }).join('\n')
-      const blob = new Blob([text], { type })
-      navigator.clipboard.write([new window.ClipboardItem({ [type]: blob })])
+  addClickListener(document.getElementById('submit-dropdown-button-copy-csv'), (event) => {
+    if (window.sqlFetch?.result) {
+      copyTextToClipboard(toCsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
     }
-  }
-  addClickListener(document.getElementById('submit-dropdown-button-copy-csv'), copyListenerFactory(','))
-  addClickListener(document.getElementById('submit-dropdown-button-copy-tsv'), copyListenerFactory('\t'))
+  })
+  addClickListener(document.getElementById('submit-dropdown-button-copy-tsv'), (event) => {
+    if (window.sqlFetch?.result) {
+      copyTextToClipboard(toTsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
+    }
+  })
   addClickListener(document.getElementById('submit-dropdown-button-download-csv'), () => {
     if (!window.sqlFetch?.result) return
 
