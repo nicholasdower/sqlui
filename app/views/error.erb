@@ -1,0 +1,21 @@
+<html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title><%= title %></title>
+  <link rel="icon" type="image/x-icon" href="/favicon.svg">
+</head>
+<body style="font-family: monospace; font-size: 16px;">
+
+<% if defined?(message) && message %>
+  <p><%= message %></p>
+<% end %>
+
+<% if defined?(stacktrace) && stacktrace %>
+<pre>
+<%= stacktrace %>
+</pre>
+<% end %>
+
+</body>
+</html>

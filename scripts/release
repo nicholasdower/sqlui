@@ -38,8 +38,11 @@ if [ "$RELEASE_TYPE" = "patch" ]; then
   patch_version=$((patch_version + 1))
 elif [ "$RELEASE_TYPE" = "minor" ]; then
   minor_version=$((minor_version + 1))
+  patch_version=0
 elif [ "$RELEASE_TYPE" = "major" ]; then
   major_version=$((major_version + 1))
+  minor_version=0
+  patch_version=0
 else
   echo "fatal: invalid RELEASE_TYPE: \"$RELEASE_TYPE\"" >&2
   exit 1

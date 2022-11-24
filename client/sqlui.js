@@ -1293,10 +1293,12 @@ window.onload = function () {
       if (contentType && contentType.indexOf('application/json') !== -1) {
         return response.json().then((result) => {
           if (result.error) {
-            let error = `<pre>${result.error}`
+            let error = '<div style="font-family: monospace; font-size: 16px;">\n'
+            error += `<div>${result.error}</div>\n`
             if (result.stacktrace) {
-              error += '\n' + result.stacktrace + '</pre>'
+              error += '<pre>\n' + result.stacktrace + '\n</pre>\n'
             }
+            error += '</div>\n'
             document.getElementById('loading-box').innerHTML = error
           } else if (!result.server) {
             document.getElementById('loading-box').innerHTML = `

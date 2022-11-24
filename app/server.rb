@@ -39,6 +39,10 @@ class Server < Sinatra::Base
       redirect config.list_url_path, 301
     end
 
+    get '/favicon.svg' do
+      send_file File.join(resources_dir, 'favicon.svg')
+    end
+
     get "#{config.list_url_path}/?" do
       erb :databases, locals: { config: config }
     end
@@ -163,15 +167,18 @@ class Server < Sinatra::Base
       end
     end
 
-    error do |e|
-      status 500
-      headers 'Content-Type' => 'application/json; charset=utf-8'
-      message = e.message.lines.first&.strip || 'unexpected error'
-      result = {
-        error: message,
-        stacktrace: e.backtrace.map { |b| b }.join("\n")
-      }
-      body result.to_json
+    error 400..510 do
+      exception = env['sinatra.error']
+      stacktrace = exception&.full_message(highlight: false)
+      if request.env['HTTP_ACCEPT'] == 'application/json'
+        headers 'Content-Type' => 'application/json; charset=utf-8'
+        message = exception&.message&.lines&.first&.strip || 'unexpected error'
+        json = { error: message, stacktrace: stacktrace }.compact.to_json
+        body json
+      else
+        message = "#{status} #{Rack::Utils::HTTP_STATUS_CODES[status]}"
+        erb :error, locals: { title: "SQLUI #{message}", message: message, stacktrace: stacktrace }
+      end
     end
 
     run!

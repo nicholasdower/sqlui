@@ -61,8 +61,6 @@ In development use version plus timestamp when server starts. Add a heartbeat to
 check whether current master is green before releasing
 allow a sql result to link to sqlui urls. maybe this is the start of some built-in functions.
 set a cookie for current default submit button
-favicon
-better 404 page
 custom column name matchers which cause cells to by hyperlinked
 the case where a user types "select table.foo from table t". the alias breaks the select
 make query endpoint a get and use same encoding as download
