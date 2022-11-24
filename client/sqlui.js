@@ -1,15 +1,8 @@
 import { createEditor } from './editor.js'
 import { EditorView } from 'codemirror'
+import { base64Encode } from './base64.js'
 
 /* global google */
-
-function base64Encode (str) {
-  // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
-  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-    function toSolidBytes (match, p1) {
-      return String.fromCharCode(Number(`0x${p1}`))
-    }))
-}
 
 function getSqlFromUrl (url) {
   const params = url.searchParams
