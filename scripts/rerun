@@ -9,12 +9,11 @@ require 'set'
 class Watcher
   MIN_REFRESH_DELAY = 2
 
-  def initialize(command:, dirs: [], files: [])
-    raise 'missing dirs or files' unless dirs&.any? || files&.any?
+  def initialize(paths, command)
+    raise 'missing paths' unless paths&.any?
     raise 'missing command' unless command&.any?
 
-    @dirs = dirs || []
-    @files = files || []
+    @paths = paths
     @command = command
     @watched_files = watched_files
     @alive = true
@@ -59,7 +58,7 @@ class Watcher
   end
 
   def watched_files
-    files = Find.find(*@dirs).to_a + @files
+    files = Find.find(*@paths).to_a
     entries = files.flat_map do |file|
       if FileTest.file?(file)
         [[file, File.mtime(file).to_i]]
@@ -78,22 +77,14 @@ class Watcher
   end
 end
 
-options = {}
-OptionParser.new do |opts|
-  opts.banner = 'Usage: ./script/rerun [options] -- command [args...]'
-
-  opts.on('-d', '--dir <dir>', 'A directory to watch') do |dir|
-    options[:dirs] ||= []
-    options[:dirs] << dir
-  end
-
-  opts.on('-f', '--file <file>', 'A file to watch.') do |file|
-    options[:files] ||= []
-    options[:files] << file
-  end
-end.parse!
-
-watcher = Watcher.new(dirs: options[:dirs], files: options[:files], command: ARGV)
+separator = ARGV.find_index('--')
+unless separator && separator > 0 && separator < (ARGV.size - 1)
+  warn 'Usage: ./scripts/rerun path... -- <command>'
+  exit 1
+end
+paths = ARGV[0...separator]
+command = ARGV[(separator + 1)..-1]
+watcher = Watcher.new(paths, command)
 
 Signal.trap('INT') do
   watcher.die('INT')
