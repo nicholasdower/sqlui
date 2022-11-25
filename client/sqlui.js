@@ -737,39 +737,7 @@ function displaySqlFetchInResultTab (fetch) {
   clearResultBox()
   displaySqlFetchResultStatus('result-status', fetch)
 
-  const tableElement = document.createElement('table')
-  tableElement.id = 'result-table'
-  const theadElement = document.createElement('thead')
-  const headerElement = document.createElement('tr')
-  const tbodyElement = document.createElement('tbody')
-  theadElement.appendChild(headerElement)
-  tableElement.appendChild(theadElement)
-  tableElement.appendChild(tbodyElement)
-  document.getElementById('result-box').appendChild(tableElement)
-
-  fetch.result.columns.forEach(column => {
-    const template = document.createElement('template')
-    template.innerHTML = `<th class="cell">${column}</th>`
-    headerElement.appendChild(template.content.firstChild)
-  })
-  if (fetch.result.columns.length > 0) {
-    headerElement.appendChild(document.createElement('th'))
-  }
-  let highlight = false
-  fetch.result.rows.forEach(function (row) {
-    const rowElement = document.createElement('tr')
-    if (highlight) {
-      rowElement.classList.add('highlighted-row')
-    }
-    highlight = !highlight
-    tbodyElement.appendChild(rowElement)
-    row.forEach(function (value) {
-      const template = document.createElement('template')
-      template.innerHTML = `<td class="cell">${value}</td>`
-      rowElement.appendChild(template.content.firstChild)
-    })
-    rowElement.appendChild(document.createElement('td'))
-  })
+  createTable(document, document.getElementById('result-box'), fetch.result.columns, fetch.result.rows, 'result-table')
 }
 
 function disableDownloadButtons () {

@@ -1,5 +1,6 @@
-export function createTable (document, parent, columns, rows) {
+export function createTable (document, parent, columns, rows, id) {
   const tableElement = document.createElement('table')
+  if (id) tableElement.id = id
   const theadElement = document.createElement('thead')
   const headerTrElement = document.createElement('tr')
   const tbodyElement = document.createElement('tbody')
