@@ -2,7 +2,20 @@
 
 set -e -u -o pipefail
 
-if [ ! -f client/resources/sqlui.js ] || [ client/sqlui.js -nt client/resources/sqlui.js ]; then
+build=0
+
+if [ ! -f client/resources/sqlui.js ]; then
+  build=1
+else
+  for file in client/*.js; do
+    if [ $file -nt client/resources/sqlui.js ]; then
+      echo 3
+      build=1
+    fi
+  done
+fi
+
+if [ $build -eq 1 ]; then
   rm -f client/resources/sqlui.js
   ./node_modules/rollup/dist/bin/rollup --config ./rollup.config.js --bundleConfigAsCjs
   chmod 444 client/resources/sqlui.js
