@@ -9,13 +9,11 @@ require 'set'
 class Watcher
   MIN_REFRESH_DELAY = 2
 
-  def initialize(includes, excludes, command)
-    raise 'missing includes' unless includes&.any?
+  def initialize(find_args, command)
+    raise 'missing find_args' unless find_args&.any?
     raise 'missing command' unless command&.any?
 
-
-    @includes = includes
-    @excludes = excludes
+    @find_args = find_args
     @command = command
     @watched_files = watched_files
     @alive = true
@@ -60,8 +58,7 @@ class Watcher
   end
 
   def watched_files
-    files = Find.find(*@includes).to_a - Find.find(*@excludes).to_a
-    files = files.select { |f| FileTest.file?(f) }
+    files = `find #{@find_args.join(' ')}`.lines.map(&:strip)
     entries = files.flat_map do |file|
       if FileTest.file?(file)
         [[file, File.mtime(file).to_i]]
@@ -87,30 +84,12 @@ end
 
 separator = ARGV.find_index('--')
 help unless separator&.between?(1, ARGV.size - 2)
-path_args = ARGV[0...separator]
-
-paths = {
-  '--include' => [],
-  '--exclude' => []
-}
-while path_args.any?
-  type = path_args.shift
-  if ['--include', '--exclude'].include?(type)
-    found = []
-    while path_args.any? && !path_args.first.start_with?('--')
-      found << path_args.shift
-    end
-    help if found.empty?
-    paths[type] += found
-  else
-    help
-  end
-end
+find_args = ARGV[0...separator]
 
 command = ARGV[(separator + 1)..]
 help if command.empty?
 
-watcher = Watcher.new(paths['--include'], paths['--exclude'], command)
+watcher = Watcher.new(find_args, command)
 
 Signal.trap('INT') do
   watcher.die('INT')

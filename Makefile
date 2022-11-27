@@ -2,7 +2,7 @@ RUN = ./scripts/docker-run
 IMAGE = nicholasdower/sqlui
 RUN_IMAGE = $(RUN) $(IMAGE)
 
-RERUN = ./scripts/rerun bin app sql client '!client/resources/sqlui.js' development_config.yml
+RERUN = ./scripts/rerun bin app sql client development_config.yml -not -path client/resources/sqlui.js -type f
 
 .install-from-docker: Gemfile Gemfile.lock .version sqlui.gemspec
 	npm install
