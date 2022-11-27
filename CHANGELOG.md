@@ -1,3 +1,11 @@
+## 0.1.48
+
+- Better SQL parser which allows for semicolons in quotes and comments.
+- Add favicon
+- Custom error pages
+- Fix bug where autocomplete displayed under table head.
+- Add support for column links.
+
 ## 0.1.47
 
 - Results are now streamed to the browser.

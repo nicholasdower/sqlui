@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqlui (0.1.47)
+    sqlui (0.1.48)
       mysql2 (~> 0.0)
       sinatra (~> 3.0)
       webrick (~> 1.0)
@@ -21,7 +21,7 @@ GEM
     parser (3.1.2.1)
       ast (~> 2.4.1)
     rack (2.2.4)
-    rack-protection (3.0.3)
+    rack-protection (3.0.4)
       rack
     rainbow (3.1.1)
     regexp_parser (2.6.0)
@@ -55,10 +55,10 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sinatra (3.0.3)
+    sinatra (3.0.4)
       mustermann (~> 3.0)
       rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.0.3)
+      rack-protection (= 3.0.4)
       tilt (~> 2.0)
     tilt (2.0.11)
     unicode-display_width (2.3.0)

@@ -1,5 +1,1 @@
-- Better SQL parser which allows for semicolons in quotes and comments.
-- Add favicon
-- Custom error pages
-- Fix bug where autocomplete displayed under table head.
-- Add support for column links.
+- No changes.
