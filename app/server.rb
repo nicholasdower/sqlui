@@ -73,6 +73,7 @@ class Server < Sinatra::Base
             list_url_path: config.list_url_path,
             schemas: DatabaseMetadata.lookup(client, database),
             tables: database.tables,
+            columns: database.columns,
             joins: database.joins,
             saved: Dir.glob("#{database.saved_path}/*.sql").to_h do |path|
               contents = File.read(path)

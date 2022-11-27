@@ -1,4 +1,4 @@
-export function createTable (document, parent, columns, rows, id) {
+export function createTable (columns, rows, id, cellRenderer) {
   const tableElement = document.createElement('table')
   if (id) tableElement.id = id
   const theadElement = document.createElement('thead')
@@ -7,11 +7,9 @@ export function createTable (document, parent, columns, rows, id) {
   theadElement.appendChild(headerTrElement)
   tableElement.appendChild(theadElement)
   tableElement.appendChild(tbodyElement)
-  parent.appendChild(tableElement)
 
   columns.forEach(function (columnName) {
     const headerElement = document.createElement('th')
-    headerElement.classList.add('cell')
     headerElement.innerText = columnName
     headerTrElement.appendChild(headerElement)
   })
@@ -26,12 +24,17 @@ export function createTable (document, parent, columns, rows, id) {
     }
     highlight = !highlight
     tbodyElement.appendChild(rowElement)
-    row.forEach(function (value) {
-      const cellElement = document.createElement('td')
-      cellElement.classList.add('cell')
-      cellElement.innerText = value
+    row.forEach(function (value, i) {
+      let cellElement
+      if (cellRenderer) {
+        cellElement = cellRenderer(columns[i], value)
+      } else {
+        cellElement = document.createElement('td')
+        cellElement.innerText = value
+      }
       rowElement.appendChild(cellElement)
     })
     rowElement.appendChild(document.createElement('td'))
   })
+  return tableElement
 }

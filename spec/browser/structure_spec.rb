@@ -41,7 +41,7 @@ describe 'structure' do
     expected_headers = %w[name data_type length allow_null key default extra]
     header_elements = wait.until do
       elements = driver.find_elements(
-        css: '#structure-box > * > #table-info > #columns > table > thead > tr > th.cell'
+        css: '#structure-box > * > #table-info > #columns > table > thead > tr > th:not(:last-child)'
       )
       elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
     end
@@ -68,7 +68,7 @@ describe 'structure' do
     expected_headers = %w[name seq_in_index non_unique column_name]
     header_elements = wait.until do
       elements = driver.find_elements(
-        css: '#structure-box > * > #table-info > #indexes > table > thead > tr > th.cell'
+        css: '#structure-box > * > #table-info > #indexes > table > thead > tr > th:not(:last-child)'
       )
       elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
     end

@@ -16,6 +16,13 @@ def wait_until_displayed(wait, *args)
   end
 end
 
+def wait_until_all_displayed(wait, *args)
+  wait.until do
+    elements = driver.find_elements(*args)
+    elements if elements&.all?(&:displayed?)
+  end
+end
+
 def wait_until_editor(wait)
   wait_until_displayed(wait, class: 'cm-content')
 end
@@ -29,14 +36,14 @@ def wait_until_results(wait, *results)
   expected_rows = results[1..]
   wait_until_result_status(wait, "#{expected_rows.size} row#{expected_rows.size == 1 ? '' : 's'}")
   header_elements = wait.until do
-    elements = driver.find_elements(css: '#result-box > table > thead > tr > th.cell')
+    elements = driver.find_elements(css: '#result-box > table > thead > tr > th:not(:last-child)')
     elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
   end
   headers = header_elements.map(&:text)
   expect(headers).to eq(expected_headers)
   row_elements = wait.until { driver.find_elements(css: '#result-box > table > tbody > tr') }
   rows = row_elements.map do |row_element|
-    row_element.find_elements(css: 'td.cell').map(&:text)
+    row_element.find_elements(css: 'td:not(:last-child)').map(&:text)
   end
   expect(rows).to eq(expected_rows)
 end

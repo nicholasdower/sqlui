@@ -8,7 +8,7 @@ require_relative 'args'
 
 # Config for a single database.
 class DatabaseConfig
-  attr_reader :display_name, :description, :url_path, :joins, :saved_path, :tables, :client_params
+  attr_reader :display_name, :description, :url_path, :joins, :saved_path, :tables, :columns, :client_params
 
   def initialize(hash)
     @display_name = Args.fetch_non_empty_string(hash, :display_name).strip
@@ -28,7 +28,7 @@ class DatabaseConfig
       raise ArgumentError, "invalid join #{join.to_json}"
     end
     @tables = Args.fetch_optional_hash(hash, :tables) || {}
-    @tables = @tables.each do |table, table_config|
+    @tables.each do |table, table_config|
       unless table_config.is_a?(Hash)
         raise ArgumentError, "invalid table config for #{table} (#{table_config}), expected hash"
       end
@@ -41,6 +41,32 @@ class DatabaseConfig
       table_boost = table_config[:boost]
       if table_boost && !table_boost.is_a?(Integer)
         raise ArgumentError, "invalid table boost for #{table} (#{table_boost}), expected int"
+      end
+    end
+    @columns = Args.fetch_optional_hash(hash, :columns) || {}
+    @columns.each do |column, column_config|
+      unless column_config.is_a?(Hash)
+        raise ArgumentError, "invalid column config for #{column} (#{column_config}), expected hash"
+      end
+
+      links = column_config[:links]
+      raise ArgumentError, "invalid links for #{column} (#{links}), expected array" if links && !links.is_a?(Array)
+
+      links.each do |link_config|
+        unless link_config.is_a?(Hash)
+          raise ArgumentError, "invalid link config for #{column} (#{link_config}), expected hash"
+        end
+
+        unless link_config[:short_name].is_a?(String)
+          raise ArgumentError,
+                "invalid link short_name for #{column} link (#{link_config[:short_name]}), expected string"
+        end
+        unless link_config[:long_name].is_a?(String)
+          raise ArgumentError, "invalid link long_name for #{column} link (#{link_config[:long_name]}), expected string"
+        end
+        unless link_config[:template].is_a?(String)
+          raise ArgumentError, "invalid template for #{column} link (#{link_config[:template]}), expected string"
+        end
       end
     end
     aliases = @tables.map { |_table, table_config| table_config[:alias] }.compact

@@ -320,7 +320,7 @@ function selectStructureTab () {
         }
         rows.push(row)
       }
-      createTable(document, columnsElement, columns, rows)
+      columnsElement.appendChild(createTable(columns, rows, null))
     }
 
     const indexEntries = Object.entries(table.indexes)
@@ -340,7 +340,7 @@ function selectStructureTab () {
           rows.push(row)
         }
       }
-      createTable(document, indexesElement, columns, rows)
+      indexesElement.appendChild(createTable(columns, rows, null))
     }
   })
   window.structureLoaded = true
@@ -737,7 +737,32 @@ function displaySqlFetchInResultTab (fetch) {
   clearResultBox()
   displaySqlFetchResultStatus('result-status', fetch)
 
-  createTable(document, document.getElementById('result-box'), fetch.result.columns, fetch.result.rows, 'result-table')
+  const createLink = function (link, value) {
+    const linkElement = document.createElement('a')
+    linkElement.href = link.template.replaceAll('{*}', encodeURIComponent(value))
+    linkElement.innerText = link.short_name
+    linkElement.target = '_blank'
+
+    const abbrElement = document.createElement('abbr')
+    abbrElement.title = link.long_name
+    abbrElement.appendChild(linkElement)
+
+    return abbrElement
+  }
+  const cellRenderer = function (column, value) {
+    const cellElement = document.createElement('td')
+    if (window.metadata.columns[column]?.links?.length > 0) {
+      cellElement.appendChild(document.createTextNode(value))
+      window.metadata.columns[column].links.forEach((link) => {
+        cellElement.appendChild(createLink(link, value))
+      })
+    } else {
+      cellElement.innerText = value
+    }
+    return cellElement
+  }
+  document.getElementById('result-box')
+    .appendChild(createTable(fetch.result.columns, fetch.result.rows, 'result-table', cellRenderer))
 }
 
 function disableDownloadButtons () {

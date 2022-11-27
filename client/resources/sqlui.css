@@ -246,6 +246,29 @@ p {
     flex-direction: column;
 }
 
+#result-table tbody tr td abbr a {
+    color: #555;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 0;
+    padding: 0 3px;
+    border: 1px dotted #555;
+    font-size: 12px;
+    display: inline-block;
+}
+
+#result-table tbody tr td abbr {
+    margin: 0 0 0 5px;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    top: -2px;
+}
+
+#result-table tbody tr td abbr:first-child {
+    margin: 0 0 0 10px;
+}
+
 .fetch-sql-box {
     justify-content: center;
     align-items: center;
@@ -271,7 +294,7 @@ table td:last-child, table th:last-child {
 }
 
 td, th {
-    padding: 5px 20px 5px 5px;
+    padding: 5px 10px;
     font-weight: normal;
     white-space: nowrap;
     max-width: 500px;

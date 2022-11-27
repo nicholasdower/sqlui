@@ -33,6 +33,15 @@ databases:
     description:  Another database about nothing.
     url_path:     /sqlui/friends
     saved_path:   sql/friends
+    columns:
+      name:
+        links:
+          - short_name: G
+            long_name:  Google
+            template:   https://www.google.com/search?q={*}
+          - short_name: W
+            long_name:  Wiki
+            template:   https://friends.fandom.com/wiki/Special:Search?query={*}
     tables:
       characters:
         alias: c

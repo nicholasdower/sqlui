@@ -248,4 +248,27 @@ describe 'query' do
       wait_until_results(wait, ['@foo'], ['99'])
     end
   end
+
+  context 'when result includes column with links configured' do
+    before do
+      driver.get(url('/sqlui/friends/query?sql=select+id%2C+name+from+characters+limit+1%3B'))
+      wait_until_displayed(wait, id: 'submit-button-current').click
+    end
+
+    it 'loads expected results' do
+      wait_until_results(wait, %w[id name], %w[1 MonicaGW])
+      abbreviations = wait_until_all_displayed(wait, css: '#result-table tbody tr td abbr')
+      expect(abbreviations.size).to eq(2)
+
+      expect(abbreviations[0].attribute('title')).to eq('Google')
+      link = abbreviations[0].find_element(css: 'a')
+      expect(link.text).to eq('G')
+      expect(link.attribute('href')).to eq('https://www.google.com/search?q=Monica')
+
+      expect(abbreviations[1].attribute('title')).to eq('Wiki')
+      link = abbreviations[1].find_element(css: 'a')
+      expect(link.text).to eq('W')
+      expect(link.attribute('href')).to eq('https://friends.fandom.com/wiki/Special:Search?query=Monica')
+    end
+  end
 end
