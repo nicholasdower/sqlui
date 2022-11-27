@@ -16,10 +16,11 @@ class DatabaseConfig
     @url_path = Args.fetch_non_empty_string(hash, :url_path).strip
     raise ArgumentError, 'url_path should start with a /' unless @url_path.start_with?('/')
     raise ArgumentError, 'url_path should not end with a /' if @url_path.length > 1 && @url_path.end_with?('/')
-
     @saved_path = Args.fetch_non_empty_string(hash, :saved_path).strip
-    @joins = Args.fetch_optional_array(hash, :joins) || []
-    @joins.map do |join|
+
+    # Make joins an array. It is only a map to allow for YAML extension.
+    @joins = (Args.fetch_optional_hash(hash, :joins) || {}).values
+    @joins.each do |join|
       next if join.is_a?(Hash) &&
               join.keys.size == 2 &&
               join[:label].is_a?(String) && !join[:label].strip.empty? &&
@@ -27,6 +28,7 @@ class DatabaseConfig
 
       raise ArgumentError, "invalid join #{join.to_json}"
     end
+
     @tables = Args.fetch_optional_hash(hash, :tables) || {}
     @tables.each do |table, table_config|
       unless table_config.is_a?(Hash)
@@ -43,15 +45,14 @@ class DatabaseConfig
         raise ArgumentError, "invalid table boost for #{table} (#{table_boost}), expected int"
       end
     end
+
     @columns = Args.fetch_optional_hash(hash, :columns) || {}
     @columns.each do |column, column_config|
       unless column_config.is_a?(Hash)
         raise ArgumentError, "invalid column config for #{column} (#{column_config}), expected hash"
       end
 
-      links = column_config[:links]
-      raise ArgumentError, "invalid links for #{column} (#{links}), expected array" if links && !links.is_a?(Hash)
-
+      links = Args.fetch_optional_hash(column_config, :links) || {}
       links.each_value do |link_config|
         unless link_config.is_a?(Hash)
           raise ArgumentError, "invalid link config for #{column} (#{link_config}), expected hash"
@@ -68,7 +69,8 @@ class DatabaseConfig
           raise ArgumentError, "invalid link template for #{column} link (#{link_config[:template]}), expected string"
         end
       end
-      column_config[:links] = links.values # Make it an array. It is only a map to allow for YAML extension.
+      # Make links an array. It is only a map to allow for YAML extension
+      column_config[:links] = links.values
     end
     aliases = @tables.map { |_table, table_config| table_config[:alias] }.compact
     if aliases.to_set.size < aliases.size

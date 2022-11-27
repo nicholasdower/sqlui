@@ -51,9 +51,11 @@ databases:
       actors:
         alias: a
     joins:
-      - label: 'actors to characters'
+      actors_to_charactors:
+        label: 'actors to characters'
         apply: 'actors a ON a.id = c.actor_id'
-      - label: 'characters to actors'
+      charactors_to_actors:
+        label: 'characters to actors'
         apply: 'characters c ON c.actor_id = a.id'
     client_params:
       database: friends

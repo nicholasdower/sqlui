@@ -147,6 +147,60 @@ describe DatabaseConfig do
       end
     end
 
+    context 'joins' do
+      before do
+        config_hash[:joins] = joins
+      end
+
+      context 'when nil' do
+        let(:joins) { nil }
+
+        it 'returns an empty array' do
+          expect(subject.joins).to eq([])
+        end
+      end
+
+      context 'when not a hash' do
+        let(:joins) { 'foo' }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'parameter joins not a hash')
+        end
+      end
+
+      context 'when empty' do
+        let(:joins) { { } }
+
+        it 'returns the expected joins' do
+          expect(subject.joins).to eq([])
+        end
+      end
+
+      context 'when label is not a string' do
+        let(:joins) { { join: { label: 1, apply: 'a' }} }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid join {"label":1,"apply":"a"}')
+        end
+      end
+
+      context 'when apply is not a string' do
+        let(:joins) { { join: { label: 'l', apply: 1 }} }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid join {"label":"l","apply":1}')
+        end
+      end
+
+      context 'valid' do
+        let(:joins) { { join: { label: 'l', apply: 'a' }} }
+
+        it 'returns the expected joins' do
+          expect(subject.joins).to eq([{ label: 'l', apply: 'a' }])
+        end
+      end
+    end
+
     context 'columns' do
       before do
         config_hash[:columns] = columns
@@ -172,7 +226,15 @@ describe DatabaseConfig do
         let(:columns) { { name: { links: 'n' } } }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'invalid links for name (n), expected array')
+          expect { subject }.to raise_error(ArgumentError, 'parameter links not a hash')
+        end
+      end
+
+      context 'when links is empty' do
+        let(:columns) { { name: { links: {} } } }
+
+        it 'returns the expected links' do
+          expect(subject.columns).to eq({ name: { links: [] } })
         end
       end
 
