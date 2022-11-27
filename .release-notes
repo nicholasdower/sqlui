@@ -1,1 +1,1 @@
-- No changes.
+- Use a map for column links to allow for YAML anchor overrides.

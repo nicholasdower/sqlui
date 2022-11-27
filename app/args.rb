@@ -4,7 +4,7 @@
 class Args
   def self.fetch_non_empty_string(hash, key)
     value = fetch_non_nil(hash, key, String)
-    raise ArgumentError, "required parameter #{key} empty" if value.strip.empty?
+    raise ArgumentError, "parameter #{key} empty" if value.strip.empty?
 
     value
   end
@@ -15,7 +15,7 @@ class Args
 
   def self.fetch_non_empty_hash(hash, key)
     value = fetch_non_nil(hash, key, Hash)
-    raise ArgumentError, "required parameter #{key} empty" if value.empty?
+    raise ArgumentError, "parameter #{key} empty" if value.empty?
 
     value
   end
@@ -29,9 +29,9 @@ class Args
   end
 
   def self.fetch_non_nil(hash, key, *classes)
-    raise ArgumentError, "required parameter #{key} missing" unless hash.key?(key)
+    raise ArgumentError, "parameter #{key} missing" unless hash.key?(key)
 
-    raise ArgumentError, "required parameter #{key} null" if hash[key].nil?
+    raise ArgumentError, "parameter #{key} null" if hash[key].nil?
 
     fetch_optional(hash, key, *classes)
   end
@@ -40,12 +40,12 @@ class Args
     value = hash[key]
     if value && classes.size.positive? && !classes.find { |clazz| value.is_a?(clazz) }
       if classes.size != 1
-        raise ArgumentError, "required parameter #{key} not #{classes.map(&:to_s).map(&:downcase).join(' or ')}"
+        raise ArgumentError, "parameter #{key} not #{classes.map(&:to_s).map(&:downcase).join(' or ')}"
       end
 
       class_name = classes[0].to_s.downcase
       class_name = %w[a e i o u].include?(class_name[0]) ? "an #{class_name}" : "a #{class_name}"
-      raise ArgumentError, "required parameter #{key} not #{class_name}"
+      raise ArgumentError, "parameter #{key} not #{class_name}"
     end
 
     value

@@ -64,13 +64,13 @@ describe DatabaseConfig do
       end
     end
 
-    shared_examples_for 'a required string field' do |field, example_value|
+    shared_examples_for 'a string field' do |field, example_value|
       context field do
         context "when #{field} is null" do
           before { config_hash[field] = nil }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{field} null")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{field} null")
           end
         end
 
@@ -78,7 +78,7 @@ describe DatabaseConfig do
           before { config_hash.delete(field) }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{field} missing")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{field} missing")
           end
         end
 
@@ -86,7 +86,7 @@ describe DatabaseConfig do
           before { config_hash[field] = 3 }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{field} not a string")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{field} not a string")
           end
         end
 
@@ -94,7 +94,7 @@ describe DatabaseConfig do
           before { config_hash[field] = ' ' }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{field} empty")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{field} empty")
           end
         end
 
@@ -108,17 +108,17 @@ describe DatabaseConfig do
       end
     end
 
-    include_examples 'a required string field', :display_name, 'some display name'
-    include_examples 'a required string field', :description, 'some description'
-    include_examples 'a required string field', :url_path, '/some/url/path'
-    include_examples 'a required string field', :saved_path, 'some/saved/path'
+    include_examples 'a string field', :display_name, 'some display name'
+    include_examples 'a string field', :description, 'some description'
+    include_examples 'a string field', :url_path, '/some/url/path'
+    include_examples 'a string field', :saved_path, 'some/saved/path'
 
     context 'client_params' do
       context 'when client_params is null' do
         before { config_hash[:client_params] = nil }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params null')
+          expect { subject }.to raise_error(ArgumentError, 'parameter client_params null')
         end
       end
 
@@ -126,7 +126,7 @@ describe DatabaseConfig do
         before { config_hash.delete(:client_params) }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params missing')
+          expect { subject }.to raise_error(ArgumentError, 'parameter client_params missing')
         end
       end
 
@@ -134,7 +134,7 @@ describe DatabaseConfig do
         before { config_hash[:client_params] = 'foo' }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params not a hash')
+          expect { subject }.to raise_error(ArgumentError, 'parameter client_params not a hash')
         end
       end
 
@@ -142,7 +142,62 @@ describe DatabaseConfig do
         before { config_hash[:client_params] = {} }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter client_params empty')
+          expect { subject }.to raise_error(ArgumentError, 'parameter client_params empty')
+        end
+      end
+    end
+
+    context 'columns' do
+      before do
+        config_hash[:columns] = columns
+      end
+
+      context 'when nil' do
+        let(:columns) { nil }
+
+        it 'returns an empty hash' do
+          expect(subject.columns).to eq({})
+        end
+      end
+
+      context 'when not a hash' do
+        let(:columns) { 'foo' }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'parameter columns not a hash')
+        end
+      end
+
+      context 'when links is not a hash' do
+        let(:columns) { { name: { links: 'n' } } }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid links for name (n), expected array')
+        end
+      end
+
+      context 'when link short_name is not a string' do
+        let(:columns) { { name: { links: { link1: { short_name: 1, long_name: 'l', template: 't' } } } } }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid link short_name for name link (1), expected string')
+        end
+      end
+
+      context 'when link long_name is not a string' do
+        let(:columns) { { name: { links: { link1: { short_name: 's', long_name: 1, template: 't' } } } } }
+
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'invalid link long_name for name link (1), expected string')
+        end
+      end
+
+      context 'when valid' do
+        let(:columns) { { name: { links: { link1: { short_name: 's', long_name: 'l', template: 't' } } } } }
+
+        it 'returns the expected links' do
+          expect(subject.columns).to eq({ name: { links: [{ long_name: 'l', short_name: 's',
+                                                            template: 't' }] } })
         end
       end
     end
@@ -164,7 +219,7 @@ describe DatabaseConfig do
         let(:tables) { 'foo' }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter tables not a hash')
+          expect { subject }.to raise_error(ArgumentError, 'parameter tables not a hash')
         end
       end
 

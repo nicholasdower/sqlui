@@ -50,9 +50,9 @@ class DatabaseConfig
       end
 
       links = column_config[:links]
-      raise ArgumentError, "invalid links for #{column} (#{links}), expected array" if links && !links.is_a?(Array)
+      raise ArgumentError, "invalid links for #{column} (#{links}), expected array" if links && !links.is_a?(Hash)
 
-      links.each do |link_config|
+      links.each_value do |link_config|
         unless link_config.is_a?(Hash)
           raise ArgumentError, "invalid link config for #{column} (#{link_config}), expected hash"
         end
@@ -65,9 +65,10 @@ class DatabaseConfig
           raise ArgumentError, "invalid link long_name for #{column} link (#{link_config[:long_name]}), expected string"
         end
         unless link_config[:template].is_a?(String)
-          raise ArgumentError, "invalid template for #{column} link (#{link_config[:template]}), expected string"
+          raise ArgumentError, "invalid link template for #{column} link (#{link_config[:template]}), expected string"
         end
       end
+      column_config[:links] = links.values # Make it an array. It is only a map to allow for YAML extension.
     end
     aliases = @tables.map { |_table, table_config| table_config[:alias] }.compact
     if aliases.to_set.size < aliases.size

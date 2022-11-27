@@ -92,7 +92,7 @@ describe SqluiConfig do
         before { config_hash.deep_set(:port, value: nil) }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter port null')
+          expect { subject }.to raise_error(ArgumentError, 'parameter port null')
         end
       end
 
@@ -100,7 +100,7 @@ describe SqluiConfig do
         before { config_hash.deep_delete(:port) }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter port missing')
+          expect { subject }.to raise_error(ArgumentError, 'parameter port missing')
         end
       end
 
@@ -108,7 +108,7 @@ describe SqluiConfig do
         before { config_hash.deep_set(:port, value: 'foo') }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'required parameter port not an integer')
+          expect { subject }.to raise_error(ArgumentError, 'parameter port not an integer')
         end
       end
     end
@@ -139,7 +139,7 @@ describe SqluiConfig do
       end
     end
 
-    shared_examples_for 'a required string field' do |path, example_value, accessor|
+    shared_examples_for 'a string field' do |path, example_value, accessor|
       context path.join(' -> ') do
         context "when #{path.join(' -> ')} is valid" do
           before { config_hash.deep_set(*path, value: example_value) }
@@ -153,7 +153,7 @@ describe SqluiConfig do
           before { config_hash.deep_set(*path, value: nil) }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{path[-1]} null")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{path[-1]} null")
           end
         end
 
@@ -161,7 +161,7 @@ describe SqluiConfig do
           before { config_hash.deep_delete(*path) }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{path[-1]} missing")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{path[-1]} missing")
           end
         end
 
@@ -169,7 +169,7 @@ describe SqluiConfig do
           before { config_hash.deep_set(*path, value: 3) }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{path[-1]} not a string")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{path[-1]} not a string")
           end
         end
 
@@ -177,7 +177,7 @@ describe SqluiConfig do
           before { config_hash.deep_set(*path, value: ' ') }
 
           it 'raises' do
-            expect { subject }.to raise_error(ArgumentError, "required parameter #{path[-1]} empty")
+            expect { subject }.to raise_error(ArgumentError, "parameter #{path[-1]} empty")
           end
         end
 
@@ -191,25 +191,25 @@ describe SqluiConfig do
       end
     end
 
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      [:name],
                      'some name', ->(s) { s.name }
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      [:environment],
                      'development', ->(s) { s.environment }
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      [:list_url_path],
                      '/sqlui', ->(s) { s.list_url_path }
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      %i[databases database_one display_name],
                      'some display name', ->(s) { s.database_configs[0].display_name }
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      %i[databases database_one description],
                      'some description', ->(s) { s.database_configs[0].description }
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      %i[databases database_one url_path],
                      '/sqlui/foo', ->(s) { s.database_configs[0].url_path }
-    include_examples 'a required string field',
+    include_examples 'a string field',
                      %i[databases database_one saved_path],
                      'some/path', ->(s) { s.database_configs[0].saved_path }
 
@@ -225,7 +225,7 @@ describe SqluiConfig do
       before { config_hash[:databases] = nil }
 
       it 'raises' do
-        expect { subject }.to raise_error(ArgumentError, 'required parameter databases null')
+        expect { subject }.to raise_error(ArgumentError, 'parameter databases null')
       end
     end
 
@@ -233,7 +233,7 @@ describe SqluiConfig do
       before { config_hash[:databases] = 'foo' }
 
       it 'raises' do
-        expect { subject }.to raise_error(ArgumentError, 'required parameter databases not a hash')
+        expect { subject }.to raise_error(ArgumentError, 'parameter databases not a hash')
       end
     end
 
@@ -241,7 +241,7 @@ describe SqluiConfig do
       before { config_hash.delete(:databases) }
 
       it 'raises' do
-        expect { subject }.to raise_error(ArgumentError, 'required parameter databases missing')
+        expect { subject }.to raise_error(ArgumentError, 'parameter databases missing')
       end
     end
   end
