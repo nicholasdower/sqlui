@@ -169,7 +169,7 @@ describe DatabaseConfig do
       end
 
       context 'when empty' do
-        let(:joins) { { } }
+        let(:joins) { {} }
 
         it 'returns the expected joins' do
           expect(subject.joins).to eq([])
@@ -177,7 +177,7 @@ describe DatabaseConfig do
       end
 
       context 'when label is not a string' do
-        let(:joins) { { join: { label: 1, apply: 'a' }} }
+        let(:joins) { { join: { label: 1, apply: 'a' } } }
 
         it 'raises' do
           expect { subject }.to raise_error(ArgumentError, 'invalid join {"label":1,"apply":"a"}')
@@ -185,7 +185,7 @@ describe DatabaseConfig do
       end
 
       context 'when apply is not a string' do
-        let(:joins) { { join: { label: 'l', apply: 1 }} }
+        let(:joins) { { join: { label: 'l', apply: 1 } } }
 
         it 'raises' do
           expect { subject }.to raise_error(ArgumentError, 'invalid join {"label":"l","apply":1}')
@@ -193,7 +193,7 @@ describe DatabaseConfig do
       end
 
       context 'valid' do
-        let(:joins) { { join: { label: 'l', apply: 'a' }} }
+        let(:joins) { { join: { label: 'l', apply: 'a' } } }
 
         it 'returns the expected joins' do
           expect(subject.joins).to eq([{ label: 'l', apply: 'a' }])

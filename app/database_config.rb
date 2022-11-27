@@ -16,6 +16,7 @@ class DatabaseConfig
     @url_path = Args.fetch_non_empty_string(hash, :url_path).strip
     raise ArgumentError, 'url_path should start with a /' unless @url_path.start_with?('/')
     raise ArgumentError, 'url_path should not end with a /' if @url_path.length > 1 && @url_path.end_with?('/')
+
     @saved_path = Args.fetch_non_empty_string(hash, :saved_path).strip
 
     # Make joins an array. It is only a map to allow for YAML extension.
