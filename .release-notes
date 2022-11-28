@@ -1,1 +1,1 @@
-- Use a map for column links to allow for YAML anchor overrides.
+- Use a map for column links and joins to allow for YAML anchor overrides.

@@ -258,15 +258,13 @@ p {
 }
 
 #result-table tbody tr td abbr {
-    margin: 0 0 0 5px;
+    margin: 0 5px 0 0;
     text-decoration: none;
-    display: inline-block;
     position: relative;
-    top: -2px;
 }
 
-#result-table tbody tr td abbr:first-child {
-    margin: 0 0 0 10px;
+#result-table tbody tr td abbr:last-child {
+    margin: 0;
 }
 
 .fetch-sql-box {

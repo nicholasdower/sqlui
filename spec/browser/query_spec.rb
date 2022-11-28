@@ -256,7 +256,7 @@ describe 'query' do
     end
 
     it 'loads expected results' do
-      wait_until_results(wait, %w[id name], %w[1 MonicaGW])
+      wait_until_results(wait, %w[id name], %w[1 GW Monica])
       abbreviations = wait_until_all_displayed(wait, css: '#result-table tbody tr td abbr')
       expect(abbreviations.size).to eq(2)
 

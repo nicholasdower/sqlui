@@ -1,4 +1,4 @@
-export function createTable (columns, rows, id, cellRenderer) {
+export function createTable (columns, rows, id, headerRenderer, cellRenderer) {
   const tableElement = document.createElement('table')
   if (id) tableElement.id = id
   const theadElement = document.createElement('thead')
@@ -9,9 +9,13 @@ export function createTable (columns, rows, id, cellRenderer) {
   tableElement.appendChild(tbodyElement)
 
   columns.forEach(function (columnName) {
-    const headerElement = document.createElement('th')
-    headerElement.innerText = columnName
-    headerTrElement.appendChild(headerElement)
+    if (headerRenderer) {
+      headerRenderer(headerTrElement, columnName)
+    } else {
+      const headerElement = document.createElement('th')
+      headerElement.innerText = columnName
+      headerTrElement.appendChild(headerElement)
+    }
   })
   if (columns.length > 0) {
     headerTrElement.appendChild(document.createElement('th'))
@@ -25,14 +29,13 @@ export function createTable (columns, rows, id, cellRenderer) {
     highlight = !highlight
     tbodyElement.appendChild(rowElement)
     row.forEach(function (value, i) {
-      let cellElement
       if (cellRenderer) {
-        cellElement = cellRenderer(columns[i], value)
+        cellRenderer(rowElement, columns[i], value)
       } else {
-        cellElement = document.createElement('td')
+        const cellElement = document.createElement('td')
         cellElement.innerText = value
+        rowElement.appendChild(cellElement)
       }
-      rowElement.appendChild(cellElement)
     })
     rowElement.appendChild(document.createElement('td'))
   })
