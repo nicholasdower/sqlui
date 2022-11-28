@@ -13,6 +13,9 @@ class SqluiConfig
   def initialize(filename, overrides = {})
     config = YAML.safe_load(ERB.new(File.read(filename)).result, aliases: true).deep_merge!(overrides)
     config.deep_symbolize_keys!
+    # Dup since if anchors are used some keys might refer to the same object. If we end up modifying an object,
+    # we don't want it to be modified in multiple places.
+    config = config.deep_dup
     @name = Args.fetch_non_empty_string(config, :name).strip
     @port = Args.fetch_non_empty_int(config, :port)
     @environment = Args.fetch_non_empty_string(config, :environment).strip
