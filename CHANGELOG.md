@@ -1,3 +1,7 @@
+## 0.1.51
+
+- Add favicon to DB list.
+
 ## 0.1.50
 
 - No changes.
