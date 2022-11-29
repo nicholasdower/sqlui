@@ -67,3 +67,4 @@ make query endpoint a get and use same encoding as download
 render streamed results as they are returned
 the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
 get rid of max rows on the server in favor of max bytes. Have the client paginate the results to avoid a huge dom
+detect when last element was the join keyword and autocomplete joins. Right now it only works when typing join. Not when typing join foo.

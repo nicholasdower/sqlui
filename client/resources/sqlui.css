@@ -245,6 +245,9 @@ p {
     display: flex;
     flex-direction: column;
 }
+#result-table tbody tr td{
+  height: calc(21px + 10px); // 21 for text, 10 for top and bottom padding of 5
+}
 
 #result-table tbody tr td abbr a {
     color: #555;

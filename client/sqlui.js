@@ -762,9 +762,11 @@ function displaySqlFetchInResultTab (fetch) {
   const cellRenderer = function (rowElement, column, value) {
     if (window.metadata.columns[column]?.links?.length > 0) {
       const linksColumnElement = document.createElement('td')
-      window.metadata.columns[column].links.forEach((link) => {
-        linksColumnElement.appendChild(createLink(link, value))
-      })
+      if (value) {
+        window.metadata.columns[column].links.forEach((link) => {
+          linksColumnElement.appendChild(createLink(link, value))
+        })
+      }
       rowElement.appendChild(linksColumnElement)
       const textColumnElement = document.createElement('td')
       textColumnElement.innerText = value
