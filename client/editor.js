@@ -35,7 +35,7 @@ import {
   rectangularSelection
 } from '@codemirror/view'
 
-function toString (context, node) {
+function toString (context, node) { // eslint-disable-line no-unused-vars
   const nodeText = node ? context.state.doc.sliceString(node.from, node.to).toLowerCase() : null
   return `${node?.name}(${nodeText})`
 }

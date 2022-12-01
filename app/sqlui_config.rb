@@ -8,7 +8,7 @@ require_relative 'deep'
 
 # App config including database configs.
 class SqluiConfig
-  attr_reader :name, :port, :environment, :list_url_path, :database_configs
+  attr_reader :name, :port, :environment, :list_url_path, :database_configs, :airbrake
 
   def initialize(filename, overrides = {})
     config = YAML.safe_load(ERB.new(File.read(filename)).result, aliases: true).deep_merge!(overrides)
@@ -29,6 +29,7 @@ class SqluiConfig
     @database_configs = databases.map do |_, current|
       DatabaseConfig.new(current)
     end
+    @airbrake = Args.fetch_optional_hash(config, :airbrake) || { enabled: false }
   end
 
   def database_config_for(url_path:)

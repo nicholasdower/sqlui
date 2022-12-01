@@ -3,7 +3,22 @@
     <meta charset="utf-8">
     <title>SQLUI</title>
     <link rel="icon" type="image/x-icon" href="/favicon.svg">
-    <script src="sqlui.js"></script>
+    <!-- Initialize Airbrake before loading the main app JS so that we can catch errors as early as possible. -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@airbrake/browser"></script>
+    <script type="text/javascript">
+      <% if airbrake_enabled %>
+        window.airbrake = new Airbrake.Notifier({
+          environment: "<%= environment %>",
+          projectId: "<%= airbrake_project_id %>",
+          projectKey: "<%= airbrake_project_key %>"
+        })
+      <% end %>
+
+      window.notifyAirbrake = function (error) {
+        window.airbrake?.notify(error)
+      }
+    </script>
+    <script type="text/javascript" src="sqlui.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <link rel="stylesheet" href="sqlui.css">
   </head>

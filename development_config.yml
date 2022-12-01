@@ -2,6 +2,10 @@ name: Development
 port: 8080
 environment: development
 list_url_path: /sqlui
+airbrake:
+  enabled:     <%= !!ENV.fetch('AIRBRAKE_PROJECT_KEY', nil) %>
+  project_id:  467499
+  project_key: <%= ENV.fetch('AIRBRAKE_PROJECT_KEY', nil) %>
 databases:
   shows:
     display_name: Shows

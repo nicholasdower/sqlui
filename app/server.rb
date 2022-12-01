@@ -8,6 +8,7 @@ require 'prometheus/middleware/collector'
 require 'prometheus/middleware/exporter'
 require 'sinatra/base'
 require 'uri'
+require 'webrick'
 require_relative 'database_metadata'
 require_relative 'mysql_types'
 require_relative 'sql_parser'
@@ -20,6 +21,29 @@ class Server < Sinatra::Base
   end
 
   def self.init_and_run(config, resources_dir)
+    logger.info("Airbrake enabled: #{config.airbrake[:enabled]}")
+    if config.airbrake[:enabled]
+      require 'airbrake'
+      require 'airbrake/rack'
+
+      Airbrake.configure do |c|
+        c.app_version = File.read('.version').strip
+        c.environment = config.environment
+        c.logger.level = Logger::DEBUG if config.environment != :production?
+        config.airbrake.each do |key, value|
+          c.send("#{key}=".to_sym, value) unless key == :enabled
+        end
+      end
+      Airbrake.add_filter(Airbrake::Rack::RequestBodyFilter.new)
+      Airbrake.add_filter(Airbrake::Rack::HttpParamsFilter.new)
+      Airbrake.add_filter(Airbrake::Rack::HttpHeadersFilter.new)
+      use Airbrake::Rack::Middleware
+    end
+
+    use Rack::Deflater
+    use Prometheus::Middleware::Collector
+    use Prometheus::Middleware::Exporter
+
     Mysql2::Client.default_query_options[:as] = :array
     Mysql2::Client.default_query_options[:cast_booleans] = true
     Mysql2::Client.default_query_options[:database_timezone] = :utc
@@ -55,17 +79,13 @@ class Server < Sinatra::Base
       end
 
       get "#{database.url_path}/sqlui.css" do
-        @css ||= File.read(File.join(resources_dir, 'sqlui.css'))
-        status 200
         headers 'Content-Type' => 'text/css; charset=utf-8'
-        body @css
+        send_file File.join(resources_dir, 'sqlui.css')
       end
 
       get "#{database.url_path}/sqlui.js" do
-        @js ||= File.read(File.join(resources_dir, 'sqlui.js'))
-        status 200
         headers 'Content-Type' => 'text/javascript; charset=utf-8'
-        body @js
+        send_file File.join(resources_dir, 'sqlui.js')
       end
 
       post "#{database.url_path}/metadata" do
@@ -101,7 +121,9 @@ class Server < Sinatra::Base
       end
 
       post "#{database.url_path}/query" do
-        params.merge!(JSON.parse(request.body.read, symbolize_names: true))
+        data = request.body.read
+        request.body.rewind # since Airbrake will read the body on error
+        params.merge!(JSON.parse(data, symbolize_names: true))
         break client_error('missing sql') unless params[:sql]
 
         variables = params[:variables] || {}
@@ -176,10 +198,13 @@ class Server < Sinatra::Base
       end
 
       get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
-        @html ||= File.read(File.join(resources_dir, 'sqlui.html'))
         status 200
-        headers 'Content-Type' => 'text/html; charset=utf-8'
-        body @html
+        erb :sqlui, locals: {
+          environment: config.environment.to_s,
+          airbrake_enabled: config.airbrake[:enabled],
+          airbrake_project_id: config.airbrake[:project_id],
+          airbrake_project_key: config.airbrake[:project_key]
+        }
       end
     end
 
@@ -196,10 +221,6 @@ class Server < Sinatra::Base
         erb :error, locals: { title: "SQLUI #{message}", message: message, stacktrace: stacktrace }
       end
     end
-
-    use Rack::Deflater
-    use Prometheus::Middleware::Collector
-    use Prometheus::Middleware::Exporter
 
     run!
   end
