@@ -12,7 +12,6 @@ use weak references to keep track of all clients. close connections on server sh
 display error on structure tab if no schemas are returned
 show a helpful message when no saved files are found or when the directory doesn't exist
 switch to typescript
-add prometheus metrics
 add error reporting
 cache saved files
 add padding inside select list, longest name overlaps scrollbar

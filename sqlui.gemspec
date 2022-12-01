@@ -21,9 +21,10 @@ Gem::Specification.new do |spec|
     Dir['client/resources/**/*'] +
     ['.version']
 
-  spec.add_dependency 'mysql2',  '~> 0.0'
-  spec.add_dependency 'sinatra', '~> 3.0'
-  spec.add_dependency 'webrick', '~> 1.0'
+  spec.add_dependency 'mysql2',            '~> 0.0'
+  spec.add_dependency 'prometheus-client', '~> 4.0'
+  spec.add_dependency 'sinatra',           '~> 3.0'
+  spec.add_dependency 'webrick',           '~> 1.0'
 
   spec.add_development_dependency 'rspec-core',         '~> 3.0'
   spec.add_development_dependency 'rspec-expectations', '~> 3.0'

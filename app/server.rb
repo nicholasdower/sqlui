@@ -4,6 +4,8 @@ require 'base64'
 require 'csv'
 require 'erb'
 require 'json'
+require 'prometheus/middleware/collector'
+require 'prometheus/middleware/exporter'
 require 'sinatra/base'
 require 'uri'
 require_relative 'database_metadata'
@@ -194,6 +196,10 @@ class Server < Sinatra::Base
         erb :error, locals: { title: "SQLUI #{message}", message: message, stacktrace: stacktrace }
       end
     end
+
+    use Rack::Deflater
+    use Prometheus::Middleware::Collector
+    use Prometheus::Middleware::Exporter
 
     run!
   end
