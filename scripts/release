@@ -29,10 +29,10 @@ if [ `git rev-parse origin/master` != `git rev-parse master` ]; then
   exit 1
 fi
 
-old_version=$(cat .version)
-major_version=$(cat .version | cut -d. -f1)
-minor_version=$(cat .version | cut -d. -f2)
-patch_version=$(cat .version | cut -d. -f3)
+old_version=$(cat .release-version)
+major_version=$(cat .release-version | cut -d. -f1)
+minor_version=$(cat .release-version | cut -d. -f2)
+patch_version=$(cat .release-version | cut -d. -f3)
 
 if [ "$RELEASE_TYPE" = "patch" ]; then
   patch_version=$((patch_version + 1))
@@ -60,8 +60,8 @@ echo "Notes:"
 cat .release-notes
 echo
 
-echo "Updating .version"
-echo $new_version > .version
+echo "Updating .release-version"
+echo $new_version > .release-version
 
 echo "Updating CHANGELOG.md"
 echo "## $new_version" >> CHANGELOG.md.new

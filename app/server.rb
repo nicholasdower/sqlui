@@ -13,6 +13,7 @@ require_relative 'database_metadata'
 require_relative 'mysql_types'
 require_relative 'sql_parser'
 require_relative 'sqlui'
+require_relative 'version'
 
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
@@ -21,13 +22,14 @@ class Server < Sinatra::Base
   end
 
   def self.init_and_run(config, resources_dir)
+    logger.info("Starting SQLUI v#{Version::SQLUI}")
     logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
     if config.airbrake[:server]&.[](:enabled)
       require 'airbrake'
       require 'airbrake/rack'
 
       Airbrake.configure do |c|
-        c.app_version = File.read('.version').strip
+        c.app_version = Version::SQLUI
         c.environment = config.environment
         c.logger.level = Logger::DEBUG if config.environment != :production?
         config.airbrake[:server].each do |key, value|

@@ -2,6 +2,7 @@
 
 require_relative 'sqlui_config'
 require_relative 'server'
+require_relative 'version'
 
 # Main entry point.
 class Sqlui
@@ -25,7 +26,7 @@ class Sqlui
 
   def self.from_command_line(args)
     if args.include?('-v') || args.include?('--version')
-      puts File.read('.version')
+      puts Version::SQLUI
       exit
     end
 

@@ -20,7 +20,7 @@ upgrade-local:
 	./scripts/nvm_exec npm update
 	bundle outdated
 
-.install-local: Gemfile Gemfile.lock .version sqlui.gemspec
+.install-local: Gemfile Gemfile.lock .release-version sqlui.gemspec
 	@make check-tools
 	./scripts/nvm_exec npm install
 	bundle config set --local path vendor/bundle-local
