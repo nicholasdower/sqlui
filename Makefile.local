@@ -50,7 +50,7 @@ mysql-local:
 
 .PHONY: build-and-start-server-local
 build-and-start-server-local: build-local
-	bundle exec ruby ./bin/sqlui development_config.yml
+	./scripts/run-in-env $(ENV) -- bundle exec ruby ./bin/sqlui development_config.yml
 
 .PHONY: start-local
 start-local: start-db-detached
@@ -59,7 +59,7 @@ start-local: start-db-detached
 
 .PHONY: unit-test-local
 unit-test-local: build-local
-	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
+	bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
 
 .PHONY: watch-unit-test-local
 watch-unit-test-local:
@@ -68,7 +68,7 @@ watch-unit-test-local:
 .PHONY: test-local
 test-local: build-local start-db-detached start-selenium-detached
 	./scripts/await-healthy-container sqlui_db
-	LOCAL=true bundle exec rspec $(if $(ARGS),$(ARGS),)
+	./scripts/run-in-env test -- bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 .PHONY: watch-test-local
 watch-test-local:

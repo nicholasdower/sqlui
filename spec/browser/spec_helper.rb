@@ -5,9 +5,7 @@ require_relative '../../app/server'
 require_relative '../../app/sqlui_config'
 
 LOCAL = %w[1 true].include?(ENV.fetch('LOCAL', 'false').strip.downcase)
-APP_PORT = 9090
-APP_HOST = LOCAL ? 'localhost' : 'sqlui_test'
-CONFIG = SqluiConfig.new('development_config.yml', { port: APP_PORT, environment: 'test' })
+CONFIG = SqluiConfig.new('development_config.yml')
 
 def wait_until_displayed(wait, *args)
   wait.until do
@@ -72,7 +70,7 @@ def wait_until_no_results(wait, status_matcher = '')
 end
 
 def url(path)
-  "http://#{APP_HOST}:#{APP_PORT}#{path}"
+  "http://#{ENV.fetch('APP_HOST')}:#{CONFIG.port}#{path}"
 end
 
 class TestServer

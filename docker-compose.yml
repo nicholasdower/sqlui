@@ -17,8 +17,6 @@ services:
   sqlui_server:
     container_name: sqlui_server
     image: nicholasdower/sqlui:latest
-    environment:
-      DB_HOST: sqlui_db
     command: bash -c "cd /sqlui && make start-server-from-docker"
     volumes:
       - .:/sqlui

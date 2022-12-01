@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [ -f ./development-secrets ]; then
+  echo 'loading development-secrets'
+  eval "$(cat ./development-secrets)"
+fi
+
+ENV=development
+APP_PORT=8080
+if [ -f /.dockerenv ]; then
+  DB_HOST=${DB_HOST:-"sqlui_db"}
+else
+  DB_HOST=${DB_HOST:-"127.0.0.1"}
+fi

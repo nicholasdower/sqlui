@@ -1,11 +1,16 @@
 name: Development
-port: 8080
-environment: development
+port: <%= ENV.fetch('APP_PORT') %>
+environment: <%= ENV.fetch('ENV') %>
 list_url_path: /sqlui
 airbrake:
-  enabled:     <%= !!ENV.fetch('AIRBRAKE_PROJECT_KEY', nil) %>
-  project_id:  467499
-  project_key: <%= ENV.fetch('AIRBRAKE_PROJECT_KEY', nil) %>
+  server:
+    enabled:     <%= ['true', '1'].include?(ENV.fetch('AIRBRAKE_SERVER_ENABLED', 'false')) %>
+    project_id:  <%= ENV.fetch('AIRBRAKE_SERVER_PROJECT_ID', '') %>
+    project_key: <%= ENV.fetch('AIRBRAKE_SERVER_PROJECT_KEY', '') %>
+  client:
+    enabled:     <%= ['true', '1'].include?(ENV.fetch('AIRBRAKE_CLIENT_ENABLED', 'false')) %>
+    project_id:  <%= ENV.fetch('AIRBRAKE_CLIENT_PROJECT_ID', '') %>
+    project_key: <%= ENV.fetch('AIRBRAKE_CLIENT_PROJECT_KEY', '') %>
 databases:
   shows:
     display_name: Shows

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+ENV=test
+APP_PORT=9090
+if [ -f /.dockerenv ]; then
+  LOCAL="false"
+  APP_HOST=${APP_HOST:-"sqlui_test"}
+  DB_HOST=${DB_HOST:-"sqlui_db"}
+else
+  LOCAL="true"
+  APP_HOST=${APP_HOST:-"127.0.0.1"}
+  DB_HOST=${DB_HOST:-"127.0.0.1"}
+fi
+AIRBRAKE_CLIENT_ENABLED="false"
+AIRBRAKE_SERVER_ENABLED="false"

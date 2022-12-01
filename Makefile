@@ -1,3 +1,4 @@
+ENV ?= development
 RUN = ./scripts/docker-run
 IMAGE = nicholasdower/sqlui
 RUN_IMAGE = $(RUN) $(IMAGE)
@@ -107,7 +108,7 @@ start-detached: install
 
 .PHONY: build-and-start-server-from-docker
 build-and-start-server-from-docker: build-from-docker
-	bundle exec ruby ./bin/sqlui development_config.yml
+	./scripts/run-in-env $(ENV) -- bundle exec ruby ./bin/sqlui development_config.yml
 
 .PHONY: start-server-from-docker
 start-server-from-docker:
@@ -124,7 +125,7 @@ start-selenium-detached:
 
 .PHONY: unit-test
 unit-test: build
-	$(RUN) --env DB_HOST=sqlui_db --publish 9090:9090 --name sqlui_test $(IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
+	$(RUN) --publish 9090:9090 --name sqlui_test $(IMAGE) ./scripts/run-in-env test -- bundle exec rspec $(if $(ARGS),$(ARGS),spec/app)
 
 .PHONY: watch-unit-test
 watch-unit-test:
@@ -133,7 +134,7 @@ watch-unit-test:
 .PHONY: test
 test: build start-db-detached start-selenium-detached
 	./scripts/await-healthy-container sqlui_db
-	$(RUN) --env DB_HOST=sqlui_db --publish 9090:9090 --name sqlui_test $(IMAGE) bundle exec rspec $(if $(ARGS),$(ARGS),)
+	$(RUN) --publish 9090:9090 --name sqlui_test $(IMAGE) ./scripts/run-in-env test -- bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 .PHONY: watch-test
 watch-test:

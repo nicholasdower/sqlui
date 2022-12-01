@@ -21,8 +21,8 @@ class Server < Sinatra::Base
   end
 
   def self.init_and_run(config, resources_dir)
-    logger.info("Airbrake enabled: #{config.airbrake[:enabled]}")
-    if config.airbrake[:enabled]
+    logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
+    if config.airbrake[:server]&.[](:enabled)
       require 'airbrake'
       require 'airbrake/rack'
 
@@ -30,7 +30,7 @@ class Server < Sinatra::Base
         c.app_version = File.read('.version').strip
         c.environment = config.environment
         c.logger.level = Logger::DEBUG if config.environment != :production?
-        config.airbrake.each do |key, value|
+        config.airbrake[:server].each do |key, value|
           c.send("#{key}=".to_sym, value) unless key == :enabled
         end
       end
@@ -199,11 +199,12 @@ class Server < Sinatra::Base
 
       get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
         status 200
+        client_config = config.airbrake[:client] || {}
         erb :sqlui, locals: {
           environment: config.environment.to_s,
-          airbrake_enabled: config.airbrake[:enabled],
-          airbrake_project_id: config.airbrake[:project_id],
-          airbrake_project_key: config.airbrake[:project_key]
+          airbrake_enabled: client_config[:enabled] || false,
+          airbrake_project_id: client_config[:project_id] || '',
+          airbrake_project_key: client_config[:project_key] || ''
         }
       end
     end

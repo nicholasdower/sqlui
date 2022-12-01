@@ -5,3 +5,6 @@
 /client/resources/sqlui.js
 /vendor
 /.install*
+/envs/*
+!/envs/development
+!/envs/test
