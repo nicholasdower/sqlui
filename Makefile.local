@@ -1,3 +1,7 @@
+.PHONY: check-tools
+check-tools:
+	@./scripts/check-tools
+
 .PHONY: bundle-update-local
 bundle-update-local:
 	bundle config set --local path vendor/bundle-local
@@ -5,20 +9,20 @@ bundle-update-local:
 
 .PHONY: npm-update-local
 npm-update-local:
-	npm update
+	./scripts/nvm_exec npm update
 
 .PHONY: update-local
 update-local: bundle-update-local npm-update-local
 
 .PHONY: update-local
 upgrade-local:
-	npx npm-check-updates --upgrade
-	npm update
+	./scripts/nvm_exec npx npm-check-updates --upgrade
+	./scripts/nvm_exec npm update
 	bundle outdated
 
 .install-local: Gemfile Gemfile.lock .version sqlui.gemspec
 	@make check-tools
-	npm install
+	./scripts/nvm_exec npm install
 	bundle config set --local path vendor/bundle-local
 	bundle install
 	@touch .install-local
@@ -33,12 +37,12 @@ build-local: check-tools install-local
 .PHONY: lint-local
 lint-local: check-tools
 	bundle exec rubocop
-	npx eslint client/*.js
+	./scripts/nvm_exec npx eslint client/*.js
 
 .PHONY: lint-fix-local
 lint-fix-local: check-tools
 	bundle exec rubocop -A
-	npx eslint client/*.js --fix
+	./scripts/nvm_exec npx eslint client/*.js --fix
 
 .PHONY: mysql-local
 mysql-local:

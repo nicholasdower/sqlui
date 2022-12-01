@@ -7,6 +7,7 @@ current_node=`node -v`
 
 if [ "$expected_node" != "$current_node" ]; then
   . $NVM_DIR/nvm.sh
+  echo 'warning: switching to Node '$expected_node', run `nvm use` to avoid this delay'
   nvm use > /dev/null
 fi
 
@@ -16,10 +17,4 @@ if [ "$expected_node" != "$current_node" ]; then
   exit 1
 fi
 
-expected_ruby=`cat .ruby-version`
-current_ruby=`ruby -v`
-
-if [[ "$current_ruby" != "ruby $expected_ruby"* ]]; then
-  echo "Ruby $expected_ruby required, see README.md" >&2
-  exit 1
-fi
+$@

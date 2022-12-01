@@ -31,10 +31,6 @@ upgrade:
 	$(RUN_IMAGE) npm update
 	$(RUN_IMAGE) bundle outdated
 
-.PHONY: check-tools
-check-tools:
-	@./scripts/check-tools
-
 .PHONY: bash
 bash:
 	$(RUN_IMAGE) bash
