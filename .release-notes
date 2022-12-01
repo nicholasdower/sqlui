@@ -1,1 +1,3 @@
-- No changes.
+- Add favicon to DB list.
+- Improve alias autocomplete.
+- Fix bug in displaying an empty result.

@@ -111,29 +111,42 @@ class Server < Sinatra::Base
         database.with_client do |client|
           query_result = execute_query(client, variables, sql)
           stream do |out|
-            json = <<~RES.chomp
-              {
-                "columns": #{query_result.fields.to_json},
-                "column_types": #{MysqlTypes.map_to_google_charts_types(query_result.field_types).to_json},
-                "total_rows": #{query_result.size.to_json},
-                "selection": #{params[:selection].to_json},
-                "query": #{params[:sql].to_json},
-                "rows": [
-            RES
-            out << json
-            bytes = json.bytesize
-            query_result.each_with_index do |row, i|
-              json = "#{i.zero? ? '' : ','}\n    #{row.to_json}"
-              bytes += json.bytesize
-              break if i == Sqlui::MAX_ROWS || bytes > Sqlui::MAX_BYTES
-
+            if query_result
+              json = <<~RES.chomp
+                {
+                  "columns": #{query_result.fields.to_json},
+                  "column_types": #{MysqlTypes.map_to_google_charts_types(query_result.field_types).to_json},
+                  "total_rows": #{query_result.size.to_json},
+                  "selection": #{params[:selection].to_json},
+                  "query": #{params[:sql].to_json},
+                  "rows": [
+              RES
               out << json
-            end
-            out << <<~RES
+              bytes = json.bytesize
+              query_result.each_with_index do |row, i|
+                json = "#{i.zero? ? '' : ','}\n    #{row.to_json}"
+                bytes += json.bytesize
+                break if i == Sqlui::MAX_ROWS || bytes > Sqlui::MAX_BYTES
 
-                ]
-              }
-            RES
+                out << json
+              end
+              out << <<~RES
+
+                  ]
+                }
+              RES
+            else
+              out << <<~RES
+                {
+                  "columns": [],
+                  "column_types": [],
+                  "total_rows": 0,
+                  "selection": #{params[:selection].to_json},
+                  "query": #{params[:sql].to_json},
+                  "rows": []
+                }
+              RES
+            end
           end
         end
       end

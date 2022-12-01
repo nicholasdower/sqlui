@@ -9,7 +9,6 @@ if [ ! -f client/resources/sqlui.js ]; then
 else
   for file in client/*.js; do
     if [ $file -nt client/resources/sqlui.js ]; then
-      echo 3
       build=1
     fi
   done
