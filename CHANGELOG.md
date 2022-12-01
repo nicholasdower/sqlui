@@ -1,3 +1,11 @@
+## 0.1.52
+
+- Add favicon to DB list.
+- Improve alias autocomplete.
+- Fix bug in displaying an empty result.
+- Add Prometheus.
+- Add support for Airbrake error reporting.
+
 ## 0.1.51
 
 - Add favicon to DB list.
