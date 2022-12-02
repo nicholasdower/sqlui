@@ -1,25 +1,15 @@
-override max?
-copy to clipboard
-download results
-autocomplete
-fix table header maybe by using flex, right now words are wrapped for no good reason
 pagination?
 make chart type configurable
-maybe highlight the current file in the saved tab
-use caching headers on js and css and html
-cache js, css and html at class level instead of instance
+use caching headers on js and css and html, include version in file name
+cache saved files
 use weak references to keep track of all clients. close connections on server shutdown?
 display error on structure tab if no schemas are returned
 show a helpful message when no saved files are found or when the directory doesn't exist
-switch to typescript
-cache saved files
 add padding inside select list, longest name overlaps scrollbar
 put current structure table and schema in url params?
 add github action to update deps or enable dependabot
 make status have a tooltip with the full error.
-add a tooltip to execute buttons ;)
 make "check console" a link that opens the console?
-add keyboard focus order
 maybe move db list into app
 test:
  - executing when viewing a file after changing selection
@@ -33,19 +23,15 @@ test:
  - tabbing between tabs, the editor and the various buttons
  - copy to clipboard, first js unit test
  - downloading
+ - autocomplete tables, aliases, joins, etc.
+ - airbrake notifications
 maybe add support for tags on database config to easily see production vs staging for instance
 add a help tab
-add copy query to clipboard button
-browser notifications when query completes
+browser notifications when query completes if on other browser tab or other SQLUI tab
 resizable columns
 copy cell contents for really long cells that can't be highlighted
 the editor is too short on a large screen. it should be a percentage
 warn when closing the browser with unsaved changes? what do other sites do?
-notify user if a query completes while on the saved or structure tab
-remove all containers script
-move from docker make targets into own Makefile
-move local make targets into own Makefile
-break javascript into modules
 javascript unit tests
 add images to README
 server unit tests
@@ -56,11 +42,10 @@ move logs to file during test
 use sqlui version as query param to css and js. Send in all json requests. Return an error if versions mismatch and tell the user to restart.
 In development use version plus timestamp when server starts. Add a heartbeat to the app which autoreloads on version mismatch.
 check whether current master is green before releasing
-allow a sql result to link to sqlui urls. maybe this is the start of some built-in functions.
 set a cookie for current default submit button
-custom column name matchers which cause cells to by hyperlinked
 the case where a user types "select table.foo from table t". the alias breaks the select
 make query endpoint a get and use same encoding as download
 render streamed results as they are returned
 the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
 get rid of max rows on the server in favor of max bytes. Have the client paginate the results to avoid a huge dom
+sql errors should be 400s and should not go to Airbrake
