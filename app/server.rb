@@ -2,6 +2,7 @@
 
 require 'base64'
 require 'csv'
+require 'digest/md5'
 require 'erb'
 require 'json'
 require 'prometheus/middleware/collector'
@@ -58,6 +59,10 @@ class Server < Sinatra::Base
     set :raise_errors,    false
     set :show_exceptions, false
 
+    favicon_hash = Digest::MD5.hexdigest(File.read(File.join(resources_dir, 'favicon.svg')))
+    css_hash = Digest::MD5.hexdigest(File.read(File.join(resources_dir, 'sqlui.css')))
+    js_hash = Digest::MD5.hexdigest(File.read(File.join(resources_dir, 'sqlui.js')))
+
     get '/-/health' do
       status 200
       body 'OK'
@@ -68,10 +73,12 @@ class Server < Sinatra::Base
     end
 
     get '/favicon.svg' do
+      headers 'Cache-Control' => 'max-age=31536000'
       send_file File.join(resources_dir, 'favicon.svg')
     end
 
     get "#{config.list_url_path}/?" do
+      headers 'Cache-Control' => 'no-cache'
       erb :databases, locals: { config: config }
     end
 
@@ -82,11 +89,13 @@ class Server < Sinatra::Base
 
       get "#{database.url_path}/sqlui.css" do
         headers 'Content-Type' => 'text/css; charset=utf-8'
+        headers 'Cache-Control' => 'max-age=31536000'
         send_file File.join(resources_dir, 'sqlui.css')
       end
 
       get "#{database.url_path}/sqlui.js" do
         headers 'Content-Type' => 'text/javascript; charset=utf-8'
+        headers 'Cache-Control' => 'max-age=31536000'
         send_file File.join(resources_dir, 'sqlui.js')
       end
 
@@ -185,6 +194,7 @@ class Server < Sinatra::Base
         sql = find_selected_query(sql, params[:selection])
 
         content_type 'application/csv; charset=utf-8'
+        headers 'Cache-Control' => 'no-cache'
         attachment 'result.csv'
         status 200
 
@@ -201,12 +211,16 @@ class Server < Sinatra::Base
 
       get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
         status 200
+        headers 'Cache-Control' => 'no-cache'
         client_config = config.airbrake[:client] || {}
         erb :sqlui, locals: {
           environment: config.environment.to_s,
           airbrake_enabled: client_config[:enabled] || false,
           airbrake_project_id: client_config[:project_id] || '',
-          airbrake_project_key: client_config[:project_key] || ''
+          airbrake_project_key: client_config[:project_key] || '',
+          js_hash: js_hash,
+          css_hash: css_hash,
+          favicon_hash: favicon_hash
         }
       end
     end

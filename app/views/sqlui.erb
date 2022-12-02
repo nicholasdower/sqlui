@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <title>SQLUI</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.svg?<%= favicon_hash %>">
     <!-- Initialize Airbrake before loading the main app JS so that we can catch errors as early as possible. -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@airbrake/browser"></script>
     <script type="text/javascript">
@@ -18,9 +19,9 @@
         window.airbrake?.notify(error)
       }
     </script>
-    <script type="text/javascript" src="sqlui.js"></script>
+    <script type="text/javascript" src="sqlui.js?<%= js_hash %>"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <link rel="stylesheet" href="sqlui.css">
+    <link rel="stylesheet" href="sqlui.css?<%= css_hash %>">
   </head>
 
   <body>
