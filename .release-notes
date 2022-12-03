@@ -1,1 +1,3 @@
-- No changes.
+- Align cell content based on type.
+- Allow resizing of columns.
+- Cache css, js and favicon.

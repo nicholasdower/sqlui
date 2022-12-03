@@ -320,7 +320,13 @@ function selectStructureTab () {
         }
         rows.push(row)
       }
-      columnsElement.appendChild(createTable(columns, rows, null))
+      const cellRenderer = function (rowElement, _columnIndex, value) {
+        const cellElement = document.createElement('td')
+        cellElement.style.textAlign = (typeof value) === 'string' ? 'left' : 'right'
+        cellElement.innerText = value
+        rowElement.appendChild(cellElement)
+      }
+      createTable(columnsElement, columns, rows, 'columns-table', cellRenderer)
     }
 
     const indexEntries = Object.entries(table.indexes)
@@ -340,7 +346,13 @@ function selectStructureTab () {
           rows.push(row)
         }
       }
-      indexesElement.appendChild(createTable(columns, rows, null))
+      const cellRenderer = function (rowElement, _columnIndex, value) {
+        const cellElement = document.createElement('td')
+        cellElement.style.textAlign = (typeof value) === 'string' ? 'left' : 'right'
+        cellElement.innerText = value
+        rowElement.appendChild(cellElement)
+      }
+      createTable(indexesElement, columns, rows, 'tables-table', cellRenderer)
     }
   })
   window.structureLoaded = true
@@ -750,35 +762,37 @@ function displaySqlFetchInResultTab (fetch) {
     return abbrElement
   }
 
-  const headerRenderer = function (rowElement, column) {
-    const headerElement = document.createElement('th')
-    headerElement.innerText = column
-    if (window.metadata.columns[column]) {
-      headerElement.colSpan = 2
-    }
-    rowElement.appendChild(headerElement)
-  }
+  const cellRenderer = function (rowElement, columnIndex, value) {
+    const column = fetch.result.columns[columnIndex]
+    const columnType = fetch.result.column_types[columnIndex]
 
-  const cellRenderer = function (rowElement, column, value) {
-    if (window.metadata.columns[column]?.links?.length > 0) {
-      const linksColumnElement = document.createElement('td')
-      if (value) {
-        window.metadata.columns[column].links.forEach((link) => {
-          linksColumnElement.appendChild(createLink(link, value))
-        })
-      }
-      rowElement.appendChild(linksColumnElement)
-      const textColumnElement = document.createElement('td')
-      textColumnElement.innerText = value
-      rowElement.appendChild(textColumnElement)
+    if (value && window.metadata.columns[column]?.links?.length > 0) {
+      const linksElement = document.createElement('div')
+      window.metadata.columns[column].links.forEach((link) => {
+        linksElement.appendChild(createLink(link, value))
+      })
+
+      const textElement = document.createElement('div')
+      textElement.classList.add('cell-value')
+      textElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
+      textElement.innerText = value
+
+      const wrapperElement = document.createElement('div')
+      wrapperElement.classList.add('cell-content-wrapper')
+      wrapperElement.appendChild(linksElement)
+      wrapperElement.appendChild(textElement)
+
+      const columnElement = document.createElement('td')
+      columnElement.appendChild(wrapperElement)
+      rowElement.appendChild(columnElement)
     } else {
       const cellElement = document.createElement('td')
+      cellElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
       cellElement.innerText = value
       rowElement.appendChild(cellElement)
     }
   }
-  document.getElementById('result-box')
-    .appendChild(createTable(fetch.result.columns, fetch.result.rows, 'result-table', headerRenderer, cellRenderer))
+  createTable(document.getElementById('result-box'), fetch.result.columns, fetch.result.rows, 'result-table', cellRenderer)
 }
 
 function disableDownloadButtons () {
