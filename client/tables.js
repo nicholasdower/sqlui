@@ -60,9 +60,9 @@ document.addEventListener('mousemove', (event) => {
     })
     let remainingWidth
     if (scrolled) {
-      remainingWidth = (scrollOffset + drag.containerElement.getBoundingClientRect().width) - runningWidth
+      remainingWidth = (scrollOffset + drag.containerElement.clientWidth) - runningWidth
     } else {
-      remainingWidth = Math.max(10, drag.containerElement.getBoundingClientRect().width - runningWidth)
+      remainingWidth = Math.max(10, drag.containerElement.clientWidth - runningWidth)
     }
     drag.lastColElement.style.width = `${remainingWidth}px`
     runningWidth += remainingWidth
@@ -126,7 +126,7 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
       nonLastColElements.forEach((element, index) => {
         runningWidth += element.getBoundingClientRect().width
       })
-      const remainingWidth = Math.max(10, containerElement.getBoundingClientRect().width - runningWidth)
+      const remainingWidth = Math.max(10, containerElement.clientWidth - runningWidth)
       colElements[colElements.length - 1].style.width = `${remainingWidth}px`
       runningWidth += remainingWidth
       tableElement.style.width = `${runningWidth}px`
