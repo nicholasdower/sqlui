@@ -1,3 +1,9 @@
+## 0.1.54
+
+- Align cell content based on type.
+- Allow resizing of columns.
+- Cache css, js and favicon.
+
 ## 0.1.53
 
 - No changes.
