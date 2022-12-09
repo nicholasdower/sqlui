@@ -79,6 +79,7 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
   const tableElement = document.createElement('table')
   containerElement.appendChild(tableElement)
   if (id) tableElement.id = id
+  tableElement.style.tableLayout = 'auto'
 
   const colgroupElement = document.createElement('colgroup')
   tableElement.appendChild(colgroupElement)
@@ -143,12 +144,23 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
     mutationObserver.observe(containerElement, { childList: true })
     colgroupElement.appendChild(lastColElement)
 
-    createTableBody(rows, tableElement, cellRenderer)
+    setTableBody(rows, tableElement, cellRenderer)
   }
+
+  return tableElement
 }
 
-export function createTableBody (rows, tableElement, cellRenderer) {
-  const tbodyElement = document.createElement('tbody')
+export function getTableBody (tableElement) {
+  return tableElement.getElementsByTagName('tbody')[0]
+}
+
+export function setTableBody (rows, tableElement, cellRenderer) {
+  tableElement.style.tableLayout = 'auto'
+
+  let tbodyElement = getTableBody(tableElement)
+  tbodyElement?.parentElement?.removeChild(tbodyElement)
+
+  tbodyElement = document.createElement('tbody')
   tableElement.appendChild(tbodyElement)
 
   let highlight = false

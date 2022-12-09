@@ -4,7 +4,7 @@ import { base64Encode } from './base64.js'
 import { copyTextToClipboard } from './clipboard.js'
 import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
-import { createTable, createTableBody } from './tables.js'
+import { createTable, getTableBody, setTableBody } from './tables.js'
 
 /* global google */
 
@@ -811,28 +811,27 @@ function displaySqlFetchInResultTab (fetch) {
 
   displaySqlFetchResultStatus(fetch)
 
-  const resultBody = document.querySelector('table[id="result-table"] > tbody')
   const pageStart = fetch.page * fetch.pageSize
   const rows = fetch.result.rows.slice(pageStart, pageStart + fetch.pageSize)
-  if (resultBody) {
+
+  let tableElement = document.getElementById('result-table')
+  if (tableElement) {
+    const resultBody = getTableBody(tableElement)
     if (resultBody.dataset.page === fetch.page) {
       // Results already displayed.
       return
     }
-    resultBody.parentElement.removeChild(resultBody)
-    createTableBody(rows, document.getElementById('result-table'), resultCellRenderer)
+    setTableBody(rows, tableElement, resultCellRenderer)
   } else {
     clearResultBox()
-    createTable(
+    tableElement = createTable(
       document.getElementById('result-box'),
       fetch.result.columns,
       rows,
       'result-table',
       resultCellRenderer)
   }
-  document
-    .querySelector('table[id="result-table"] > tbody')
-    .setAttribute('data-page', fetch.page)
+  tableElement.setAttribute('data-page', fetch.page)
 }
 
 function disableDownloadButtons () {

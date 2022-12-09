@@ -283,7 +283,6 @@ table {
     color: #333;
     font-size: 18px;
     width: 100%;
-    table-layout: auto; /* Will be overridden if a column is resized. */
 }
 
 table td:last-child, table th:last-child {
