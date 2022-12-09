@@ -50,3 +50,4 @@ get rid of max rows on the server in favor of max bytes
 sql errors should be 400s and should not go to Airbrake
 improve performance of column resizing by not reading the width of all columns on each mouse move
 numbers are displayed in exponential notation
+host sqlui as a demo somewhere
