@@ -1,14 +1,19 @@
-const drag = {
-  containerElement: null,
-  tableElement: null,
-  thElement: null,
-  colElement: null,
-  otherColWidths: null,
-  lastColElement: null
+class Drag {
+  scrolled = null
+  scrollOffset = null
+  containerOffset = null
+  containerWidth = null
+  thElement = null
+  colElement = null
+  otherColWidths = null
+  lastColElement = null
 }
+
+let drag = new Drag()
 
 document.addEventListener('mousedown', (event) => {
   if (event.target.classList.contains('col-resizer')) {
+    drag = new Drag()
     event.preventDefault()
     const thElement = event.target.parentElement.parentElement
     if (thElement.tagName.toLowerCase() !== 'th') {
@@ -16,57 +21,43 @@ document.addEventListener('mousedown', (event) => {
     }
     const trElement = thElement.parentElement
     const theadElement = trElement.parentElement
-    drag.tableElement = theadElement.parentElement
-    drag.containerElement = drag.tableElement.parentElement
+    const tableElement = theadElement.parentElement
+    const containerElement = tableElement.parentElement
+    drag.containerWidth = containerElement.clientWidth
+    drag.scrollOffset = containerElement.scrollLeft
+    drag.scrolled = drag.scrollOffset > 0
+    drag.containerOffset = containerElement.offsetLeft
     drag.thElement = thElement
     drag.colElement = document.getElementById(event.target.dataset.colId)
 
     const colElements = Array.from(drag.colElement.parentElement.childNodes)
     drag.lastColElement = colElements[colElements.length - 1]
-    drag.otherColWidths = []
+    drag.otherColsWidth = 0
     for (let i = 0; i < colElements.length - 1; i++) {
       if (colElements[i] !== drag.colElement) {
-        drag.otherColWidths.push(colElements[i].getBoundingClientRect().width)
+        drag.otherColsWidth += colElements[i].getBoundingClientRect().width
       }
+      colElements[i].style.width = `${colElements[i].getBoundingClientRect().width}px`
     }
-    colElements.forEach((element) => {
-      element.style.width = `${element.getBoundingClientRect().width}px`
-    })
-    drag.tableElement.style.tableLayout = 'fixed'
+    tableElement.style.tableLayout = 'fixed'
   }
 })
 
 document.addEventListener('mouseup', (event) => {
-  drag.containerElement = null
-  drag.tableElement = null
-  drag.thElement = null
-  drag.colElement = null
-  drag.otherColWidths = null
-  drag.lastColElement = null
+  drag = new Drag()
 })
 
 document.addEventListener('mousemove', (event) => {
-  if (drag.colElement) {
-    const scrollOffset = drag.containerElement.scrollLeft
-    const scrolled = scrollOffset > 0
-    const containerOffset = drag.containerElement.offsetLeft
-    const newColumnWidth = Math.max(0, scrollOffset + (event.clientX - containerOffset) - drag.thElement.offsetLeft)
-    if (newColumnWidth < drag.colElement.getBoundingClientRect().width && newColumnWidth < 30) return
+  if (!drag.colElement) return
 
-    drag.colElement.style.width = `${newColumnWidth}px`
-    let runningWidth = newColumnWidth
-    drag.otherColWidths.forEach((width) => {
-      runningWidth += width
-    })
-    let remainingWidth
-    if (scrolled) {
-      remainingWidth = (scrollOffset + drag.containerElement.clientWidth) - runningWidth
-    } else {
-      remainingWidth = Math.max(10, drag.containerElement.clientWidth - runningWidth)
-    }
-    drag.lastColElement.style.width = `${remainingWidth}px`
-    runningWidth += remainingWidth
-    drag.tableElement.style.width = `${runningWidth}px`
+  const newColumnWidth = Math.max(0, drag.scrollOffset + (event.clientX - drag.containerOffset) - drag.thElement.offsetLeft)
+  if (newColumnWidth < drag.colElement.getBoundingClientRect().width && newColumnWidth < 30) return
+
+  drag.colElement.style.width = `${newColumnWidth}px`
+  if (drag.scrolled) {
+    drag.lastColElement.style.width = ((drag.scrollOffset + drag.containerWidth) - (newColumnWidth + drag.otherColsWidth)) + 'px'
+  } else {
+    drag.lastColElement.style.width = (Math.max(10, drag.containerWidth - (newColumnWidth + drag.otherColsWidth))) + 'px'
   }
 })
 
@@ -90,45 +81,52 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
   const headerTrElement = document.createElement('tr')
   theadElement.appendChild(headerTrElement)
 
-  const nonLastColElements = []
-  columns.forEach(function (column, index) {
-    const headerElement = document.createElement('th')
-    headerTrElement.appendChild(headerElement)
-
-    const contentWrapperElement = document.createElement('div')
-    contentWrapperElement.classList.add('col-content-wrapper')
-    headerElement.appendChild(contentWrapperElement)
-
-    const nameElement = document.createElement('div')
-    nameElement.classList.add('col-name')
-    contentWrapperElement.appendChild(nameElement)
-
-    const colElement = document.createElement('col')
-    colElement.id = `${id}-col-${index}`
-    colgroupElement.appendChild(colElement)
-    nonLastColElements.push(colElement)
-
-    const resizerElement = document.createElement('div')
-    resizerElement.classList.add('col-resizer')
-    resizerElement.dataset.colId = colElement.id
-    contentWrapperElement.appendChild(resizerElement)
-
-    nameElement.innerText = column
-  })
   if (columns.length > 0) {
+    const colElements = []
+    columns.forEach(function (column, index) {
+      const headerElement = document.createElement('th')
+      headerTrElement.appendChild(headerElement)
+
+      const contentWrapperElement = document.createElement('div')
+      contentWrapperElement.classList.add('col-content-wrapper')
+      headerElement.appendChild(contentWrapperElement)
+
+      const nameElement = document.createElement('div')
+      nameElement.classList.add('col-name')
+      contentWrapperElement.appendChild(nameElement)
+
+      const colElement = document.createElement('col')
+      colElement.id = `${id}-col-${index}`
+      colgroupElement.appendChild(colElement)
+      colElements.push(colElement)
+
+      const resizerElement = document.createElement('div')
+      resizerElement.classList.add('col-resizer')
+      resizerElement.dataset.colId = colElement.id
+      contentWrapperElement.appendChild(resizerElement)
+
+      nameElement.innerText = column
+    })
+
     headerTrElement.appendChild(document.createElement('th'))
     const lastColElement = document.createElement('col')
     lastColElement.style.width = '100%'
+    colElements.push(lastColElement)
+
+    let columnsWidth
     function resize () {
-      let runningWidth = 0
-      const colElements = Array.from(tableElement.getElementsByTagName('col'))
-      nonLastColElements.forEach((element, index) => {
-        runningWidth += element.getBoundingClientRect().width
-      })
-      const remainingWidth = Math.max(10, containerElement.clientWidth - runningWidth)
-      colElements[colElements.length - 1].style.width = `${remainingWidth}px`
-      runningWidth += remainingWidth
-      tableElement.style.width = `${runningWidth}px`
+      if (tableElement.style.tableLayout === 'auto') {
+        return
+      }
+      if (!columnsWidth) {
+        columnsWidth = 0
+        colElements.slice(0, -1).forEach((element, index) => {
+          columnsWidth += element.getBoundingClientRect().width
+        })
+      }
+      const remainingWidth = Math.max(10, containerElement.clientWidth - columnsWidth)
+      colElements.slice(-1)[0].style.width = `${remainingWidth}px`
+      tableElement.style.width = `${columnsWidth + remainingWidth}px`
     }
 
     const resizeObserver = new ResizeObserver(resize)
