@@ -1,3 +1,7 @@
+## 0.1.55
+
+- Prevent horizontal scrollbar caused by fill column taking up too much space.
+
 ## 0.1.54
 
 - Align cell content based on type.
