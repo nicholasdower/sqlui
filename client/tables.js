@@ -77,6 +77,7 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
   if (!id) throw new Error('missing table id')
 
   const tableElement = document.createElement('table')
+  containerElement.appendChild(tableElement)
   if (id) tableElement.id = id
 
   const colgroupElement = document.createElement('colgroup')
@@ -84,9 +85,6 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
 
   const theadElement = document.createElement('thead')
   tableElement.appendChild(theadElement)
-
-  const tbodyElement = document.createElement('tbody')
-  tableElement.appendChild(tbodyElement)
 
   const headerTrElement = document.createElement('tr')
   theadElement.appendChild(headerTrElement)
@@ -144,7 +142,15 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
     })
     mutationObserver.observe(containerElement, { childList: true })
     colgroupElement.appendChild(lastColElement)
+
+    createTableBody(rows, tableElement, cellRenderer)
   }
+}
+
+export function createTableBody (rows, tableElement, cellRenderer) {
+  const tbodyElement = document.createElement('tbody')
+  tableElement.appendChild(tbodyElement)
+
   let highlight = false
   rows.forEach(function (row) {
     const rowElement = document.createElement('tr')
@@ -164,5 +170,4 @@ export function createTable (containerElement, columns, rows, id, cellRenderer) 
     })
     rowElement.appendChild(document.createElement('td'))
   })
-  containerElement.appendChild(tableElement)
 }

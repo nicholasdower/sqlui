@@ -4,9 +4,11 @@ import { base64Encode } from './base64.js'
 import { copyTextToClipboard } from './clipboard.js'
 import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
-import { createTable } from './tables.js'
+import { createTable, createTableBody } from './tables.js'
 
 /* global google */
+
+const PAGE_SIZE = 500
 
 function getSqlFromUrl (url) {
   const params = url.searchParams
@@ -72,6 +74,14 @@ function init (parent, onSubmit, onShiftSubmit) {
     if (window.sqlFetch?.result) {
       copyTextToClipboard(toTsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
     }
+  })
+  addClickListener(document.getElementById('prev-button'), (event) => {
+    window.sqlFetch.page -= 1
+    displaySqlFetch(window.sqlFetch)
+  })
+  addClickListener(document.getElementById('next-button'), (event) => {
+    window.sqlFetch.page += 1
+    displaySqlFetch(window.sqlFetch)
   })
   addClickListener(document.getElementById('submit-dropdown-button-download-csv'), () => {
     if (!window.sqlFetch?.result) return
@@ -362,7 +372,6 @@ function selectGraphTab (internal) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('graph-box').style.display = 'flex'
-  document.getElementById('graph-status').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.display = 'none'
   updateDownloadButtons(window?.sqlFetch)
@@ -375,7 +384,6 @@ function selectResultTab (internal) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('result-box').style.display = 'flex'
-  document.getElementById('result-status').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.display = 'none'
   focus(getSelection())
@@ -387,17 +395,15 @@ function selectSavedTab () {
     selected.style.display = 'flex'
   })
 
-  if (window.savedLoaded) {
-    return
-  }
-
   const savedElement = document.getElementById('saved-box')
+  const saved = window.metadata.saved
+  const numFiles = Object.keys(saved).length
+  setStatus(`${numFiles} file${numFiles === 1 ? '' : 's'}`)
+
   if (savedElement.children.length > 0) {
     return
   }
-  const saved = window.metadata.saved
-  const numFiles = Object.keys(saved).length
-  setSavedStatus(`${numFiles} file${numFiles === 1 ? '' : 's'}`)
+
   Object.values(saved).forEach(file => {
     const viewUrl = new URL(window.location.origin + window.location.pathname)
     setActionInUrl(viewUrl, 'query')
@@ -446,7 +452,6 @@ function selectSavedTab () {
 
     savedElement.appendChild(divElement)
   })
-  window.savedLoaded = true
 }
 
 function submitAll (target, event) {
@@ -502,27 +507,25 @@ function submit (target, event, selection = null) {
 
 function clearResult () {
   if (window.sqlFetch?.state === 'pending' || window.sqlFetch?.spinner === 'always') {
-    window.sqlFetch.state = 'aborted'
-    window.sqlFetch.spinner = 'never'
-    window.sqlFetch.fetchController.abort()
+    window.sqlFetch.abort()
     displaySqlFetch(window.sqlFetch)
     return
   }
   window.sqlFetch = null
   clearSpinner()
   clearGraphBox()
-  clearGraphStatus()
+  clearStatus()
   clearResultBox()
-  clearResultStatus()
   disableDownloadButtons()
 }
 
-function clearResultStatus () {
-  document.getElementById('result-status').innerText = ''
+function clearStatus () {
+  document.getElementById('status-message').innerText = ''
 }
 
-function clearGraphStatus () {
-  document.getElementById('graph-status').innerText = ''
+function setStatus (message) {
+  const element = document.getElementById('status-message')
+  element.innerText = message
 }
 
 function clearResultBox () {
@@ -579,22 +582,24 @@ function fetchSql (sqlFetch) {
     signal: sqlFetch.fetchController.signal
   })
     .then((response) => {
+      sqlFetch.endedAt = window.performance.now()
       const contentType = response.headers.get('content-type')
       if (contentType && contentType.indexOf('application/json') !== -1) {
         response.json().then((result) => {
           if (result?.query) {
             sqlFetch.state = 'success'
             sqlFetch.result = result
+            sqlFetch.pageCount = Math.ceil(result.rows.length / sqlFetch.pageSize)
           } else {
             sqlFetch.state = 'error'
             if (result?.error) {
-              sqlFetch.error_message = result.error
-              sqlFetch.error_details = result.stacktrace
+              sqlFetch.errorMessage = result.error
+              sqlFetch.errorDetails = result.stacktrace
             } else if (result) {
-              sqlFetch.error_message = 'failed to execute query'
-              sqlFetch.error_details = result.toString()
+              sqlFetch.errorMessage = 'failed to execute query'
+              sqlFetch.errorDetails = result.toString()
             } else {
-              sqlFetch.error_message = 'failed to execute query'
+              sqlFetch.errorMessage = 'failed to execute query'
             }
           }
           displaySqlFetch(sqlFetch)
@@ -602,17 +607,18 @@ function fetchSql (sqlFetch) {
       } else {
         response.text().then((result) => {
           sqlFetch.state = 'error'
-          sqlFetch.error_message = 'failed to execute query'
-          sqlFetch.error_details = result
+          sqlFetch.errorMessage = 'failed to execute query'
+          sqlFetch.errorDetails = result
           displaySqlFetch(sqlFetch)
         })
       }
     })
     .catch(function (error) {
       if (sqlFetch.state === 'pending') {
+        sqlFetch.endedAt = window.performance.now()
         sqlFetch.state = 'error'
-        sqlFetch.error_message = 'failed to execute query'
-        sqlFetch.error_details = error
+        sqlFetch.errorMessage = 'failed to execute query'
+        sqlFetch.errorDetails = error
       }
       displaySqlFetch(sqlFetch)
     })
@@ -681,18 +687,36 @@ function maybeFetchResult (internal) {
   }
 }
 
-function buildSqlFetch (sql, file, variables, selection) {
-  const sqlFetch = {
-    fetchController: new AbortController(),
-    state: 'pending',
-    startedAt: window.performance.now(),
-    spinner: 'never',
-    finished: null,
-    sql,
-    file,
-    selection,
-    variables
+class SqlFetch {
+  constructor (sql, file, variables, selection) {
+    this.sql = sql
+    this.file = file
+    this.variables = variables
+    this.selection = selection
+    this.startedAt = window.performance.now()
+    this.endedAt = null
+    this.state = 'pending'
+    this.fetchController = new AbortController()
+    this.spinner = 'never'
+    this.finished = null
+    this.page = 0
+    this.pageSize = PAGE_SIZE
+    this.pageCount = null
   }
+
+  abort () {
+    this.state = 'aborted'
+    this.endedAt = window.performance.now()
+    this.spinner = 'never'
+    this.fetchController.abort()
+  }
+
+  getDuration () {
+    return (this.endedAt || window.performance.now()) - this.startedAt
+  }
+}
+function buildSqlFetch (sql, file, variables, selection) {
+  const sqlFetch = new SqlFetch(sql, file, variables, selection)
 
   if (file) {
     const fileDetails = window.metadata.saved[file]
@@ -706,6 +730,50 @@ function buildSqlFetch (sql, file, variables, selection) {
   }
 
   return sqlFetch
+}
+
+const createCellLink = function (link, value) {
+  const linkElement = document.createElement('a')
+  linkElement.href = link.template.replaceAll('{*}', encodeURIComponent(value))
+  linkElement.innerText = link.short_name
+  linkElement.target = '_blank'
+
+  const abbrElement = document.createElement('abbr')
+  abbrElement.title = link.long_name
+  abbrElement.appendChild(linkElement)
+
+  return abbrElement
+}
+
+const resultCellRenderer = function (rowElement, columnIndex, value) {
+  const column = window.sqlFetch.result.columns[columnIndex]
+  const columnType = window.sqlFetch.result.column_types[columnIndex]
+
+  if (value && window.metadata.columns[column]?.links?.length > 0) {
+    const linksElement = document.createElement('div')
+    window.metadata.columns[column].links.forEach((link) => {
+      linksElement.appendChild(createCellLink(link, value))
+    })
+
+    const textElement = document.createElement('div')
+    textElement.classList.add('cell-value')
+    textElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
+    textElement.innerText = value
+
+    const wrapperElement = document.createElement('div')
+    wrapperElement.classList.add('cell-content-wrapper')
+    wrapperElement.appendChild(linksElement)
+    wrapperElement.appendChild(textElement)
+
+    const columnElement = document.createElement('td')
+    columnElement.appendChild(wrapperElement)
+    rowElement.appendChild(columnElement)
+  } else {
+    const cellElement = document.createElement('td')
+    cellElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
+    cellElement.innerText = value
+    rowElement.appendChild(cellElement)
+  }
 }
 
 function displaySqlFetchInResultTab (fetch) {
@@ -727,13 +795,13 @@ function displaySqlFetchInResultTab (fetch) {
 
   if (fetch.state === 'aborted') {
     clearResultBox()
-    document.getElementById('result-status').innerText = 'query cancelled'
+    setStatus('query cancelled')
     return
   }
 
   if (fetch.state === 'error') {
     clearResultBox()
-    displaySqlFetchError('result-status', fetch.error_message, fetch.error_details)
+    displaySqlFetchError(fetch.errorMessage, fetch.errorDetails)
     return
   }
 
@@ -741,58 +809,30 @@ function displaySqlFetchInResultTab (fetch) {
     throw new Error(`unexpected fetch sql request status: ${fetch.status}`)
   }
 
-  if (document.getElementById('result-table')) {
-    // Results already displayed.
-    return
-  }
+  displaySqlFetchResultStatus(fetch)
 
-  clearResultBox()
-  displaySqlFetchResultStatus('result-status', fetch)
-
-  const createLink = function (link, value) {
-    const linkElement = document.createElement('a')
-    linkElement.href = link.template.replaceAll('{*}', encodeURIComponent(value))
-    linkElement.innerText = link.short_name
-    linkElement.target = '_blank'
-
-    const abbrElement = document.createElement('abbr')
-    abbrElement.title = link.long_name
-    abbrElement.appendChild(linkElement)
-
-    return abbrElement
-  }
-
-  const cellRenderer = function (rowElement, columnIndex, value) {
-    const column = fetch.result.columns[columnIndex]
-    const columnType = fetch.result.column_types[columnIndex]
-
-    if (value && window.metadata.columns[column]?.links?.length > 0) {
-      const linksElement = document.createElement('div')
-      window.metadata.columns[column].links.forEach((link) => {
-        linksElement.appendChild(createLink(link, value))
-      })
-
-      const textElement = document.createElement('div')
-      textElement.classList.add('cell-value')
-      textElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
-      textElement.innerText = value
-
-      const wrapperElement = document.createElement('div')
-      wrapperElement.classList.add('cell-content-wrapper')
-      wrapperElement.appendChild(linksElement)
-      wrapperElement.appendChild(textElement)
-
-      const columnElement = document.createElement('td')
-      columnElement.appendChild(wrapperElement)
-      rowElement.appendChild(columnElement)
-    } else {
-      const cellElement = document.createElement('td')
-      cellElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
-      cellElement.innerText = value
-      rowElement.appendChild(cellElement)
+  const resultBody = document.querySelector('table[id="result-table"] > tbody')
+  const pageStart = fetch.page * fetch.pageSize
+  const rows = fetch.result.rows.slice(pageStart, pageStart + fetch.pageSize)
+  if (resultBody) {
+    if (resultBody.dataset.page === fetch.page) {
+      // Results already displayed.
+      return
     }
+    resultBody.parentElement.removeChild(resultBody)
+    createTableBody(rows, document.getElementById('result-table'), resultCellRenderer)
+  } else {
+    clearResultBox()
+    createTable(
+      document.getElementById('result-box'),
+      fetch.result.columns,
+      rows,
+      'result-table',
+      resultCellRenderer)
   }
-  createTable(document.getElementById('result-box'), fetch.result.columns, fetch.result.rows, 'result-table', cellRenderer)
+  document
+    .querySelector('table[id="result-table"] > tbody')
+    .setAttribute('data-page', fetch.page)
 }
 
 function disableDownloadButtons () {
@@ -824,8 +864,7 @@ function displaySqlFetch (fetch) {
   }
 }
 
-function displaySqlFetchError (statusElementId, message, details) {
-  const statusElement = document.getElementById(statusElementId)
+function displaySqlFetchError (message, details) {
   let statusMessage = 'error: ' + message
   if (statusMessage.length > 90) {
     statusMessage = statusMessage.substring(0, 90) + '…'
@@ -834,7 +873,7 @@ function displaySqlFetchError (statusElementId, message, details) {
     console.log(`${message}\n${details}`)
     statusMessage += ' (check console)'
   }
-  statusElement.innerText = statusMessage
+  setStatus(statusMessage)
 }
 
 function clearSpinner () {
@@ -884,13 +923,13 @@ function displaySqlFetchInGraphTab (fetch) {
 
   if (fetch.state === 'aborted') {
     clearGraphBox()
-    document.getElementById('graph-status').innerText = 'query cancelled'
+    setStatus('query cancelled')
     return
   }
 
   if (fetch.state === 'error') {
     clearGraphBox()
-    displaySqlFetchError('graph-status', fetch.error_message, fetch.error_details)
+    displaySqlFetchError(fetch.errorMessage, fetch.errorDetails)
     return
   }
 
@@ -898,7 +937,7 @@ function displaySqlFetchInGraphTab (fetch) {
     throw new Error(`unexpected fetch sql request status: ${fetch.status}`)
   }
   clearGraphBox()
-  displaySqlFetchResultStatus('graph-status', fetch)
+  displaySqlFetchResultStatus(fetch)
 
   if (!fetch.result.rows) {
     return
@@ -937,24 +976,30 @@ function displaySqlFetchInGraphTab (fetch) {
   chart.draw(dataTable, options)
 }
 
-function displaySqlFetchResultStatus (statusElementId, sqlFetch) {
+function displaySqlFetchResultStatus (sqlFetch) {
   const result = sqlFetch.result
-  const statusElement = document.getElementById(statusElementId)
-  const elapsed = Math.round(100 * (window.performance.now() - sqlFetch.startedAt) / 1000.0) / 100
+  const elapsed = Math.round(100 * (sqlFetch.getDuration() / 1000.0)) / 100
 
+  let message
   if (result.total_rows === 1) {
-    statusElement.innerText = `${result.total_rows} row (${elapsed}s)`
+    message = `${result.total_rows} row (${elapsed}s)`
   } else {
-    statusElement.innerText = `${result.total_rows.toLocaleString()} rows (${elapsed}s)`
+    message = `${result.total_rows.toLocaleString()} rows (${elapsed}s)`
   }
 
   if (result.total_rows > result.rows.length) {
-    statusElement.innerText += ` (truncated to ${result.rows.length})`
+    message += ` (truncated to ${result.rows.length})`
   }
-}
+  setStatus(message)
 
-function setSavedStatus (status) {
-  document.getElementById('saved-status').innerText = status
+  const pageCountBox = document.getElementById('page-count-box')
+  pageCountBox.style.display = 'flex'
+  pageCountBox.innerText = `${sqlFetch.page + 1} of ${sqlFetch.pageCount}`
+  if (sqlFetch.pageCount > 1) {
+    document.getElementById('pagination-box').style.display = 'flex'
+    document.getElementById('next-button').disabled = sqlFetch.page + 1 === sqlFetch.pageCount
+    document.getElementById('prev-button').disabled = sqlFetch.page === 0
+  }
 }
 
 window.addEventListener('popstate', function (event) {

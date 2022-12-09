@@ -32,7 +32,7 @@ end
 def wait_until_results(wait, *results)
   expected_headers = results[0]
   expected_rows = results[1..]
-  wait_until_result_status(wait, "#{expected_rows.size} row#{expected_rows.size == 1 ? '' : 's'}")
+  wait_until_status(wait, "#{expected_rows.size} row#{expected_rows.size == 1 ? '' : 's'}")
   header_elements = wait.until do
     elements = driver.find_elements(css: '#result-box > table > thead > tr > th:not(:last-child)')
     elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
@@ -46,22 +46,15 @@ def wait_until_results(wait, *results)
   expect(rows).to eq(expected_rows)
 end
 
-def wait_until_result_status(wait, status)
+def wait_until_status(wait, status)
   wait.until do
-    element = driver.find_element(css: '#result-status')
-    element if element&.attribute('style') == 'display: flex;' && element.text.match(status)
-  end
-end
-
-def wait_until_saved_status(wait, status)
-  wait.until do
-    element = driver.find_element(css: '#saved-status')
-    element if element&.attribute('style') == 'display: flex;' && element.text.match(status)
+    element = driver.find_element(id: 'status-message')
+    element if element.text.match(status)
   end
 end
 
 def wait_until_no_results(wait, status_matcher = '')
-  wait_until_result_status(wait, status_matcher)
+  wait_until_status(wait, status_matcher)
   wait.until do
     driver.find_element(css: '#result-box > table')
   rescue Selenium::WebDriver::Error::NoSuchElementError

@@ -28,7 +28,6 @@ test:
 maybe add support for tags on database config to easily see production vs staging for instance
 add a help tab
 browser notifications when query completes if on other browser tab or other SQLUI tab
-resizable columns
 copy cell contents for really long cells that can't be highlighted
 the editor is too short on a large screen. it should be a percentage
 warn when closing the browser with unsaved changes? what do other sites do?
@@ -47,5 +46,7 @@ the case where a user types "select table.foo from table t". the alias breaks th
 make query endpoint a get and use same encoding as download
 render streamed results as they are returned
 the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
-get rid of max rows on the server in favor of max bytes. Have the client paginate the results to avoid a huge dom
+get rid of max rows on the server in favor of max bytes
 sql errors should be 400s and should not go to Airbrake
+improve performance of column resizing by not reading the width of all columns on each mouse move
+numbers are displayed in exponential notation

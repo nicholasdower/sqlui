@@ -6,7 +6,7 @@ require_relative 'version'
 
 # Main entry point.
 class Sqlui
-  MAX_ROWS = 10_000
+  MAX_ROWS = 5_000
   MAX_BYTES = 10 * 1_024 * 1_024
 
   def initialize(config_file)
