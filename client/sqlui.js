@@ -231,6 +231,8 @@ function route (target = null, event = null, url = null, internal = false) {
     selected.style.display = 'none'
   })
 
+  setStatus('')
+
   switch (window.tab) {
     case 'query':
       selectResultTab(internal)
