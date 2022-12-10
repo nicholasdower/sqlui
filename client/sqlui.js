@@ -4,7 +4,7 @@ import { base64Encode } from './base64.js'
 import { copyTextToClipboard } from './clipboard.js'
 import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
-import { Resizetable } from './tables.js'
+import { ResizeTable } from './resize-table.js'
 
 /* global google */
 
@@ -75,12 +75,20 @@ function init (parent, onSubmit, onShiftSubmit) {
       copyTextToClipboard(toTsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
     }
   })
+  addClickListener(document.getElementById('first-button'), (event) => {
+    window.sqlFetch.page = 0
+    displaySqlFetch(window.sqlFetch)
+  })
   addClickListener(document.getElementById('prev-button'), (event) => {
     window.sqlFetch.page -= 1
     displaySqlFetch(window.sqlFetch)
   })
   addClickListener(document.getElementById('next-button'), (event) => {
     window.sqlFetch.page += 1
+    displaySqlFetch(window.sqlFetch)
+  })
+  addClickListener(document.getElementById('last-button'), (event) => {
+    window.sqlFetch.page = window.sqlFetch.pageCount - 1
     displaySqlFetch(window.sqlFetch)
   })
   addClickListener(document.getElementById('submit-dropdown-button-download-csv'), () => {
@@ -338,7 +346,7 @@ function selectStructureTab () {
         cellElement.innerText = value
         rowElement.appendChild(cellElement)
       }
-      columnsElement.appendChild(new Resizetable(columns, rows, cellRenderer))
+      columnsElement.appendChild(new ResizeTable(columns, rows, cellRenderer))
     }
 
     const indexEntries = Object.entries(table.indexes)
@@ -364,7 +372,7 @@ function selectStructureTab () {
         cellElement.innerText = value
         rowElement.appendChild(cellElement)
       }
-      indexesElement.appendChild(new Resizetable(columns, rows, cellRenderer))
+      indexesElement.appendChild(new ResizeTable(columns, rows, cellRenderer))
     }
   })
   window.structureLoaded = true
@@ -827,7 +835,7 @@ function displaySqlFetchInResultTab (fetch) {
   } else {
     clearResultBox()
     const resultBoxElement = document.getElementById('result-box')
-    tableElement = new Resizetable(fetch.result.columns, rows, resultCellRenderer)
+    tableElement = new ResizeTable(fetch.result.columns, rows, resultCellRenderer)
     tableElement.id = 'result-table'
     resultBoxElement.appendChild(tableElement)
   }
@@ -987,7 +995,7 @@ function displaySqlFetchResultStatus (sqlFetch) {
   }
 
   if (result.total_rows > result.rows.length) {
-    message += ` (truncated to ${result.rows.length})`
+    message += ` (truncated to ${result.rows.length.toLocaleString()})`
   }
   setStatus(message)
 
@@ -999,6 +1007,17 @@ function displaySqlFetchResultStatus (sqlFetch) {
     document.getElementById('next-button').disabled = sqlFetch.page + 1 === sqlFetch.pageCount
     document.getElementById('prev-button').disabled = sqlFetch.page === 0
   }
+
+  if (sqlFetch.pageCount > 2) {
+    document.getElementById('first-button').style.display = 'flex'
+    document.getElementById('last-button').style.display = 'flex'
+    document.getElementById('first-button').disabled = sqlFetch.page === 0
+    document.getElementById('last-button').disabled = sqlFetch.page === sqlFetch.pageCount - 1
+  } else {
+    document.getElementById('last-button').style.display = 'none'
+    document.getElementById('first-button').style.display = 'none'
+  }
+
 }
 
 window.addEventListener('popstate', function (event) {

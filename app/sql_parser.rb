@@ -12,6 +12,10 @@ class SqlParser
     part_with_range[0]
   end
 
+  def self.split(sql)
+    parse(sql).map { |p| p.first }
+  end
+
   def self.parse(sql)
     scanner = StringScanner.new(sql)
     statements = []

@@ -68,7 +68,7 @@ document.addEventListener('mousemove', (event) => {
   drag.tableElement.style.width = (drag.otherColsWidth + newColumnWidth + lastColWidth) + 'px'
 })
 
-export class Resizetable extends HTMLTableElement {
+export class ResizeTable extends HTMLTableElement {
   constructor (columns, rows, cellRenderer) {
     super()
 
@@ -203,4 +203,4 @@ export class Resizetable extends HTMLTableElement {
   }
 }
 
-customElements.define('resize-table', Resizetable, { extends: 'table' })
+customElements.define('resize-table', ResizeTable, { extends: 'table' })

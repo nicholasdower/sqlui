@@ -138,13 +138,13 @@ class Server < Sinatra::Base
         break client_error('missing sql') unless params[:sql]
 
         variables = params[:variables] || {}
-        sql = find_selected_query(params[:sql], params[:selection])
+        queries = find_selected_queries(params[:sql], params[:selection])
 
         status 200
         headers 'Content-Type' => 'application/json; charset=utf-8'
 
         database.with_client do |client|
-          query_result = execute_query(client, variables, sql)
+          query_result = execute_query(client, variables, queries)
           stream do |out|
             if query_result
               json = <<~RES.chomp
@@ -159,7 +159,7 @@ class Server < Sinatra::Base
               out << json
               bytes = json.bytesize
               query_result.each_with_index do |row, i|
-                json = "#{i.zero? ? '' : ','}\n    #{row.to_json}"
+                json = "#{i.zero? ? '' : ','}\n    #{row.map { |v| big_decimal_to_float(v) }.to_json}"
                 bytes += json.bytesize
                 break if i == Sqlui::MAX_ROWS || bytes > Sqlui::MAX_BYTES
 
@@ -191,7 +191,7 @@ class Server < Sinatra::Base
 
         sql = Base64.decode64(params[:sql]).force_encoding('UTF-8')
         variables = params.map { |k, v| k[0] == '_' ? [k, v] : nil }.compact.to_h
-        sql = find_selected_query(sql, params[:selection])
+        queries = find_selected_queries(sql, params[:selection])
 
         content_type 'application/csv; charset=utf-8'
         headers 'Cache-Control' => 'no-cache'
@@ -199,11 +199,11 @@ class Server < Sinatra::Base
         status 200
 
         database.with_client do |client|
-          query_result = execute_query(client, variables, sql)
+          query_result = execute_query(client, variables, queries)
           stream do |out|
             out << CSV::Row.new(query_result.fields, query_result.fields, header_row: true).to_s.strip
             query_result.each do |row|
-              out << "\n#{CSV::Row.new(query_result.fields, row).to_s.strip}"
+              out << "\n#{CSV::Row.new(query_result.fields, row.map { |v| big_decimal_to_float(v) }).to_s.strip}"
             end
           end
         end
@@ -250,33 +250,45 @@ class Server < Sinatra::Base
     body({ error: message, stacktrace: stacktrace }.compact.to_json)
   end
 
-  def find_selected_query(full_sql, selection)
-    return full_sql unless selection
+  def find_selected_queries(full_sql, selection)
+    if selection
+      if selection.include?('-')
+        # sort because the selection could be in either direction
+        selection = selection.split('-').map { |v| Integer(v) }.sort
+      else
+        selection = Integer(selection)
+        selection = [selection, selection]
+      end
 
-    if selection.include?('-')
-      # sort because the selection could be in either direction
-      selection = selection.split('-').map { |v| Integer(v) }.sort
+      if selection[0] == selection[1]
+        [SqlParser.find_statement_at_cursor(full_sql, selection[0])]
+      else
+        SqlParser.split(full_sql[selection[0], selection[1]])
+      end
     else
-      selection = Integer(selection)
-      selection = [selection, selection]
-    end
-
-    if selection[0] == selection[1]
-      SqlParser.find_statement_at_cursor(full_sql, selection[0])
-    else
-      full_sql[selection[0], selection[1]]
+      SqlParser.split(full_sql)
     end
   end
 
-  def execute_query(client, variables, sql)
+  def execute_query(client, variables, queries)
     variables.each do |name, value|
       client.query("SET @#{name} = #{value};")
     end
-    queries = if sql.include?(';')
-                sql.split(/(?<=;)/).map(&:strip).reject(&:empty?)
-              else
-                [sql]
-              end
     queries.map { |current| client.query(current) }.last
+  end
+
+  def big_decimal_to_float(maybe_big_decimal)
+    # TODO: This BigDecimal thing needs some thought.
+    if maybe_big_decimal.is_a?(BigDecimal)
+      big_decimal_string = maybe_big_decimal.to_s('F')
+      float = maybe_big_decimal.to_f
+      if big_decimal_string == float.to_s
+        float
+      else
+        big_decimal_string
+      end
+    else
+      maybe_big_decimal
+    end
   end
 end
