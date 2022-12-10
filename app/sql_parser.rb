@@ -13,7 +13,7 @@ class SqlParser
   end
 
   def self.split(sql)
-    parse(sql).map { |p| p.first }
+    parse(sql).map(&:first)
   end
 
   def self.parse(sql)

@@ -1017,7 +1017,6 @@ function displaySqlFetchResultStatus (sqlFetch) {
     document.getElementById('last-button').style.display = 'none'
     document.getElementById('first-button').style.display = 'none'
   }
-
 }
 
 window.addEventListener('popstate', function (event) {
