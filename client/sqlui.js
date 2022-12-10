@@ -4,7 +4,7 @@ import { base64Encode } from './base64.js'
 import { copyTextToClipboard } from './clipboard.js'
 import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
-import { createTable, getTableBody, setTableBody } from './tables.js'
+import { Resizetable } from './tables.js'
 
 /* global google */
 
@@ -338,7 +338,7 @@ function selectStructureTab () {
         cellElement.innerText = value
         rowElement.appendChild(cellElement)
       }
-      createTable(columnsElement, columns, rows, 'columns-table', cellRenderer)
+      columnsElement.appendChild(new Resizetable(columns, rows, cellRenderer))
     }
 
     const indexEntries = Object.entries(table.indexes)
@@ -364,7 +364,7 @@ function selectStructureTab () {
         cellElement.innerText = value
         rowElement.appendChild(cellElement)
       }
-      createTable(indexesElement, columns, rows, 'tables-table', cellRenderer)
+      indexesElement.appendChild(new Resizetable(columns, rows, cellRenderer))
     }
   })
   window.structureLoaded = true
@@ -818,20 +818,18 @@ function displaySqlFetchInResultTab (fetch) {
 
   let tableElement = document.getElementById('result-table')
   if (tableElement) {
-    const resultBody = getTableBody(tableElement)
+    const resultBody = tableElement.getTableBody()
     if (resultBody.dataset.page === fetch.page) {
       // Results already displayed.
       return
     }
-    setTableBody(rows, tableElement, resultCellRenderer)
+    tableElement.updateTableBody(rows, resultCellRenderer)
   } else {
     clearResultBox()
-    tableElement = createTable(
-      document.getElementById('result-box'),
-      fetch.result.columns,
-      rows,
-      'result-table',
-      resultCellRenderer)
+    const resultBoxElement = document.getElementById('result-box')
+    tableElement = new Resizetable(fetch.result.columns, rows, resultCellRenderer)
+    tableElement.id = 'result-table'
+    resultBoxElement.appendChild(tableElement)
   }
   tableElement.setAttribute('data-page', fetch.page)
 }

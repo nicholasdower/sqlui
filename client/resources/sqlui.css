@@ -282,7 +282,6 @@ table {
     border-spacing: 0;
     color: #333;
     font-size: 18px;
-    width: 100%;
 }
 
 table td:last-child, table th:last-child {
@@ -293,6 +292,10 @@ td, th {
     font-weight: normal;
     white-space: nowrap;
     max-width: 500px;
+}
+
+td:last-child, th:last-child {
+    max-width: none;
 }
 
 td {
