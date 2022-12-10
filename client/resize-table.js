@@ -120,20 +120,20 @@ export class ResizeTable extends HTMLTableElement {
       colElements.push(lastColElement)
 
       const containerMutationObserver = new MutationObserver(function (mutationList, observer) {
-        if (mutationList.length !== 1) {
-          throw new Error(`Expected 1 mutation, found ${mutationList.length}`)
-        }
-        const mutation = mutationList[0]
-        if (this.parentElement) {
-          if (this.parentElement !== mutation.target) {
-            throw new Error('Unexpected table parent')
+        mutationList.forEach(function (mutation) {
+          if (this.parentElement) {
+            if (this.parentElement !== mutation.target) {
+              throw new Error('Unexpected table parent')
+            }
+            return
           }
-          return
-        }
 
-        observer.resizeObserver.unobserve(mutation.target)
-        observer.resizeObserver = null
-        observer.disconnect()
+          if (observer.resizeObserver) {
+            observer.resizeObserver.unobserve(mutation.target)
+            observer.resizeObserver = null
+          }
+          observer.disconnect()
+        }.bind(this))
       }.bind(this))
 
       const tableResizeObserver = new ResizeObserver(function () {
@@ -159,6 +159,8 @@ export class ResizeTable extends HTMLTableElement {
 
         containerMutationObserver.resizeObserver = containerResizeObserver
         containerMutationObserver.containerElement = this.parentElement
+        console.log('observing')
+        console.log(this.parentElement)
         containerMutationObserver.observe(this.parentElement, { childList: true })
       }.bind(this))
       tableResizeObserver.observe(this)
