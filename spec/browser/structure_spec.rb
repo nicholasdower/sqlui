@@ -12,7 +12,7 @@ describe 'structure' do
   end
 
   it 'hides the list of schemas' do
-    expected_table_names = %w[characters]
+    expected_table_names = %w[characters random_data]
     wait.until do
       elements = driver.find_elements(css: '#structure-box > * > .tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
@@ -22,7 +22,7 @@ describe 'structure' do
   end
 
   it 'displays the list of tables' do
-    expected_table_names = %w[characters]
+    expected_table_names = %w[characters random_data]
     table_elements = wait.until do
       elements = driver.find_elements(css: '#structure-box > * > .tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
@@ -32,9 +32,10 @@ describe 'structure' do
   end
 
   it 'displays columns for the selected table' do
+    expected_table_names = %w[characters random_data]
     table_elements = wait.until do
       elements = driver.find_elements(css: '#structure-box > * > #tables > option')
-      elements if elements.size == 1 && elements[0].displayed?
+      elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     table_elements[0].click
 
@@ -60,9 +61,10 @@ describe 'structure' do
   end
 
   it 'displays headers for the selected table' do
+    expected_table_names = %w[characters random_data]
     table_elements = wait.until do
       elements = driver.find_elements(css: '#structure-box > * > #tables > option')
-      elements if elements.size == 1 && elements[0].displayed?
+      elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     table_elements[0].click
     expected_headers = %w[name seq_in_index non_unique column_name]
