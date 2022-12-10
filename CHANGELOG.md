@@ -1,3 +1,7 @@
+## 0.1.58
+
+- Fix status message styling.
+
 ## 0.1.57
 
 - Resize columns to fit on page change.
