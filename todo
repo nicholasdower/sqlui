@@ -1,4 +1,3 @@
-pagination?
 make chart type configurable
 use caching headers on js and css and html, include version in file name
 cache saved files
@@ -25,6 +24,10 @@ test:
  - downloading
  - autocomplete tables, aliases, joins, etc.
  - airbrake notifications
+ - pagination
+ - max rows
+ - decimal rendering
+ - SqlParser.split.
 maybe add support for tags on database config to easily see production vs staging for instance
 add a help tab
 browser notifications when query completes if on other browser tab or other SQLUI tab
@@ -43,11 +46,7 @@ In development use version plus timestamp when server starts. Add a heartbeat to
 check whether current master is green before releasing
 set a cookie for current default submit button
 the case where a user types "select table.foo from table t". the alias breaks the select
-make query endpoint a get and use same encoding as download
 render streamed results as they are returned
-the timer hangs when rendering a large number of rows. Note that the animation does not hang. Maybe need a css timer. See https://codepen.io/kindofone/pen/DddNdL and https://bashooka.com/coding/40-css-javascript-animated-countdown-timer-examples/
 get rid of max rows on the server in favor of max bytes
 sql errors should be 400s and should not go to Airbrake
-improve performance of column resizing by not reading the width of all columns on each mouse move
-numbers are displayed in exponential notation
 host sqlui as a demo somewhere
