@@ -16,6 +16,11 @@ values
   ('Elaine', 'A wonderful girl, a great pal, and more.'),
   ('Kramer', 'A hipster doofus.');
 
+create table seinfeld.random_data(
+  id int auto_increment primary key,
+  data varchar(8)
+);
+
 create user if not exists 'newman'@'%' identified by 'drakescoffeecake';
 grant usage on seinfeld.* to 'newman'@'%';
 grant all privileges on seinfeld.* to 'newman'@'%';
@@ -69,3 +74,55 @@ grant usage on *.* to 'root'@'%';
 grant all privileges on *.* to 'root'@'%';
 
 flush privileges;
+
+-- Random data, useful for testing pagination and max rows.
+use seinfeld;
+
+drop procedure if exists seed_random_data;
+
+delimiter //  
+create procedure seed_random_data()   
+begin
+  set @i = 0; 
+  -- Max rows is currently set at 50,000.
+  -- Insert 50,001 random rows (100 rows per insert * 50 inserts).
+
+  insert into seinfeld.random_data (data) values (left(uuid(), 8));
+
+  while (@i < 500) do
+    insert into seinfeld.random_data
+      (data)
+    values
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8));
+    set @i = @i + 1;
+  end while;
+end;
+//  
+
+delimiter ;
+
+call seed_random_data(); 
