@@ -228,7 +228,7 @@ p {
     background: none !important;
 }
 
-.status-message {
+#status-message {
     display: flex;
     justify-content: center;
     align-content: center;
