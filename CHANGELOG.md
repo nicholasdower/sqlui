@@ -1,3 +1,13 @@
+## 0.1.57
+
+- Resize columns to fit on page change.
+- Improve column resize performance.
+- Add first and last pagination buttons.
+- Far better query splitting.
+- Increase max rows to 50,000.
+- Render decimals properly.
+- Fix formatting on truncated row count.
+
 ## 0.1.56
 
 - Resize columns to fit on page change.
