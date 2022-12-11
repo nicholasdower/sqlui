@@ -20,7 +20,7 @@ p {
     font-size: 18px;
 }
 
-.loading-box {
+#loading-box {
     font-family: monospace;
     display: flex;
     flex-direction: column;
@@ -34,7 +34,7 @@ p {
     color: #333;
 }
 
-.main-box {
+#main-box {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -43,24 +43,24 @@ p {
     min-height: 100%;
 }
 
-.header, .server-name {
+#header, #server-name {
     display: flex;
     align-items: center;
     justify-content: start;
     color: #333;
 }
 
-.header {
+#header {
     font-weight: bold;
     padding-left: 5px;
 }
 
-.header a {
+#header a {
     text-decoration: none;
     color: #333
 }
 
-.server-name {
+#server-name {
     flex: 1;
     padding-left: 15px;
     font-weight: normal;
@@ -69,12 +69,13 @@ p {
     margin: 0;
 }
 
-.tabs-box {
+#tabs-box {
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid #ddd;
     height: 36px;
     font-family: Helvetica, sans-serif;
+    padding: 5px;
 }
 
 .tab-button, .selected-tab-button {
@@ -103,7 +104,7 @@ p {
     font-weight: bold;
 }
 
-.query-box {
+#query-box {
     display: flex;
     flex-direction: column;
 }
@@ -112,7 +113,7 @@ p {
     font-size: 18px;
 }
 
-.submit-box {
+#submit-box {
     display: flex;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
@@ -214,7 +215,10 @@ p {
     background-color: #efefef;
 }
 
-.submit-dropdown-content-button:active, .submit-button:active, .cancel-button:active, .submit-dropdown-button:active {
+.submit-dropdown-content-button:active,
+.submit-button:active,
+.cancel-button:active,
+.submit-dropdown-button:active {
     background-color: #e6e6e6;
     outline: none
 }
@@ -238,9 +242,10 @@ p {
     overflow: hidden;
     font-size: 16px;
     color: #333;
+    margin-left: 5px;
 }
 
-.result-box, .fetch-sql-box, .saved-box, .graph-box, .structure-box {
+#result-box, #fetch-sql-box, #saved-box, #graph-box, #structure-box {
     flex: 1;
     overflow: auto;
     display: flex;
@@ -268,12 +273,12 @@ table tbody tr td {
     bottom: 2px; /* To make the links look vertically centered. */
 }
 
-.fetch-sql-box {
+#fetch-sql-box {
     justify-content: center;
     align-items: center;
 }
 
-.graph-box {
+#graph-box {
     padding: 20px;
 }
 
@@ -352,8 +357,8 @@ thead {
     background: #eee;
 }
 
-.status-box {
-    padding: 5px 15px;
+#status-box {
+    padding: 5px;
     display: flex;
     flex-direction: row;
     border-top: 1px solid #ddd;
@@ -366,17 +371,11 @@ thead {
     color: #999;
 }
 
-.tabs-box {
-    display: flex;
-    padding: 5px;
-}
-
-.saved-box {
+#saved-box {
     font-family: Helvetica, sans-serif;
 }
 
-.saved-box h2 {
-    margin: 0;
+#saved-box h2 {
     font-weight: bold;
 }
 
@@ -384,7 +383,7 @@ thead {
     border-top: none !important;
 }
 
-.saved-box p {
+#saved-box p {
     margin: 0;
 }
 
@@ -427,27 +426,27 @@ thead {
     height: 100%;
 }
 
-.schemas, .tables {
+#schemas, #tables {
     border: none;
     display: flex;
     min-width: 200px;
 }
 
-.table-info {
+#table-info {
     display: grid;
     grid-template-rows: 0.5fr 0.5fr;
     justify-items: stretch;
     flex: 1;
 }
 
-.columns {
+#columns {
     border-bottom: 1px solid #ddd;
     overflow: auto;
     grid-column: 1;
     grid-row: 1;
 }
 
-.indexes {
+#indexes {
     overflow: auto;
     grid-column: 1;
     grid-row: 2;
@@ -494,16 +493,30 @@ select {
 }
 
 .pagination-button {
-    margin: 0 10px;
-    cursor: pointer;
+    margin: 0 0 0 10px;
     background: none;
     color: #333;
     border: 1px solid #888;
     font-size: 16px;
-    padding: 2px 10px;
+    padding: 2px 5px;
+    width: 30px;
+    justify-content: center;
+}
+
+.pagination-button:enabled {
+    cursor: pointer;
 }
 
 .pagination-button:disabled {
     color: #888;
     border: 1px solid #ddd;
+}
+
+.pagination-button:active:enabled {
+    background-color: #e6e6e6;
+    outline: none
+}
+
+.jump-button {
+    font-size: 12px;
 }

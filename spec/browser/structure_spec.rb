@@ -14,7 +14,7 @@ describe 'structure' do
   it 'hides the list of schemas' do
     expected_table_names = %w[characters random_data]
     wait.until do
-      elements = driver.find_elements(css: '#structure-box > * > .tables > option')
+      elements = driver.find_elements(css: '#structure-box > * > #tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     schema_element = wait.until { driver.find_element(css: '#structure-box > * > #schemas') }
@@ -24,7 +24,7 @@ describe 'structure' do
   it 'displays the list of tables' do
     expected_table_names = %w[characters random_data]
     table_elements = wait.until do
-      elements = driver.find_elements(css: '#structure-box > * > .tables > option')
+      elements = driver.find_elements(css: '#structure-box > * > #tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     table_names = table_elements.map(&:text)

@@ -25,24 +25,24 @@
   </head>
 
   <body>
-    <div id="loading-box" class="loading-box">
+    <div id="loading-box">
     </div>
 
-    <div id="main-box" class="main-box" style="display:none">
-      <div class="tabs-box">
-        <h1 class="header"><a id="header-link">SQLUI</a></h1>
-        <h1 id="server-name" class="server-name"></h1>
+    <div id="main-box" style="display:none">
+      <div id="tabs-box">
+        <h1 id="header"><a id="header-link">SQLUI</a></h1>
+        <h1 id="server-name"></h1>
         <a id="query-tab-button" class="tab-button">Query</a>
         <a id="graph-tab-button" class="tab-button">Graph</a>
         <a id="saved-tab-button" class="tab-button">Saved</a>
         <a id="structure-tab-button" class="tab-button">Structure</a>
       </div>
 
-      <div id="query-box" class="query-box tab-content-element graph-element query-element" style="display: none;">
+      <div id="query-box" class="tab-content-element graph-element query-element" style="display: none;">
         <div id="query" class="query"></div>
       </div>
 
-      <div id="submit-box" class="submit-box tab-content-element graph-element query-element" style="display: none;">
+      <div id="submit-box" class="tab-content-element graph-element query-element" style="display: none;">
         <input id="cancel-button" class="cancel-button" type="button" value="cancel"></input>
         <div class="submit-fill"></div>
         <div style="position: relative;">
@@ -66,44 +66,50 @@
         </div>
       </div>
 
-      <div id="result-box" class="result-box tab-content-element query-element" style="display: none;">
+      <div id="result-box" class="tab-content-element query-element" style="display: none;">
       </div>
 
-      <div id="graph-box" class="graph-box tab-content-element graph-element" style="display: none;">
+      <div id="graph-box" class="tab-content-element graph-element" style="display: none;">
       </div>
 
-      <div id="fetch-sql-box" class="fetch-sql-box tab-content-element graph-element query-element" style="display: none;">
+      <div id="fetch-sql-box" class="tab-content-element graph-element query-element" style="display: none;">
         <div id="result-loader" class="loader"></div>
         <p id="result-time" class="result-time"></p>
       </div>
 
-      <div id="saved-box" class="saved-box tab-content-element saved-element" style="display: none;">
+      <div id="saved-box" class="tab-content-element saved-element" style="display: none;">
       </div>
 
-      <div id="structure-box" class="structure-box tab-content-element structure-element" style="display: none;">
+      <div id="structure-box" class="tab-content-element structure-element" style="display: none;">
         <div class="structure-wrapper">
-          <select id="schemas" class="schemas" size="4">
+          <select id="schemas" size="4">
           </select>
-          <select id="tables" class="tables" size="4">
+          <select id="tables" size="4">
           </select>
-          <div id="table-info" class="table-info">
-            <div id="columns" class="columns">
+          <div id="table-info">
+            <div id="columns">
             </div>
-            <div id="indexes" class="indexes">
+            <div id="indexes">
             </div>
           </div>
         </div>
       </div>
 
-      <div id="status-box" class="status-box">
+      <div id="status-box">
         <div id="status-message"></div>
         <div style="flex: 1;"></div>
         <div id="pagination-box" class="tab-content-element">
           <div id="page-count-box"></div>
-          <input id="first-button" class="pagination-button" type="button" value="First" />
-          <input id="prev-button" class="pagination-button" type="button" value="Prev" />
-          <input id="next-button" class="pagination-button" type="button" value="Next" />
-          <input id="last-button" class="pagination-button" type="button" value="Last" />
+          <input id="first-button" class="pagination-button" type="button" value="&laquo;" />
+          <input id="jb5-button" class="pagination-button jump-button" type="button" value="50" data-jump="-50" data-min="100" />
+          <input id="jb10-button" class="pagination-button jump-button" type="button" value="10" data-jump="-10" data-min="25"/>
+          <input id="jb50-button" class="pagination-button jump-button" type="button" value="5"  data-jump="-5"  data-min="10" data-max="24"/>
+          <input id="prev-button" class="pagination-button" type="button" value="&lsaquo;" />
+          <input id="next-button" class="pagination-button" type="button" value="&rsaquo;" />
+          <input id="jf5-button" class="pagination-button jump-button" type="button"  value="5"  data-jump="5"   data-min="10" data-max="24"/>
+          <input id="jf10-button" class="pagination-button jump-button" type="button" value="10" data-jump="10"  data-min="25"/>
+          <input id="jf50-button" class="pagination-button jump-button" type="button" value="50" data-jump="50"  data-min="100"/>
+          <input id="last-button" class="pagination-button" type="button" value="&raquo;" />
         </div>
       </div>
     </div>

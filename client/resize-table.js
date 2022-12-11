@@ -159,8 +159,6 @@ export class ResizeTable extends HTMLTableElement {
 
         containerMutationObserver.resizeObserver = containerResizeObserver
         containerMutationObserver.containerElement = this.parentElement
-        console.log('observing')
-        console.log(this.parentElement)
         containerMutationObserver.observe(this.parentElement, { childList: true })
       }.bind(this))
       tableResizeObserver.observe(this)

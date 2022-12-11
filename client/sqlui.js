@@ -8,7 +8,7 @@ import { ResizeTable } from './resize-table.js'
 
 /* global google */
 
-const PAGE_SIZE = 500
+const PAGE_SIZE = 100
 
 function getSqlFromUrl (url) {
   const params = url.searchParams
@@ -28,15 +28,18 @@ function getSqlFromUrl (url) {
 }
 
 function init (parent, onSubmit, onShiftSubmit) {
-  addClickListener(document.getElementById('query-tab-button'), (event) => selectTab(event, 'query'))
-  addClickListener(document.getElementById('saved-tab-button'), (event) => selectTab(event, 'saved'))
-  addClickListener(document.getElementById('structure-tab-button'), (event) => selectTab(event, 'structure'))
-  addClickListener(document.getElementById('graph-tab-button'), (event) => selectTab(event, 'graph'))
-  addClickListener(document.getElementById('cancel-button'), (event) => clearResult())
+  addEventListener('#query-tab-button', 'click', (event) => selectTab(event, 'query'))
+  addEventListener('#saved-tab-button', 'click', (event) => selectTab(event, 'saved'))
+  addEventListener('#structure-tab-button', 'click', (event) => selectTab(event, 'structure'))
+  addEventListener('#graph-tab-button', 'click', (event) => selectTab(event, 'graph'))
+  addEventListener('#cancel-button', 'click', () => clearResult())
 
+  addEventListener('#query-box', 'click', () => {
+    focus()
+  })
   const dropdownContent = document.getElementById('submit-dropdown-content')
   const dropdownButton = document.getElementById('submit-dropdown-button')
-  addClickListener(dropdownButton, () => dropdownContent.classList.toggle('submit-dropdown-content-show'))
+  addEventListener(dropdownButton, 'click', () => dropdownContent.classList.toggle('submit-dropdown-content-show'))
 
   const isMac = navigator.userAgent.includes('Mac')
   const runCurrentLabel = `run selection (${isMac ? '⌘' : 'Ctrl'}-Enter)`
@@ -44,54 +47,68 @@ function init (parent, onSubmit, onShiftSubmit) {
 
   const submitButtonCurrent = document.getElementById('submit-button-current')
   submitButtonCurrent.value = runCurrentLabel
-  addClickListener(submitButtonCurrent, (event) => submitCurrent(event.target, event))
+  addEventListener(submitButtonCurrent, 'click', (event) => submitCurrent(event.target, event))
 
   const submitButtonAll = document.getElementById('submit-button-all')
   submitButtonAll.value = runAllLabel
-  addClickListener(submitButtonAll, (event) => submitAll(event.target, event))
+  addEventListener(submitButtonAll, 'click', (event) => submitAll(event.target, event))
 
   const dropdownButtonCurrent = document.getElementById('submit-dropdown-button-current')
   dropdownButtonCurrent.value = runCurrentLabel
-  addClickListener(dropdownButtonCurrent, (event) => submitCurrent(event.target, event))
+  addEventListener(dropdownButtonCurrent, 'click', (event) => submitCurrent(event.target, event))
 
   const dropdownAllButton = document.getElementById('submit-dropdown-button-all')
   dropdownAllButton.value = runAllLabel
-  addClickListener(dropdownAllButton, (event) => submitAll(event.target, event))
+  addEventListener(dropdownAllButton, 'click', (event) => submitAll(event.target, event))
 
   const dropdownToggleButton = document.getElementById('submit-dropdown-button-toggle')
-  addClickListener(dropdownToggleButton, () => {
+  addEventListener(dropdownToggleButton, 'click', () => {
     submitButtonCurrent.classList.toggle('submit-button-show')
     submitButtonAll.classList.toggle('submit-button-show')
     focus(getSelection())
   })
 
-  addClickListener(document.getElementById('submit-dropdown-button-copy-csv'), (event) => {
+  addEventListener('#submit-dropdown-button-copy-csv', 'click', () => {
     if (window.sqlFetch?.result) {
       copyTextToClipboard(toCsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
     }
   })
-  addClickListener(document.getElementById('submit-dropdown-button-copy-tsv'), (event) => {
+  addEventListener('#submit-dropdown-button-copy-tsv', 'click', () => {
     if (window.sqlFetch?.result) {
       copyTextToClipboard(toTsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
     }
   })
-  addClickListener(document.getElementById('first-button'), (event) => {
+  addEventListener('#first-button', 'click', () => {
     window.sqlFetch.page = 0
     displaySqlFetch(window.sqlFetch)
   })
-  addClickListener(document.getElementById('prev-button'), (event) => {
+  addEventListener('#prev-button', 'click', () => {
     window.sqlFetch.page -= 1
     displaySqlFetch(window.sqlFetch)
   })
-  addClickListener(document.getElementById('next-button'), (event) => {
+  document.querySelectorAll('.jump-button').forEach((button) => {
+    addEventListener(button, 'click', (event) => {
+      const jump = parseInt(event.target.dataset.jump)
+      let page = 1 + window.sqlFetch.page
+      if (jump < 0) {
+        page -= (page % jump) === 0 ? Math.abs(jump) : page % jump
+      } else {
+        page += jump
+        page -= page % jump
+      }
+      window.sqlFetch.page = Math.max(0, Math.min(window.sqlFetch.pageCount - 1, page - 1))
+      displaySqlFetch(window.sqlFetch)
+    })
+  })
+  addEventListener('#next-button', 'click', () => {
     window.sqlFetch.page += 1
     displaySqlFetch(window.sqlFetch)
   })
-  addClickListener(document.getElementById('last-button'), (event) => {
+  addEventListener('#last-button', 'click', () => {
     window.sqlFetch.page = window.sqlFetch.pageCount - 1
     displaySqlFetch(window.sqlFetch)
   })
-  addClickListener(document.getElementById('submit-dropdown-button-download-csv'), () => {
+  addEventListener('#submit-dropdown-button-download-csv', 'click', () => {
     if (!window.sqlFetch?.result) return
 
     const url = new URL(window.location)
@@ -107,12 +124,12 @@ function init (parent, onSubmit, onShiftSubmit) {
     focus(getSelection())
   })
 
-  document.addEventListener('click', function (event) {
+  addEventListener(document, 'click', (event) => {
     if (event.target !== dropdownButton) {
       dropdownContent.classList.remove('submit-dropdown-content-show')
     }
   })
-  dropdownContent.addEventListener('focusout', function (event) {
+  addEventListener(dropdownContent, 'focusout', (event) => {
     if (!dropdownContent.contains(event.relatedTarget)) {
       dropdownContent.classList.remove('submit-dropdown-content-show')
     }
@@ -120,8 +137,12 @@ function init (parent, onSubmit, onShiftSubmit) {
   window.editorView = createEditor(parent, window.metadata, onSubmit, onShiftSubmit)
 }
 
-function addClickListener (element, func) {
-  element.addEventListener('click', (event) => func(event))
+function addEventListener (elementOrSelector, type, func) {
+  if (typeof elementOrSelector === 'string') {
+    document.querySelector(elementOrSelector).addEventListener(type, func)
+  } else {
+    elementOrSelector.addEventListener(type, func)
+  }
 }
 
 function getSelection () {
@@ -153,9 +174,9 @@ function setSelection (selection) {
   })
 }
 
-function focus (selection) {
+function focus (selection = null) {
   window.editorView.focus()
-  setSelection(selection)
+  if (selection) setSelection(selection)
 }
 
 function getValue () {
@@ -423,7 +444,7 @@ function selectSavedTab () {
     viewLinkElement.classList.add('view-link')
     viewLinkElement.innerText = 'view'
     viewLinkElement.href = viewUrl.pathname + viewUrl.search
-    addClickListener(viewLinkElement, (event) => {
+    addEventListener(viewLinkElement, 'click', (event) => {
       clearResult()
       route(event.target, event, viewUrl, true)
     })
@@ -437,7 +458,7 @@ function selectSavedTab () {
     runLinkElement.classList.add('run-link')
     runLinkElement.innerText = 'run'
     runLinkElement.href = runUrl.pathname + runUrl.search
-    addClickListener(runLinkElement, (event) => {
+    addEventListener(runLinkElement, 'click', (event) => {
       clearResult()
       route(event.target, event, viewUrl, true)
       route(event.target, event, runUrl, true)
@@ -1017,6 +1038,18 @@ function displaySqlFetchResultStatus (sqlFetch) {
     document.getElementById('last-button').style.display = 'none'
     document.getElementById('first-button').style.display = 'none'
   }
+
+  document.querySelectorAll('.jump-button').forEach((button) => {
+    const jump = parseInt(button.dataset.jump)
+    if (jump < 0) {
+      button.disabled = sqlFetch.page === 0
+    } else {
+      button.disabled = sqlFetch.page === sqlFetch.pageCount - 1
+    }
+    const min = button.dataset.min ? parseInt(button.dataset.min) : 0
+    const max = button.dataset.max ? parseInt(button.dataset.max) : Infinity
+    button.style.display = sqlFetch.pageCount >= min && sqlFetch.pageCount <= max ? '' : 'none'
+  })
 }
 
 window.addEventListener('popstate', function (event) {

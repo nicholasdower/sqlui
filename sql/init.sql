@@ -84,8 +84,8 @@ delimiter //
 create procedure seed_random_data()   
 begin
   set @i = 0; 
-  -- Max rows is currently set at 50,000.
-  -- Insert 50,001 random rows (100 rows per insert * 50 inserts).
+  -- Max rows is currently set at 100,000.
+  -- Insert 100,001 random rows (200 rows per insert * 500 inserts).
 
   insert into seinfeld.random_data (data) values (left(uuid(), 8));
 
@@ -93,31 +93,31 @@ begin
     insert into seinfeld.random_data
       (data)
     values
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
-      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8));
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)),
+      (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8)), (left(uuid(), 8));
     set @i = @i + 1;
   end while;
 end;
