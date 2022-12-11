@@ -1,3 +1,8 @@
+## 0.1.59
+
+- Focus editor on click.
+- Add jump button to pagination.
+
 ## 0.1.58
 
 - Fix status message styling.
