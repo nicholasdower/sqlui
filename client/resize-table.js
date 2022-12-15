@@ -13,6 +13,7 @@ class Drag {
 let drag = new Drag()
 
 document.addEventListener('mousedown', (event) => {
+  if (event.button !== 0) return
   if (!event.target.classList.contains('col-resizer')) return
 
   drag = new Drag()

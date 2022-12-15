@@ -240,17 +240,8 @@ p {
     overflow: hidden;
     font-size: 16px;
     color: #333;
-    margin-left: 5px;
+    margin: 0 5px;
     text-overflow: ellipsis;
-}
-
-#check-console {
-    justify-content: left;
-    font-family: Helvetica, sans-serif;
-    white-space: nowrap;
-    font-size: 16px;
-    color: #333;
-    margin: 0 10px 0 5px;
 }
 
 #result-box, #fetch-sql-box, #saved-box, #graph-box, #structure-box {
@@ -494,7 +485,7 @@ select {
 #pagination-box {
     display: flex;
     flex-direction: row;
-    margin-right: 5px;
+    margin: 0 5px;
 }
 
 #page-count-box {

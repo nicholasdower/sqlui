@@ -134,6 +134,7 @@ function init (parent, onSubmit, onShiftSubmit) {
       dropdownContent.classList.remove('submit-dropdown-content-show')
     }
   })
+
   window.editorView = createEditor(parent, window.metadata, onSubmit, onShiftSubmit)
 }
 
@@ -552,17 +553,11 @@ function clearResult () {
 
 function clearStatus () {
   document.getElementById('status-message').innerText = ''
-  document.getElementById('check-console').style.display = 'none'
 }
 
-function setStatus (message, checkConsole = false) {
+function setStatus (message) {
   const element = document.getElementById('status-message')
   element.innerText = message
-  if (checkConsole) {
-    document.getElementById('check-console').style.display = 'block'
-  } else {
-    document.getElementById('check-console').style.display = 'none'
-  }
 }
 
 function clearResultBox () {
@@ -911,11 +906,9 @@ function displaySqlFetch (fetch) {
 
 function displaySqlFetchError (message, details) {
   if (details) {
-    console.log(`${message}\n${details}`)
-    setStatus(message, true)
-  } else {
-    setStatus(message)
+    console.log(details)
   }
+  setStatus(message)
 }
 
 function clearSpinner () {
