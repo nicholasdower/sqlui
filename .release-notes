@@ -1,1 +1,4 @@
-- No changes.
+- Display entire error in status. Show elipsis conditionally.
+- Fix result streaming.
+- Don't exceed max result bytes.
+- Handle More JavaScript errors.

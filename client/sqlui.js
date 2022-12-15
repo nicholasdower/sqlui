@@ -552,11 +552,17 @@ function clearResult () {
 
 function clearStatus () {
   document.getElementById('status-message').innerText = ''
+  document.getElementById('check-console').style.display = 'none'
 }
 
-function setStatus (message) {
+function setStatus (message, checkConsole = false) {
   const element = document.getElementById('status-message')
   element.innerText = message
+  if (checkConsole) {
+    document.getElementById('check-console').style.display = 'block'
+  } else {
+    document.getElementById('check-console').style.display = 'none'
+  }
 }
 
 function clearResultBox () {
@@ -634,6 +640,9 @@ function fetchSql (sqlFetch) {
             }
           }
           displaySqlFetch(sqlFetch)
+        }).catch(function (error) {
+          setSqlFetchError(sqlFetch, error)
+          displaySqlFetch(sqlFetch)
         })
       } else {
         response.text().then((result) => {
@@ -641,18 +650,26 @@ function fetchSql (sqlFetch) {
           sqlFetch.errorMessage = 'failed to execute query'
           sqlFetch.errorDetails = result
           displaySqlFetch(sqlFetch)
+        }).catch(function (error) {
+          setSqlFetchError(sqlFetch, error)
+          displaySqlFetch(sqlFetch)
         })
       }
     })
     .catch(function (error) {
-      if (sqlFetch.state === 'pending') {
-        sqlFetch.endedAt = window.performance.now()
-        sqlFetch.state = 'error'
-        sqlFetch.errorMessage = 'failed to execute query'
-        sqlFetch.errorDetails = error
-      }
+      setSqlFetchError(sqlFetch, error)
       displaySqlFetch(sqlFetch)
     })
+}
+
+function setSqlFetchError (sqlFetch, error) {
+  // Ignore the error unless pending since the error may be the result of aborting.
+  if (sqlFetch.state === 'pending') {
+    sqlFetch.endedAt = window.performance.now()
+    sqlFetch.state = 'error'
+    sqlFetch.errorMessage = 'failed to execute query'
+    sqlFetch.errorDetails = error
+  }
 }
 
 function parseSqlVariables (params) {
@@ -893,15 +910,12 @@ function displaySqlFetch (fetch) {
 }
 
 function displaySqlFetchError (message, details) {
-  let statusMessage = 'error: ' + message
-  if (statusMessage.length > 90) {
-    statusMessage = statusMessage.substring(0, 90) + '…'
-  }
   if (details) {
     console.log(`${message}\n${details}`)
-    statusMessage += ' (check console)'
+    setStatus(message, true)
+  } else {
+    setStatus(message)
   }
-  setStatus(statusMessage)
 }
 
 function clearSpinner () {
@@ -1009,14 +1023,14 @@ function displaySqlFetchResultStatus (sqlFetch) {
   const elapsed = Math.round(100 * (sqlFetch.getDuration() / 1000.0)) / 100
 
   let message
-  if (result.total_rows === 1) {
-    message = `${result.total_rows} row (${elapsed}s)`
+  if (result.rows.length === 1) {
+    message = `1 row returned after ${elapsed}s`
   } else {
-    message = `${result.total_rows.toLocaleString()} rows (${elapsed}s)`
+    message = `${result.rows.length.toLocaleString()} rows returned after ${elapsed}s`
   }
 
   if (result.total_rows > result.rows.length) {
-    message += ` (truncated to ${result.rows.length.toLocaleString()})`
+    message += ` (truncated from ${result.total_rows.toLocaleString()})`
   }
   setStatus(message)
 

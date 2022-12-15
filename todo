@@ -50,3 +50,5 @@ render streamed results as they are returned
 get rid of max rows on the server in favor of max bytes
 sql errors should be 400s and should not go to Airbrake
 host sqlui as a demo somewhere
+Add the ability to demo with a client-side fake server
+Display number of rows affected if different from rows returned. 

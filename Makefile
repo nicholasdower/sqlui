@@ -78,6 +78,7 @@ start-db:
 .PHONY: start-db-detached
 start-db-detached:
 	./scripts/docker-compose-up-detach sqlui_db
+	./scripts/await-healthy-container sqlui_db
 
 .PHONY: stop-db
 stop-db:
@@ -133,7 +134,6 @@ watch-unit-test:
 
 .PHONY: test
 test: build start-db-detached start-selenium-detached
-	./scripts/await-healthy-container sqlui_db
 	$(RUN) --publish 9090:9090 --name sqlui_test $(IMAGE) ./scripts/run-in-env test -- bundle exec rspec $(if $(ARGS),$(ARGS),)
 
 .PHONY: watch-test

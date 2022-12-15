@@ -143,31 +143,60 @@ class Server < Sinatra::Base
         status 200
         headers 'Content-Type' => 'application/json; charset=utf-8'
 
-        database.with_client do |client|
-          query_result = execute_query(client, variables, queries)
-          stream do |out|
+        stream do |out|
+          database.with_client do |client|
+            begin
+              query_result = execute_query(client, variables, queries)
+            rescue Mysql2::Error => e
+              stacktrace = e.full_message(highlight: false)
+              message = "ERROR #{e.error_number} (#{e.sql_state}): #{e.message.lines.first&.strip || 'unknown error'}"
+              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              break
+            rescue StandardError => e
+              stacktrace = e.full_message(highlight: false)
+              message = e.message.lines.first&.strip || 'unknown error'
+              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              break
+            end
+
             if query_result
               json = <<~RES.chomp
                 {
                   "columns": #{query_result.fields.to_json},
                   "column_types": #{MysqlTypes.map_to_google_charts_types(query_result.field_types).to_json},
-                  "total_rows": #{query_result.size.to_json},
                   "selection": #{params[:selection].to_json},
                   "query": #{params[:sql].to_json},
                   "rows": [
               RES
               out << json
-              bytes = json.bytesize
+              bytes_written = json.bytesize
+              max_rows_written = false
+              rows_written = 0
+              total_rows = 0
               query_result.each_with_index do |row, i|
+                total_rows += 1
+                next if max_rows_written
+
                 json = "#{i.zero? ? '' : ','}\n    #{row.map { |v| big_decimal_to_float(v) }.to_json}"
-                bytes += json.bytesize
-                break if i == Sqlui::MAX_ROWS || bytes > Sqlui::MAX_BYTES
+                bytesize = json.bytesize
+                if bytes_written + bytesize > Sqlui::MAX_BYTES
+                  max_rows_written = true
+                  next
+                end
 
                 out << json
+                bytes_written += bytesize
+                rows_written += 1
+
+                if rows_written == Sqlui::MAX_ROWS
+                  max_rows_written = true
+                  next
+                end
               end
               out << <<~RES
 
-                  ]
+                  ],
+                  "total_rows": #{total_rows}
                 }
               RES
             else
@@ -198,9 +227,21 @@ class Server < Sinatra::Base
         attachment 'result.csv'
         status 200
 
-        database.with_client do |client|
-          query_result = execute_query(client, variables, queries)
-          stream do |out|
+        stream do |out|
+          database.with_client do |client|
+            begin
+              query_result = execute_query(client, variables, queries)
+            rescue Mysql2::Error => e
+              stacktrace = e.full_message(highlight: false)
+              message = "ERROR #{e.error_number} (#{e.sql_state}): #{e.message.lines.first&.strip || 'unknown error'}"
+              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              break
+            rescue StandardError => e
+              stacktrace = e.full_message(highlight: false)
+              message = e.message.lines.first&.strip || 'unknown error'
+              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              break
+            end
             out << CSV::Row.new(query_result.fields, query_result.fields, header_row: true).to_s.strip
             query_result.each do |row|
               out << "\n#{CSV::Row.new(query_result.fields, row.map { |v| big_decimal_to_float(v) }).to_s.strip}"
@@ -230,7 +271,7 @@ class Server < Sinatra::Base
       stacktrace = exception&.full_message(highlight: false)
       if request.env['HTTP_ACCEPT'] == 'application/json'
         headers 'Content-Type' => 'application/json; charset=utf-8'
-        message = exception&.message&.lines&.first&.strip || 'unexpected error'
+        message = "error: #{exception&.message&.lines&.first&.strip || 'unexpected error'}"
         json = { error: message, stacktrace: stacktrace }.compact.to_json
         body json
       else
@@ -274,7 +315,10 @@ class Server < Sinatra::Base
     variables.each do |name, value|
       client.query("SET @#{name} = #{value};")
     end
-    queries.map { |current| client.query(current) }.last
+    queries[0..-2].map do |current|
+      client.query(current, stream: true)&.free
+    end
+    client.query(queries[-1], stream: true)
   end
 
   def big_decimal_to_float(maybe_big_decimal)

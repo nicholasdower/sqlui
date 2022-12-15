@@ -233,16 +233,24 @@ p {
 }
 
 #status-message {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: row;
+    min-width: 0;
+    justify-content: left;
     font-family: Helvetica, sans-serif;
     white-space: nowrap;
     overflow: hidden;
     font-size: 16px;
     color: #333;
     margin-left: 5px;
+    text-overflow: ellipsis;
+}
+
+#check-console {
+    justify-content: left;
+    font-family: Helvetica, sans-serif;
+    white-space: nowrap;
+    font-size: 16px;
+    color: #333;
+    margin: 0 10px 0 5px;
 }
 
 #result-box, #fetch-sql-box, #saved-box, #graph-box, #structure-box {
@@ -358,7 +366,8 @@ thead {
 }
 
 #status-box {
-    padding: 5px;
+    width: 100%;
+    padding: 5px 0;
     display: flex;
     flex-direction: row;
     border-top: 1px solid #ddd;
@@ -485,11 +494,13 @@ select {
 #pagination-box {
     display: flex;
     flex-direction: row;
+    margin-right: 5px;
 }
 
 #page-count-box {
     align-self: center;
     font-size: 16px;
+    white-space: nowrap;
 }
 
 .pagination-button {

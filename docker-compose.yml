@@ -8,6 +8,10 @@ services:
       - '3306:3306'
     volumes:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./sql/my.cnf:/etc/mysql/my.cnf:ro
+      - ./logs/mysql-general.log:/var/log/mysql-general.log
+      - ./logs/mysql-error.log:/var/log/mysql-error.log
+    #command: mysqld --general-log=1 --general-log-file=/var/log/mysql-general.log
     healthcheck:
       test: ['CMD', 'mysql', '--user=root', '--password=root', '--execute', 'show databases;']
       interval: 5s

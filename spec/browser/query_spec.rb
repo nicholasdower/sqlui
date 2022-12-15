@@ -110,7 +110,7 @@ describe 'query' do
       end
 
       it 'displays an error and no results' do
-        wait_until_no_results(wait, /^error: You have an error in your SQL syntax;/)
+        wait_until_no_results(wait, /^ERROR 1064 \(42000\): You have an error in your SQL syntax;/)
       end
     end
 

@@ -8,3 +8,4 @@
 /envs/*
 !/envs/development
 !/envs/test
+/logs
