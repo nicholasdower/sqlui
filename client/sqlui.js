@@ -5,6 +5,7 @@ import { copyTextToClipboard } from './clipboard.js'
 import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
 import { ResizeTable } from './resize-table.js'
+import { createPopup } from './popup.js'
 
 /* global google */
 
@@ -362,7 +363,7 @@ function selectStructureTab () {
         }
         rows.push(row)
       }
-      const cellRenderer = function (rowElement, _columnIndex, value) {
+      const cellRenderer = function (rowElement, _rowIndex, _columnIndex, value) {
         const cellElement = document.createElement('td')
         cellElement.style.textAlign = (typeof value) === 'string' ? 'left' : 'right'
         cellElement.innerText = value
@@ -388,7 +389,7 @@ function selectStructureTab () {
           rows.push(row)
         }
       }
-      const cellRenderer = function (rowElement, _columnIndex, value) {
+      const cellRenderer = function (rowElement, _rowIndex, _columnIndex, value) {
         const cellElement = document.createElement('td')
         cellElement.style.textAlign = (typeof value) === 'string' ? 'left' : 'right'
         cellElement.innerText = value
@@ -788,9 +789,18 @@ const createCellLink = function (link, value) {
   return abbrElement
 }
 
-const resultCellRenderer = function (rowElement, columnIndex, value) {
+const resultCellRenderer = function (rowElement, rowIndex, columnIndex, value) {
   const column = window.sqlFetch.result.columns[columnIndex]
   const columnType = window.sqlFetch.result.column_types[columnIndex]
+
+  const cellElement = document.createElement('td')
+  cellElement.dataset.column = columnIndex.toString()
+  cellElement.dataset.row = rowIndex.toString()
+  rowElement.appendChild(cellElement)
+
+  if (typeof value === 'string' && value.indexOf('\n') >= 0) {
+    value = value.replaceAll('\n', '¶')
+  }
 
   if (value && window.metadata.columns[column]?.links?.length > 0) {
     const linksElement = document.createElement('div')
@@ -808,14 +818,10 @@ const resultCellRenderer = function (rowElement, columnIndex, value) {
     wrapperElement.appendChild(linksElement)
     wrapperElement.appendChild(textElement)
 
-    const columnElement = document.createElement('td')
-    columnElement.appendChild(wrapperElement)
-    rowElement.appendChild(columnElement)
+    cellElement.appendChild(wrapperElement)
   } else {
-    const cellElement = document.createElement('td')
     cellElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
     cellElement.innerText = value
-    rowElement.appendChild(cellElement)
   }
 }
 
@@ -870,11 +876,24 @@ function displaySqlFetchInResultTab (fetch) {
     const resultBoxElement = document.getElementById('result-box')
     tableElement = new ResizeTable(fetch.result.columns, rows, resultCellRenderer)
     tableElement.id = 'result-table'
+    registerTableCellPopup(tableElement)
     resultBoxElement.appendChild(tableElement)
   }
   tableElement.setAttribute('data-page', fetch.page)
 }
 
+function registerTableCellPopup (tableElement) {
+  addEventListener(tableElement, 'mousedown', (event) => {
+    if (event.which === 1) {
+      if (event.target.tagName.toLowerCase() === 'td') {
+        const row = parseInt(event.target.dataset.row)
+        const column = parseInt(event.target.dataset.column)
+        createPopup(window.sqlFetch.result.columns[column], window.sqlFetch.result.rows[row][column])
+        event.preventDefault()
+      }
+    }
+  })
+}
 function disableDownloadButtons () {
   document.getElementById('submit-dropdown-button-download-csv').classList.add('disabled')
   document.getElementById('submit-dropdown-button-copy-csv').classList.add('disabled')

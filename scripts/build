@@ -7,7 +7,7 @@ build=0
 if [ ! -f client/resources/sqlui.js ]; then
   build=1
 else
-  for file in client/*.js; do
+  for file in client/*.{js,css}; do
     if [ $file -nt client/resources/sqlui.js ]; then
       build=1
     fi

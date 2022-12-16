@@ -179,16 +179,16 @@ export class ResizeTable extends HTMLTableElement {
     this.tbodyElement = tbodyElement
 
     let highlight = false
-    rows.forEach(function (row) {
+    rows.forEach(function (row, rowIndex) {
       const rowElement = document.createElement('tr')
       if (highlight) {
         rowElement.classList.add('highlighted-row')
       }
       highlight = !highlight
       tbodyElement.appendChild(rowElement)
-      row.forEach(function (value, index) {
+      row.forEach(function (value, columnIndex) {
         if (cellRenderer) {
-          cellRenderer(rowElement, index, value)
+          cellRenderer(rowElement, rowIndex, columnIndex, value)
         } else {
           const cellElement = document.createElement('td')
           cellElement.innerText = value
