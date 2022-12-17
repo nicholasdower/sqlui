@@ -70,19 +70,23 @@ clean: kill
 	rm -rf .bundle*
 	rm -rf *.gem
 	rm -rf .install*
+	rm -rf logs/*
+
+.PHONY: db-logs
+db-logs:
+	rm -rf logs/mysql-error.log logs/mysql-general.log
+	mkdir -p logs
+	touch logs/mysql-error.log
+	touch logs/mysql-general.log
 
 .PHONY: start-db
-start-db:
+start-db: db-logs
 	docker compose up sqlui_db
 
 .PHONY: start-db-detached
-start-db-detached:
+start-db-detached: db-logs
 	./scripts/docker-compose-up-detach sqlui_db
 	./scripts/await-healthy-container sqlui_db
-
-.PHONY: stop-db
-stop-db:
-	docker compose down sqlui_db
 
 .PHONY: seed-db
 seed-db:
@@ -97,12 +101,12 @@ docker-run:
 	@$(RUN_IMAGE) $(CMD)
 
 .PHONY: start
-start: build
+start: build db-logs
 	./scripts/docker-compose-up-detach sqlui_db
 	docker compose up sqlui_server
 
 .PHONY: start-detached
-start-detached: install
+start-detached: install db-logs
 	./scripts/docker-compose-up-detach sqlui_db
 	./scripts/docker-compose-up-detach sqlui_server
 	./scripts/await-healthy-container sqlui_server
