@@ -63,4 +63,8 @@
     font-size: 18px;
     color: #333;
     font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: calc(100% - 120px);
 }

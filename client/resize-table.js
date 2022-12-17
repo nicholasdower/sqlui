@@ -70,10 +70,11 @@ document.addEventListener('mousemove', (event) => {
 })
 
 export class ResizeTable extends HTMLTableElement {
-  constructor (columns, rows, cellRenderer) {
+  constructor (columns, rows, headerRenderer, cellRenderer) {
     super()
 
     this.columns = columns
+    this.headerRenderer = headerRenderer
     this.cellRenderer = cellRenderer
 
     this.style.tableLayout = 'auto'
@@ -112,7 +113,11 @@ export class ResizeTable extends HTMLTableElement {
         resizerElement.dataset.colId = colElement.dataset.colId
         contentWrapperElement.appendChild(resizerElement)
 
-        nameElement.innerText = column
+        if (headerRenderer) {
+          nameElement.appendChild(headerRenderer(headerElement, index, column))
+        } else {
+          nameElement.innerText = column
+        }
       })
 
       headerTrElement.appendChild(document.createElement('th'))
@@ -187,13 +192,13 @@ export class ResizeTable extends HTMLTableElement {
       highlight = !highlight
       tbodyElement.appendChild(rowElement)
       row.forEach(function (value, columnIndex) {
+        const cellElement = document.createElement('td')
         if (cellRenderer) {
-          cellRenderer(rowElement, rowIndex, columnIndex, value)
+          cellElement.appendChild(cellRenderer(cellElement, rowIndex, columnIndex, value))
         } else {
-          const cellElement = document.createElement('td')
           cellElement.innerText = value
-          rowElement.appendChild(cellElement)
         }
+        rowElement.appendChild(cellElement)
       })
       rowElement.appendChild(document.createElement('td'))
     })

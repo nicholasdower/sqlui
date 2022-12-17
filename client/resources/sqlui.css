@@ -254,7 +254,7 @@ table tbody tr td {
   height: 21px;
 }
 
-#result-table td {
+#result-table td, #result-table th {
     cursor: default;
 }
 

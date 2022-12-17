@@ -19,6 +19,7 @@ export function createPopup (title, text) {
   closeElement.addEventListener('click', (event) => {
     document.body.removeChild(wrapperElement)
   })
+  closeElement.focus()
 
   const titleElement = document.createElement('div')
   titleElement.classList.add(styles['popup-title'])

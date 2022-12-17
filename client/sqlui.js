@@ -363,13 +363,11 @@ function selectStructureTab () {
         }
         rows.push(row)
       }
-      const cellRenderer = function (rowElement, _rowIndex, _columnIndex, value) {
-        const cellElement = document.createElement('td')
+      const cellRenderer = function (cellElement, _rowIndex, _columnIndex, value) {
         cellElement.style.textAlign = (typeof value) === 'string' ? 'left' : 'right'
-        cellElement.innerText = value
-        rowElement.appendChild(cellElement)
+        return document.createTextNode(value)
       }
-      columnsElement.appendChild(new ResizeTable(columns, rows, cellRenderer))
+      columnsElement.appendChild(new ResizeTable(columns, rows, null, cellRenderer))
     }
 
     const indexEntries = Object.entries(table.indexes)
@@ -389,13 +387,11 @@ function selectStructureTab () {
           rows.push(row)
         }
       }
-      const cellRenderer = function (rowElement, _rowIndex, _columnIndex, value) {
-        const cellElement = document.createElement('td')
+      const cellRenderer = function (cellElement, _rowIndex, _columnIndex, value) {
         cellElement.style.textAlign = (typeof value) === 'string' ? 'left' : 'right'
-        cellElement.innerText = value
-        rowElement.appendChild(cellElement)
+        return document.createTextNode(value)
       }
-      indexesElement.appendChild(new ResizeTable(columns, rows, cellRenderer))
+      indexesElement.appendChild(new ResizeTable(columns, rows, null, cellRenderer))
     }
   })
   window.structureLoaded = true
@@ -789,14 +785,12 @@ const createCellLink = function (link, value) {
   return abbrElement
 }
 
-const resultCellRenderer = function (rowElement, rowIndex, columnIndex, value) {
+const resultCellRenderer = function (cellElement, rowIndex, columnIndex, value) {
   const column = window.sqlFetch.result.columns[columnIndex]
   const columnType = window.sqlFetch.result.column_types[columnIndex]
 
-  const cellElement = document.createElement('td')
   cellElement.dataset.column = columnIndex.toString()
   cellElement.dataset.row = rowIndex.toString()
-  rowElement.appendChild(cellElement)
 
   if (typeof value === 'string' && value.indexOf('\n') >= 0) {
     value = value.replaceAll('\n', '¶')
@@ -818,11 +812,20 @@ const resultCellRenderer = function (rowElement, rowIndex, columnIndex, value) {
     wrapperElement.appendChild(linksElement)
     wrapperElement.appendChild(textElement)
 
-    cellElement.appendChild(wrapperElement)
+    return wrapperElement
   } else {
     cellElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
-    cellElement.innerText = value
+    return document.createTextNode(value)
   }
+}
+
+function resultHeaderRenderer (headerElement, columnIndex, value) {
+  headerElement.dataset.column = columnIndex.toString()
+
+  if (typeof value === 'string' && value.indexOf('\n') >= 0) {
+    value = value.replaceAll('\n', '¶')
+  }
+  return document.createTextNode(value)
 }
 
 function displaySqlFetchInResultTab (fetch) {
@@ -874,7 +877,7 @@ function displaySqlFetchInResultTab (fetch) {
   } else {
     clearResultBox()
     const resultBoxElement = document.getElementById('result-box')
-    tableElement = new ResizeTable(fetch.result.columns, rows, resultCellRenderer)
+    tableElement = new ResizeTable(fetch.result.columns, rows, resultHeaderRenderer, resultCellRenderer)
     tableElement.id = 'result-table'
     registerTableCellPopup(tableElement)
     resultBoxElement.appendChild(tableElement)
@@ -883,16 +886,35 @@ function displaySqlFetchInResultTab (fetch) {
 }
 
 function registerTableCellPopup (tableElement) {
-  addEventListener(tableElement, 'mousedown', (event) => {
-    if (event.which === 1) {
-      if (event.target.tagName.toLowerCase() === 'td') {
-        const row = parseInt(event.target.dataset.row)
-        const column = parseInt(event.target.dataset.column)
-        createPopup(window.sqlFetch.result.columns[column], window.sqlFetch.result.rows[row][column])
+  const listener = (event) => {
+    if (event.which === 1 && event.detail === 2) {
+      let node = event.target
+      while (!['td', 'th', 'table'].includes(node.tagName.toLowerCase()) && node.parentNode) {
+        node = node.parentNode
+      }
+      if (node.tagName.toLowerCase() === 'td') {
+        if (event.type === 'mousedown') {
+          const row = parseInt(node.dataset.row)
+          const column = parseInt(node.dataset.column)
+          const title = window.sqlFetch.result.columns[column].replaceAll('\n', '¶')
+          createPopup(title, window.sqlFetch.result.rows[row][column])
+        }
+        event.preventDefault()
+      } else if (node.tagName.toLowerCase() === 'th') {
+        if (event.type === 'mousedown') {
+          const column = parseInt(node.dataset.column)
+          const value = window.sqlFetch.result.columns[column]
+          const title = value.replaceAll('\n', '¶')
+          createPopup(title, value)
+        }
         event.preventDefault()
       }
     }
-  })
+  }
+  // We only open the popup on mouseup but we need to preventDefault on mousedown to avoid the clicked text from
+  // being highlighted.
+  addEventListener(tableElement, 'mouseup', listener)
+  addEventListener(tableElement, 'mousedown', listener)
 }
 function disableDownloadButtons () {
   document.getElementById('submit-dropdown-button-download-csv').classList.add('disabled')
