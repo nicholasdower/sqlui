@@ -74,10 +74,11 @@ clean: kill
 
 .PHONY: db-logs
 db-logs:
-	rm -rf logs/mysql-error.log logs/mysql-general.log
+	rm -rf logs/mysql-*.log
 	mkdir -p logs
 	touch logs/mysql-error.log
 	touch logs/mysql-general.log
+	chmod 666 logs/mysql-*.log
 
 .PHONY: start-db
 start-db: db-logs
