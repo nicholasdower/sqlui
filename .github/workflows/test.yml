@@ -34,6 +34,12 @@ jobs:
         run: make start-selenium-detached
       - name: Test
         run: make test
+      - name: Dump MySQL Error Log
+        if: always()
+        run: cat logs/mysql-error.log
+      - name: Dump MySQL General Log
+        if: always()
+        run: cat logs/mysql-general.log
       - name: Kill
         if: always()
         run: make kill
