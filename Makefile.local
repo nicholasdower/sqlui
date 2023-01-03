@@ -14,6 +14,10 @@ npm-update-local:
 .PHONY: update-local
 update-local: bundle-update-local npm-update-local
 
+.PHONY: bundle-outdated-local
+bundle-outdated-local:
+	bundle outdated
+
 .PHONY: update-local
 upgrade-local:
 	./scripts/nvm_exec npx npm-check-updates --upgrade

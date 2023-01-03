@@ -26,6 +26,10 @@ npm-update:
 .PHONY: update
 update: bundle-update npm-update
 
+.PHONY: bundle-outdated
+bundle-outdated:
+	$(RUN_IMAGE) bundle outdated
+
 .PHONY: upgrade
 upgrade:
 	$(RUN_IMAGE) npx npm-check-updates --upgrade
