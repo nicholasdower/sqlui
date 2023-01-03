@@ -51,5 +51,4 @@ sql errors should be 400s and should not go to Airbrake
 host sqlui as a demo somewhere
 Add the ability to demo with a client-side fake server
 Display number of rows affected if different from rows returned. 
-fix tab focus when popup is displayed. Tab should move between selecting all in pre and close button, then cycle back.
 make it possible to focus on table and use arrows to highlight cells

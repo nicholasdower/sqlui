@@ -11,6 +11,7 @@ export function createPopup (title, text) {
   wrapperElement.appendChild(contentElement)
 
   const closeElement = document.createElement('input')
+  closeElement.id = 'popup-close'
   closeElement.classList.add(styles['popup-close'])
   closeElement.type = 'button'
   closeElement.value = 'Close'
@@ -19,7 +20,6 @@ export function createPopup (title, text) {
   closeElement.addEventListener('click', (event) => {
     document.body.removeChild(wrapperElement)
   })
-  closeElement.focus()
 
   const titleElement = document.createElement('div')
   titleElement.classList.add(styles['popup-title'])
@@ -27,6 +27,7 @@ export function createPopup (title, text) {
   wrapperElement.appendChild(titleElement)
 
   const preElement = document.createElement('pre')
+  preElement.id = 'popup-pre'
   preElement.classList.add(styles['popup-pre'])
   contentElement.appendChild(preElement)
   preElement.innerText = text
@@ -38,13 +39,22 @@ export function createPopup (title, text) {
   contentElement.addEventListener('click', (event) => {
     event.stopPropagation()
   })
+
+  closeElement.focus()
 }
 
 document.addEventListener('keydown', (event) => {
   if (event.code === 'Escape') {
-    const popupWrapperElement = document.getElementById('popup')
-    if (popupWrapperElement) {
-      document.body.removeChild(popupWrapperElement)
+    const wrapperElement = document.getElementById('popup')
+    if (wrapperElement) {
+      event.preventDefault()
+      document.body.removeChild(wrapperElement)
+    }
+  } else if (event.code === 'Tab') {
+    const wrapperElement = document.getElementById('popup')
+    if (wrapperElement) {
+      event.preventDefault()
+      document.getElementById('popup-close').focus()
     }
   }
 })

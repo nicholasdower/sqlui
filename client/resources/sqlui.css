@@ -267,6 +267,7 @@ table tbody tr td {
     border: 1px dotted #555;
     font-size: 12px;
     display: inline-block;
+    user-select: none;
 }
 
 #result-table tbody tr td abbr {

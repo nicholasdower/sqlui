@@ -34,6 +34,9 @@
     font-family: monospace;
 }
 
+.popup-pre:focus {
+    outline: none;
+}
 .popup-close {
     position: absolute;
     right: 20px;
