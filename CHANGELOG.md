@@ -1,3 +1,12 @@
+## 0.1.60
+
+- Display entire error in status. Show elipsis conditionally.
+- Fix result streaming.
+- Don't exceed max result bytes.
+- Handle more JavaScript errors.
+- Clicking a result cell now displays all contents in a popup.
+- Handle newlines in cell contents.
+
 ## 0.1.59
 
 - Focus editor on click.
