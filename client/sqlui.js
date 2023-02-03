@@ -893,7 +893,7 @@ function displaySqlFetchInResultTab (fetch) {
 
 function registerTableCellPopup (tableElement) {
   const listener = (event) => {
-    if (event.which === 1 && event.detail === 2) {
+    if (event.which === 1 && event.metaKey) {
       let node = event.target
       while (!['td', 'th', 'table'].includes(node.tagName.toLowerCase()) && node.parentNode) {
         node = node.parentNode

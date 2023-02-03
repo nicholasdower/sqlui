@@ -2,3 +2,5 @@
 - Make DB URL paths relative.
 - Add editor resizer button.
 - Don't uppercase SQL.
+- Result cell popup is now triggered by a meta-click.
+- Fix bug preventing easily highlighting content in popup.

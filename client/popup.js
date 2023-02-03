@@ -24,7 +24,7 @@ export function createPopup (title, text) {
   const titleElement = document.createElement('div')
   titleElement.classList.add(styles['popup-title'])
   titleElement.innerText = title
-  wrapperElement.appendChild(titleElement)
+  contentElement.appendChild(titleElement)
 
   const preElement = document.createElement('pre')
   preElement.id = 'popup-pre'

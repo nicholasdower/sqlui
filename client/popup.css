@@ -60,8 +60,8 @@
 
 .popup-title {
     position: absolute;
-    left: 60px;
-    top: 60px;
+    top: 10px;
+    left: 10px;
     font-family: Helvetica, sans-serif;
     font-size: 18px;
     color: #333;
@@ -69,5 +69,5 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: calc(100% - 120px);
+    width: calc(100% - 20px);
 }
