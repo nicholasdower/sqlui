@@ -52,3 +52,9 @@ host sqlui as a demo somewhere
 Add the ability to demo with a client-side fake server
 Display number of rows affected if different from rows returned. 
 make it possible to focus on table and use arrows to highlight cells
+Add ability to auto-refresh current query
+When auto-refreshing, show browser notification if results change.
+double clicking to select in popup also selects the title
+change action required to open popup. Double-click is still useful for cells which don't overflow or contain newlines.
+the editor resizor is broken
+increase max url length. See https://stackoverflow.com/questions/8333158/webrick-requesturitoolarge-should-i-update-or-use-a-different-server
