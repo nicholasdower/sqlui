@@ -999,7 +999,7 @@ function displaySqlFetchInGraphTab (fetch) {
     return
   }
 
-  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('cancel-button').style.visibility = 'hidden'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('graph-box').style.display = 'flex'
 
