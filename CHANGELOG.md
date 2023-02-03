@@ -1,3 +1,13 @@
+## 0.1.61
+
+- Replace list_url_path with base_url_path.
+- Make DB URL paths relative.
+- Add editor resizer button.
+- Don't uppercase SQL.
+- Result cell popup is now triggered by a meta-click.
+- Fix bug preventing easily highlighting content in popup.
+- Allow URLs up to 2 MB. Old limit was 2 KB.
+
 ## 0.1.60
 
 - Display entire error in status. Show elipsis conditionally.
