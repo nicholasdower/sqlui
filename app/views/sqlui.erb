@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>SQLUI</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.svg?<%= favicon_hash %>">
+    <link rel="icon" type="image/x-icon" href="<%= resource_path_map['favicon.svg'] %>">
     <!-- Initialize Airbrake before loading the main app JS so that we can catch errors as early as possible. -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@airbrake/browser"></script>
     <script type="text/javascript">
@@ -19,9 +19,9 @@
         window.airbrake?.notify(error)
       }
     </script>
-    <script type="text/javascript" src="sqlui.js?<%= js_hash %>"></script>
+    <script type="text/javascript" src="<%= resource_path_map['sqlui.js'] %>"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <link rel="stylesheet" href="sqlui.css?<%= css_hash %>">
+    <link rel="stylesheet" href="<%= resource_path_map['sqlui.css'] %>">
   </head>
 
   <body>
@@ -43,10 +43,12 @@
       </div>
 
       <div id="submit-box" class="tab-content-element graph-element query-element" style="display: none;">
-        <input id="cancel-button" class="cancel-button" type="button" value="cancel"></input>
-        <div id="editor-resizer"></div>
+        <input id="cancel-button" type="button" value="cancel"></input>
+        <div id="editor-resizer">
+          <img src="<%= resource_path_map['vertical-resizer.svg'] %>" />
+        </div>
         <div style="position: relative;">
-          <div class="submit-button-wrapper">
+          <div id="submit-button-wrapper">
             <input id="submit-button-all" class="submit-button" type="button"></input>
             <input id="submit-button-current" class="submit-button submit-button-show" type="button"></input>
             <input id="submit-dropdown-button" class="submit-dropdown-button" type="button", value="▼"></input>

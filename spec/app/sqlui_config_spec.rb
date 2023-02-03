@@ -25,12 +25,12 @@ describe SqluiConfig do
       name: 'some server name',
       port: 8080,
       environment: 'development',
-      list_url_path: '/some/path',
+      base_url_path: '/some/path',
       databases: {
         database_one: {
           display_name: 'some database name',
           description: 'some description',
-          url_path: '/db/path',
+          url_path: 'db/path',
           saved_path: 'path/to/sql',
           client_params: {
             database: 'some_database',
@@ -51,11 +51,11 @@ describe SqluiConfig do
       context 'when one database is specified' do
         it 'returns the expected config' do
           expect(subject.name).to eq('some server name')
-          expect(subject.list_url_path).to eq('/some/path')
+          expect(subject.base_url_path).to eq('/some/path')
           expect(subject.database_configs.size).to eq(1)
           expect(subject.database_configs.first.display_name).to eq('some database name')
           expect(subject.database_configs.first.description).to eq('some description')
-          expect(subject.database_configs.first.url_path).to eq('/db/path')
+          expect(subject.database_configs.first.url_path).to eq('db/path')
           expect(subject.database_configs.first.saved_path).to eq('path/to/sql')
           expect(subject.database_configs.first.client_params[:database]).to eq('some_database')
           expect(subject.database_configs.first.client_params[:username]).to eq('some_username')
@@ -113,25 +113,25 @@ describe SqluiConfig do
       end
     end
 
-    context 'list_url_path slashes' do
-      context 'when list_url_path does not start with a /' do
-        before { config_hash[:list_url_path] = 'db/path' }
+    context 'base_url_path slashes' do
+      context 'when base_url_path does not start with a /' do
+        before { config_hash[:base_url_path] = 'db/path' }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'list_url_path should start with a /')
+          expect { subject }.to raise_error(ArgumentError, 'base_url_path should start with a /')
         end
       end
 
-      context 'when list_url_path ends with a /' do
-        before { config_hash[:list_url_path] = '/db/path/' }
+      context 'when base_url_path ends with a /' do
+        before { config_hash[:base_url_path] = '/db/path/' }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'list_url_path should not end with a /')
+          expect { subject }.to raise_error(ArgumentError, 'base_url_path should not end with a /')
         end
       end
 
-      context 'when list_url_path is only a /' do
-        before { config_hash[:list_url_path] = '/' }
+      context 'when base_url_path is only a /' do
+        before { config_hash[:base_url_path] = '/' }
 
         it "doesn't raise" do
           expect { subject }.not_to raise_error
@@ -198,8 +198,8 @@ describe SqluiConfig do
                      [:environment],
                      'development', ->(s) { s.environment }
     include_examples 'a string field',
-                     [:list_url_path],
-                     '/sqlui', ->(s) { s.list_url_path }
+                     [:base_url_path],
+                     '/sqlui', ->(s) { s.base_url_path }
     include_examples 'a string field',
                      %i[databases database_one display_name],
                      'some display name', ->(s) { s.database_configs[0].display_name }
@@ -208,16 +208,16 @@ describe SqluiConfig do
                      'some description', ->(s) { s.database_configs[0].description }
     include_examples 'a string field',
                      %i[databases database_one url_path],
-                     '/sqlui/foo', ->(s) { s.database_configs[0].url_path }
+                     'sqlui/foo', ->(s) { s.database_configs[0].url_path }
     include_examples 'a string field',
                      %i[databases database_one saved_path],
                      'some/path', ->(s) { s.database_configs[0].saved_path }
 
     context 'when config is an erb template' do
-      before { config_hash[:list_url_path] = '<%= "/some/template/val" %>' }
+      before { config_hash[:base_url_path] = '<%= "/some/template/val" %>' }
 
       it 'renders the template' do
-        expect(subject.list_url_path).to eq('/some/template/val')
+        expect(subject.base_url_path).to eq('/some/template/val')
       end
     end
 
@@ -250,12 +250,12 @@ describe SqluiConfig do
     subject { sqlui_config.database_config_for(url_path: url_path) }
 
     context 'when path exists' do
-      let(:url_path) { '/db/path' }
+      let(:url_path) { 'db/path' }
 
       it 'returns the expected database config' do
         expect(subject.display_name).to eq('some database name')
         expect(subject.description).to eq('some description')
-        expect(subject.url_path).to eq('/db/path')
+        expect(subject.url_path).to eq('db/path')
         expect(subject.saved_path).to eq('path/to/sql')
         expect(subject.client_params[:database]).to eq('some_database')
         expect(subject.client_params[:username]).to eq('some_username')
@@ -266,10 +266,10 @@ describe SqluiConfig do
     end
 
     context 'when path does not exist' do
-      let(:url_path) { '/some/other/path' }
+      let(:url_path) { 'some/other/path' }
 
       it 'returns the expected database config' do
-        expect { subject }.to raise_error(ArgumentError, 'no config found for path /some/other/path')
+        expect { subject }.to raise_error(ArgumentError, 'no config found for path some/other/path')
       end
     end
   end

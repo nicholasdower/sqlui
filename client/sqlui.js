@@ -408,7 +408,7 @@ function selectGraphTab (internal) {
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('graph-box').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
-  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('cancel-button').style.visibility = 'hidden'
   updateDownloadButtons(window?.sqlFetch)
   maybeFetchResult(internal)
 
@@ -420,7 +420,7 @@ function selectResultTab (internal) {
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('result-box').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
-  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('cancel-button').style.visibility = 'hidden'
   focus(getSelection())
   maybeFetchResult(internal)
 }
@@ -847,7 +847,7 @@ function displaySqlFetchInResultTab (fetch) {
     return
   }
 
-  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('cancel-button').style.visibility = 'hidden'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('result-box').style.display = 'flex'
 
@@ -959,12 +959,12 @@ function displaySqlFetchError (message, details) {
 }
 
 function clearSpinner () {
-  document.getElementById('cancel-button').style.display = 'none'
+  document.getElementById('cancel-button').style.visibility = 'hidden'
   document.getElementById('fetch-sql-box').style.display = 'none'
 }
 
 function displaySpinner (fetch) {
-  document.getElementById('cancel-button').style.display = 'flex'
+  document.getElementById('cancel-button').style.visibility = 'visible'
   document.getElementById('fetch-sql-box').style.display = 'flex'
 
   const elapsed = window.performance.now() - fetch.startedAt
@@ -1153,7 +1153,7 @@ window.onload = function () {
             document.getElementById('main-box').style.display = 'flex'
             document.getElementById('server-name').innerText = window.metadata.server
             document.title = `SQLUI ${window.metadata.server}`
-            document.getElementById('header-link').href = result.list_url_path
+            document.getElementById('header-link').href = result.base_url_path
             const queryElement = document.getElementById('query')
 
             init(queryElement, submitCurrent, submitAll)

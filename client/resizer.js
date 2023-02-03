@@ -1,26 +1,24 @@
 export function createVerticalResizer (resizerElement, resizableElement, min, max) {
-  let dragging = false
   let startY = null
   let startHeight = null
 
-  resizerElement.addEventListener('mousedown', (event) => {
-    dragging = true
-    event.preventDefault()
-    startY = event.clientY
-    startHeight = resizableElement.clientHeight
-  })
-
-  document.addEventListener('mouseup', (_) => {
-    dragging = false
-    startY = null
-  })
-
-  document.addEventListener('mousemove', (event) => {
-    if (!dragging) return
-
+  const moveListener = (event) => {
     const y = event.clientY - startY
     const height = Math.min(max, Math.max(min, startHeight + y))
     console.log(`y: ${y}, height: ${height}`)
     resizableElement.style.height = `${height}px`
+  }
+
+  resizerElement.addEventListener('mousedown', (event) => {
+    if (event.button !== 0) return
+    event.preventDefault()
+    startY = event.clientY
+    startHeight = resizableElement.clientHeight
+    document.addEventListener('mousemove', moveListener)
+  })
+
+  document.addEventListener('mouseup', (_) => {
+    startY = null
+    document.removeEventListener('mousemove', moveListener)
   })
 }

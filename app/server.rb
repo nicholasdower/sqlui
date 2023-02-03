@@ -59,51 +59,53 @@ class Server < Sinatra::Base
     set :raise_errors,    false
     set :show_exceptions, false
 
-    favicon_hash = Digest::MD5.hexdigest(File.read(File.join(resources_dir, 'favicon.svg')))
-    css_hash = Digest::MD5.hexdigest(File.read(File.join(resources_dir, 'sqlui.css')))
-    js_hash = Digest::MD5.hexdigest(File.read(File.join(resources_dir, 'sqlui.js')))
-
     get '/-/health' do
       status 200
       body 'OK'
     end
 
     get '/?' do
-      redirect config.list_url_path, 301
+      redirect config.base_url_path, 301
     end
 
-    get '/favicon.svg' do
-      headers 'Cache-Control' => 'max-age=31536000'
-      send_file File.join(resources_dir, 'favicon.svg')
+    resource_path_map = {}
+    Dir.glob(File.join(resources_dir, '*')).each do |file|
+      hash = Digest::MD5.hexdigest(File.read(file))
+      basename = File.basename(file)
+      url_path = "#{config.base_url_path}/#{basename}"
+      case File.extname(basename)
+      when '.svg'
+        content_type = 'image/svg+xml; charset=utf-8'
+      when '.css'
+        content_type = 'text/css; charset=utf-8'
+      when '.js'
+        content_type = 'text/javascript; charset=utf-8'
+      else
+        raise "unsupported resource file extension: #{File.extname(basename)}"
+      end
+      resource_path_map[basename] = "#{url_path}?#{hash}"
+      get url_path do
+        headers 'Content-Type' => content_type
+        headers 'Cache-Control' => 'max-age=31536000'
+        send_file file
+      end
     end
 
-    get "#{config.list_url_path}/?" do
+    get "#{config.base_url_path}/?" do
       headers 'Cache-Control' => 'no-cache'
-      erb :databases, locals: { config: config }
+      erb :databases, locals: { config: config, resource_path_map: resource_path_map }
     end
 
     config.database_configs.each do |database|
-      get "#{database.url_path}/?" do
+      get "#{config.base_url_path}/#{database.url_path}/?" do
         redirect "#{database.url_path}/query", 301
       end
 
-      get "#{database.url_path}/sqlui.css" do
-        headers 'Content-Type' => 'text/css; charset=utf-8'
-        headers 'Cache-Control' => 'max-age=31536000'
-        send_file File.join(resources_dir, 'sqlui.css')
-      end
-
-      get "#{database.url_path}/sqlui.js" do
-        headers 'Content-Type' => 'text/javascript; charset=utf-8'
-        headers 'Cache-Control' => 'max-age=31536000'
-        send_file File.join(resources_dir, 'sqlui.js')
-      end
-
-      post "#{database.url_path}/metadata" do
+      post "#{config.base_url_path}/#{database.url_path}/metadata" do
         metadata = database.with_client do |client|
           {
             server: "#{config.name} - #{database.display_name}",
-            list_url_path: config.list_url_path,
+            base_url_path: config.base_url_path,
             schemas: DatabaseMetadata.lookup(client, database),
             tables: database.tables,
             columns: database.columns,
@@ -131,7 +133,7 @@ class Server < Sinatra::Base
         body metadata.to_json
       end
 
-      post "#{database.url_path}/query" do
+      post "#{config.base_url_path}/#{database.url_path}/query" do
         data = request.body.read
         request.body.rewind # since Airbrake will read the body on error
         params.merge!(JSON.parse(data, symbolize_names: true))
@@ -215,7 +217,7 @@ class Server < Sinatra::Base
         end
       end
 
-      get "#{database.url_path}/download_csv" do
+      get "#{config.base_url_path}/#{database.url_path}/download_csv" do
         break client_error('missing sql') unless params[:sql]
 
         sql = Base64.decode64(params[:sql]).force_encoding('UTF-8')
@@ -250,7 +252,7 @@ class Server < Sinatra::Base
         end
       end
 
-      get(%r{#{Regexp.escape(database.url_path)}/(query|graph|structure|saved)}) do
+      get(/#{Regexp.escape("#{config.base_url_path}/#{database.url_path}/")}(query|graph|structure|saved)/) do
         status 200
         headers 'Cache-Control' => 'no-cache'
         client_config = config.airbrake[:client] || {}
@@ -259,9 +261,7 @@ class Server < Sinatra::Base
           airbrake_enabled: client_config[:enabled] || false,
           airbrake_project_id: client_config[:project_id] || '',
           airbrake_project_key: client_config[:project_key] || '',
-          js_hash: js_hash,
-          css_hash: css_hash,
-          favicon_hash: favicon_hash
+          resource_path_map: resource_path_map
         }
       end
     end
@@ -276,7 +276,12 @@ class Server < Sinatra::Base
         body json
       else
         message = "#{status} #{Rack::Utils::HTTP_STATUS_CODES[status]}"
-        erb :error, locals: { title: "SQLUI #{message}", message: message, stacktrace: stacktrace }
+        erb :error, locals: {
+          resource_path_map: resource_path_map,
+          title: "SQLUI #{message}",
+          message: message,
+          stacktrace: stacktrace
+        }
       end
     end
 

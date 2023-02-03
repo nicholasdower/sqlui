@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>SQLUI <%= config.name %> Databases</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="<%= resource_path_map['favicon.svg'] %>">
 
   <style>
       body {
@@ -92,9 +92,9 @@
   <div class="database">
     <div class="name-and-links">
       <h2 class='name'><%= database_config.display_name %></h2>
-      <a class='query-link' href="<%= database_config.url_path %>/query">query</a>
-      <a class='saved-link' href="<%= database_config.url_path %>/saved">saved</a>
-      <a class='structure-link' href="<%= database_config.url_path %>/structure">structure</a>
+      <a class='query-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/query" %>">query</a>
+      <a class='saved-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/saved" %>">saved</a>
+      <a class='structure-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/structure" %>">structure</a>
     </div>
     <p class='description'>
       <%= database_config.description %>

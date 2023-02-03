@@ -1,1 +1,4 @@
-- No changes.
+- Replace list_url_path with base_url_path.
+- Make DB URL paths relative.
+- Add editor resizer button.
+- Don't uppercase SQL.

@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'A SQL UI.'
   spec.summary       = 'A SQL UI.'
   spec.homepage      = 'https://github.com/nicholasdower/sqlui'
-  spec.version       = ::Version::SQLUI
+  spec.version       = Version::SQLUI
   spec.license       = 'MIT'
   spec.authors       = ['Nick Dower']
   spec.email         = 'nicholasdower@gmail.com'

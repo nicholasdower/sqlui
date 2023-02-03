@@ -28,14 +28,14 @@ A web app which can be used to query one or more SQL databases.
 
 ```yaml
 name: some_name      # Server display name to be used in the UI.
-list_url_path: /path # Absolute URL path used for the databases list.
+base_url_path: /path # Absolute URL path used as the base for all app URLs.
 databases:
   development:
     name:        some_name   # User-facing name.
     port:        8080        # App port.
     environment: development # App environment.
     description: description # User-facing description.
-    url_path:    development # Absolute URL path used to access this database.
+    url_path:    development # Relative URL path used to access this database.
     saved_path:  path/to/sql # Relative path to the directory containing saved SQL files.
     client_params:
       database:    name        # Database name.

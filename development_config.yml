@@ -1,7 +1,7 @@
 name: Development
 port: <%= ENV.fetch('APP_PORT') %>
 environment: <%= ENV.fetch('ENV') %>
-list_url_path: /sqlui
+base_url_path: /sqlui
 airbrake:
   server:
     enabled:     <%= ['true', '1'].include?(ENV.fetch('AIRBRAKE_SERVER_ENABLED', 'false')) %>
@@ -15,7 +15,7 @@ databases:
   shows:
     display_name: Shows
     description:  Some databases about nothing.
-    url_path:     /sqlui/shows
+    url_path:     shows
     saved_path:   sql/shows
     tables:
       friends.characters:
@@ -29,7 +29,7 @@ databases:
   seinfeld:
     display_name: Seinfeld
     description:  A database about nothing.
-    url_path:     /sqlui/seinfeld
+    url_path:     seinfeld
     saved_path:   sql/seinfeld
     client_params:
       database: seinfeld
@@ -40,7 +40,7 @@ databases:
   friends:
     display_name: Friends
     description:  Another database about nothing.
-    url_path:     /sqlui/friends
+    url_path:     friends
     saved_path:   sql/friends
     columns:
       name:

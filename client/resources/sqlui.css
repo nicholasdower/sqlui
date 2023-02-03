@@ -124,24 +124,31 @@ p {
     display: flex;
     flex: 1;
     cursor: row-resize;
+    flex-direction: column;
+    align-items: center;
 }
 
-.cancel-button {
+#cancel-button {
     cursor: pointer;
-    margin: 0;
     background: none;
     color: #333;
     border: 1px solid #888;
     height: 32px;
     font-size: 18px;
+    margin: 0 220px 0 0; /* To center the resizer icon. Ok, it's a hack. Get over it. */
 }
 
-.submit-button-wrapper {
+#cancel-button-spacer {
+    width: 150px;
+}
+
+#submit-button-wrapper {
     cursor: pointer;
     border: 1px solid #888;
     height: 32px;
     display: flex;
     flex-direction: row;
+    background: white;
 }
 
 .submit-button, .submit-dropdown-button {
@@ -218,7 +225,7 @@ p {
 
 .submit-dropdown-content-button:active,
 .submit-button:active,
-.cancel-button:active,
+#cancel-button:active,
 .submit-dropdown-button:active {
     background-color: #e6e6e6;
     outline: none

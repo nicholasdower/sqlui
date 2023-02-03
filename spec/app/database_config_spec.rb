@@ -9,7 +9,7 @@ describe DatabaseConfig do
     {
       display_name: 'some display name',
       description: 'some description',
-      url_path: '/some/path',
+      url_path: 'path',
       saved_path: 'path/to/sql',
       client_params: {
         database: 'some_database',
@@ -28,7 +28,7 @@ describe DatabaseConfig do
       it 'returns the expected config' do
         expect(subject.display_name).to eq('some display name')
         expect(subject.description).to eq('some description')
-        expect(subject.url_path).to eq('/some/path')
+        expect(subject.url_path).to eq('path')
         expect(subject.saved_path).to eq('path/to/sql')
         expect(subject.client_params[:database]).to eq('some_database')
         expect(subject.client_params[:username]).to eq('some_username')
@@ -39,27 +39,27 @@ describe DatabaseConfig do
     end
 
     context 'url_path slashes' do
-      context 'when url_path does not start with a /' do
-        before { config_hash[:url_path] = 'db/path' }
+      context 'when url_path starts with a /' do
+        before { config_hash[:url_path] = '/db/path' }
 
         it 'raises' do
-          expect { subject }.to raise_error(ArgumentError, 'url_path should start with a /')
+          expect { subject }.to raise_error(ArgumentError, 'url_path should not start with a /')
         end
       end
 
       context 'when url_path ends with a /' do
-        before { config_hash[:url_path] = '/db/path/' }
+        before { config_hash[:url_path] = 'db/path/' }
 
         it 'raises' do
           expect { subject }.to raise_error(ArgumentError, 'url_path should not end with a /')
         end
       end
 
-      context 'when url_path is only a /' do
-        before { config_hash[:url_path] = '/' }
+      context 'when url_path is empty' do
+        before { config_hash[:url_path] = '' }
 
-        it 'returns the expected config' do
-          expect(subject.url_path).to eq('/')
+        it 'raises' do
+          expect { subject }.to raise_error(ArgumentError, 'parameter url_path empty')
         end
       end
     end
@@ -110,7 +110,7 @@ describe DatabaseConfig do
 
     include_examples 'a string field', :display_name, 'some display name'
     include_examples 'a string field', :description, 'some description'
-    include_examples 'a string field', :url_path, '/some/url/path'
+    include_examples 'a string field', :url_path, 'some/url/path'
     include_examples 'a string field', :saved_path, 'some/saved/path'
 
     context 'client_params' do
