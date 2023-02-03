@@ -135,7 +135,7 @@ export function createEditor (parent, metadata, onSubmit, onShiftSubmit) {
   ])
   const sqlConfig = {
     dialect: MySQL,
-    upperCaseKeywords: true,
+    upperCaseKeywords: false,
     schema: editorSchema,
     tables
   }
@@ -272,7 +272,7 @@ export function createEditor (parent, metadata, onSubmit, onShiftSubmit) {
         }
       }),
       MySQL.language.data.of({
-        autocomplete: keywordCompletionSource(MySQL, true)
+        autocomplete: keywordCompletionSource(MySQL, false)
       })
     ]
   )
