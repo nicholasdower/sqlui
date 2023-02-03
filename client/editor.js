@@ -43,9 +43,7 @@ function toString (context, node) { // eslint-disable-line no-unused-vars
 export function createEditor (parent, metadata, onSubmit, onShiftSubmit) {
   const fixedHeightEditor = EditorView.theme({
     '.cm-scroller': {
-      height: '200px',
       overflow: 'auto',
-      resize: 'vertical'
     }
   })
   const schemas = Object.entries(metadata.schemas)

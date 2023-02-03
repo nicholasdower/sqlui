@@ -6,6 +6,7 @@ import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
 import { ResizeTable } from './resize-table.js'
 import { createPopup } from './popup.js'
+import { createVerticalResizer } from './resizer.js'
 
 /* global google */
 
@@ -137,6 +138,11 @@ function init (parent, onSubmit, onShiftSubmit) {
   })
 
   window.editorView = createEditor(parent, window.metadata, onSubmit, onShiftSubmit)
+  const cmScroller = document.getElementsByClassName('cm-scroller')[0]
+  cmScroller.style.height = '200px'
+
+  const editorResizer = document.getElementById('editor-resizer')
+  createVerticalResizer(editorResizer, cmScroller, 100, 500)
 }
 
 function addEventListener (elementOrSelector, type, func) {

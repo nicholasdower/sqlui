@@ -120,9 +120,10 @@ p {
     padding: 5px;
 }
 
-.submit-fill {
+#editor-resizer {
     display: flex;
-    flex: 1
+    flex: 1;
+    cursor: row-resize;
 }
 
 .cancel-button {

@@ -56,5 +56,4 @@ Add ability to auto-refresh current query
 When auto-refreshing, show browser notification if results change.
 double clicking to select in popup also selects the title
 change action required to open popup. Double-click is still useful for cells which don't overflow or contain newlines.
-the editor resizor is broken
 increase max url length. See https://stackoverflow.com/questions/8333158/webrick-requesturitoolarge-should-i-update-or-use-a-different-server
