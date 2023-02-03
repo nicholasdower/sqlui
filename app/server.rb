@@ -25,6 +25,9 @@ class Server < Sinatra::Base
   def self.init_and_run(config, resources_dir)
     logger.info("Starting SQLUI v#{Version::SQLUI}")
     logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
+
+    WEBrick::HTTPRequest.const_set('MAX_URI_LENGTH', 2 * 1024 * 1024)
+
     if config.airbrake[:server]&.[](:enabled)
       require 'airbrake'
       require 'airbrake/rack'

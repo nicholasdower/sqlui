@@ -22,6 +22,56 @@ describe 'query' do
     end
   end
 
+  context 'when very long URL requested' do
+    before do
+      driver.get(
+        url(
+          '/sqlui/friends/query?sql=select+*+from+characters+c+where%0Atrue+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true' \
+          '+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true+or+true'
+        )
+      )
+    end
+
+    it 'does not load any results' do
+      wait_until_no_results(wait)
+    end
+  end
+
   context 'when sql specified in query parameter without run' do
     before do
       driver.get(
