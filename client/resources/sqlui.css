@@ -262,10 +262,6 @@ table tbody tr td {
   height: 21px;
 }
 
-#result-table td, #result-table th {
-    cursor: default;
-}
-
 #result-table tbody tr td abbr a {
     color: #555;
     cursor: pointer;
