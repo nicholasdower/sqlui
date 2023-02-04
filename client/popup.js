@@ -1,5 +1,6 @@
 import styles from './popup.css'
 import { copyTextToClipboard } from './clipboard.js'
+import { toast } from './toast.js'
 
 export function createPopup (title, text) {
   const popupWrapperElement = document.createElement('div')
@@ -42,6 +43,7 @@ export function createPopup (title, text) {
 
   copyElement.addEventListener('click', (event) => {
     copyTextToClipboard(text)
+    toast('Text copied to clipboard.')
   })
 
   const closeElement = document.createElement('input')

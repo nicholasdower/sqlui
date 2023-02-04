@@ -1,0 +1,39 @@
+.toast {
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    position: fixed; /* Sit on top of the screen */
+    left: 50%; /* Center on screen. */
+    top: 30px; /* 30px from the top of the screen */
+    z-index: 3;
+    background-color: white;
+    font-family: Helvetica, sans-serif;
+    font-size: 18px;
+    box-shadow: 2px 2px 2px rgb(0, 0, 0, .2);
+    color: #333;
+    border: 1px solid #888;
+    text-align: center;
+    border-radius: 2px;
+    padding: 10px;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadein {
+    from {top: 0; opacity: 0;}
+    to {top: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {top: 0; opacity: 0;}
+    to {top: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {top: 30px; opacity: 1;}
+    to {top: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {top: 30px; opacity: 1;}
+    to {top: 0; opacity: 0;}
+}

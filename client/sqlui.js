@@ -7,6 +7,7 @@ import { createEditor } from './editor.js'
 import { ResizeTable } from './resize-table.js'
 import { createPopup } from './popup.js'
 import { createVerticalResizer } from './resizer.js'
+import { toast } from './toast.js'
 
 /* global google */
 
@@ -893,25 +894,36 @@ function displaySqlFetchInResultTab (fetch) {
 
 function registerTableCellPopup (tableElement) {
   const listener = (event) => {
-    if (event.which === 1 && event.metaKey) {
+    if (event.which === 1 && (event.metaKey || event.altKey)) {
       let node = event.target
       while (!['td', 'th', 'table'].includes(node.tagName.toLowerCase()) && node.parentNode) {
         node = node.parentNode
       }
+
       if (node.tagName.toLowerCase() === 'td') {
-        if (event.type === 'mousedown') {
+        if (event.type === 'mousedown' && node.dataset.row) {
           const row = parseInt(node.dataset.row)
           const column = parseInt(node.dataset.column)
           const title = window.sqlFetch.result.columns[column].replaceAll('\n', '¶')
-          createPopup(title, window.sqlFetch.result.rows[row][column])
+          if (event.metaKey) {
+            createPopup(title, window.sqlFetch.result.rows[row][column])
+          } else if (event.altKey) {
+            copyTextToClipboard(window.sqlFetch.result.rows[row][column])
+            toast('Text copied to clipboard.')
+          }
         }
         event.preventDefault()
       } else if (node.tagName.toLowerCase() === 'th') {
-        if (event.type === 'mousedown') {
+        if (event.type === 'mousedown' && node.dataset.column) {
           const column = parseInt(node.dataset.column)
           const value = window.sqlFetch.result.columns[column]
           const title = value.replaceAll('\n', '¶')
-          createPopup(title, value)
+          if (event.metaKey) {
+            createPopup(title, value)
+          } else if (event.altKey) {
+            copyTextToClipboard(value)
+            toast('Text copied to clipboard.')
+          }
         }
         event.preventDefault()
       }
