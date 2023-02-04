@@ -1,3 +1,10 @@
+## 0.1.62
+
+- Fix bug preventing cancel button from displaying after going to graph tab.
+- Fix busted popup.
+- Copy to clipboard on alt-click.
+- Show toasts when copying to clipboard.
+
 ## 0.1.61
 
 - Replace list_url_path with base_url_path.
