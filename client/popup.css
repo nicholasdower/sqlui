@@ -55,13 +55,12 @@
 .button-bar {
     display: flex;
     flex-direction: row;
-    justify-content: right;
     margin: 0;
     padding: 10px;
 }
 
 .button {
-    width: 100px;
+    width: 150px;
     height: 30px;
     margin: 0 5px;
     cursor: pointer;

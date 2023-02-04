@@ -1,1 +1,5 @@
-- No changes.
+- Fix bug preventing cancel button from displaying after going to graph tab.
+- Fix busted popup.
+- Copy to clipboard on alt-click.
+- Show toasts when copying to clipboard.
+- Add a button to pretty format JSON.

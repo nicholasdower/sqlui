@@ -35,6 +35,20 @@ export function createPopup (title, text) {
   buttonBarElement.classList.add(styles['button-bar'])
   popupElement.appendChild(buttonBarElement)
 
+  const jsonElement = document.createElement('input')
+  jsonElement.classList.add(styles.button)
+  jsonElement.type = 'button'
+  jsonElement.value = 'Parse JSON'
+  buttonBarElement.appendChild(jsonElement)
+
+  jsonElement.addEventListener('click', (event) => {
+    try {
+      contentElement.innerText = JSON.stringify(JSON.parse(text), null, 2)
+    } catch (_) {
+      toast('Failed to parse JSON.')
+    }
+  })
+
   const copyElement = document.createElement('input')
   copyElement.classList.add(styles.button)
   copyElement.type = 'button'
@@ -42,9 +56,13 @@ export function createPopup (title, text) {
   buttonBarElement.appendChild(copyElement)
 
   copyElement.addEventListener('click', (event) => {
-    copyTextToClipboard(text)
+    copyTextToClipboard(contentElement.innerText)
     toast('Text copied to clipboard.')
   })
+
+  const spacerElement = document.createElement('div')
+  spacerElement.style.flex = 1
+  buttonBarElement.appendChild(spacerElement)
 
   const closeElement = document.createElement('input')
   closeElement.id = 'popup-close'
