@@ -1,3 +1,7 @@
+## 0.1.65
+
+- Fix bug preventing display of numbers in the popup.
+
 ## 0.1.64
 
 - Auto-parse JSON.
