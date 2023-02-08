@@ -1,3 +1,8 @@
+## 0.1.64
+
+- Auto-parse JSON.
+- Don't display the popup when meta-clicking or alt-clicking cell links.
+
 ## 0.1.63
 
 - Fix bug preventing cancel button from displaying after going to graph tab.
