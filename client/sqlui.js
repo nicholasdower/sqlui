@@ -896,6 +896,9 @@ function registerTableCellPopup (tableElement) {
   const listener = (event) => {
     if (event.which === 1 && (event.metaKey || event.altKey)) {
       let node = event.target
+      // If the cell contains a link, let it handle the click.
+      if (node.tagName.toLowerCase() === 'a') return
+
       while (!['td', 'th', 'table'].includes(node.tagName.toLowerCase()) && node.parentNode) {
         node = node.parentNode
       }

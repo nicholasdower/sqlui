@@ -1,1 +1,2 @@
 - Auto-parse JSON.
+- Don't display the popup when meta-clicking or alt-clicking cell links.
