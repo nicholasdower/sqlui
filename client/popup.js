@@ -31,7 +31,7 @@ export function createPopup (title, text) {
   popupElement.appendChild(contentElement)
 
   let renderedText = text
-  if (text.match(/^\s*(?:\{.*\}|\[.*\])\s*$/)) {
+  if (typeof text === 'string' && text.match(/^\s*(?:\{.*\}|\[.*\])\s*$/)) {
     try {
       renderedText = JSON.stringify(JSON.parse(text), null, 2)
     } catch (_) { }
