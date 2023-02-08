@@ -28,26 +28,19 @@ export function createPopup (title, text) {
 
   const contentElement = document.createElement('pre')
   contentElement.classList.add(styles.content)
-  contentElement.innerText = text
   popupElement.appendChild(contentElement)
+
+  let renderedText = text
+  if (text.match(/^\s*(?:\{.*\}|\[.*\])\s*$/)) {
+    try {
+      renderedText = JSON.stringify(JSON.parse(text), null, 2)
+    } catch (_) { }
+  }
+  contentElement.innerText = renderedText
 
   const buttonBarElement = document.createElement('div')
   buttonBarElement.classList.add(styles['button-bar'])
   popupElement.appendChild(buttonBarElement)
-
-  const jsonElement = document.createElement('input')
-  jsonElement.classList.add(styles.button)
-  jsonElement.type = 'button'
-  jsonElement.value = 'Parse JSON'
-  buttonBarElement.appendChild(jsonElement)
-
-  jsonElement.addEventListener('click', (event) => {
-    try {
-      contentElement.innerText = JSON.stringify(JSON.parse(text), null, 2)
-    } catch (_) {
-      toast('Failed to parse JSON.')
-    }
-  })
 
   const copyElement = document.createElement('input')
   copyElement.classList.add(styles.button)
@@ -56,9 +49,22 @@ export function createPopup (title, text) {
   buttonBarElement.appendChild(copyElement)
 
   copyElement.addEventListener('click', (event) => {
-    copyTextToClipboard(contentElement.innerText)
+    copyTextToClipboard(renderedText)
     toast('Text copied to clipboard.')
   })
+
+  if (renderedText !== text) {
+    const copyOriginalElement = document.createElement('input')
+    copyOriginalElement.classList.add(styles.button)
+    copyOriginalElement.type = 'button'
+    copyOriginalElement.value = 'Copy Original'
+    buttonBarElement.appendChild(copyOriginalElement)
+
+    copyOriginalElement.addEventListener('click', (event) => {
+      copyTextToClipboard(text)
+      toast('Text copied to clipboard.')
+    })
+  }
 
   const spacerElement = document.createElement('div')
   spacerElement.style.flex = 1
