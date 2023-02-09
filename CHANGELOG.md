@@ -1,3 +1,7 @@
+## 0.1.66
+
+- Properly handle nulls in results and in popup.
+
 ## 0.1.65
 
 - Fix bug preventing display of numbers in the popup.
