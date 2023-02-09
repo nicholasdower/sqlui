@@ -31,9 +31,17 @@ export function createPopup (title, text) {
   popupElement.appendChild(contentElement)
 
   let renderedText = text
-  if (typeof text === 'string' && text.match(/^\s*(?:\{.*\}|\[.*\])\s*$/)) {
+  let clipboardText = text
+  let formatted = false
+  if (text === null) {
+    renderedText = 'null'
+    contentElement.style.color = '#888'
+    clipboardText = ''
+  } else if (typeof text === 'string' && text.match(/^\s*(?:\{.*\}|\[.*\])\s*$/)) {
     try {
       renderedText = JSON.stringify(JSON.parse(text), null, 2)
+      clipboardText = renderedText
+      formatted = renderedText !== text
     } catch (_) { }
   }
   contentElement.innerText = renderedText
@@ -49,11 +57,11 @@ export function createPopup (title, text) {
   buttonBarElement.appendChild(copyElement)
 
   copyElement.addEventListener('click', (event) => {
-    copyTextToClipboard(renderedText)
+    copyTextToClipboard(clipboardText)
     toast('Text copied to clipboard.')
   })
 
-  if (renderedText !== text) {
+  if (formatted) {
     const copyOriginalElement = document.createElement('input')
     copyOriginalElement.classList.add(styles.button)
     copyOriginalElement.type = 'button'

@@ -822,6 +822,9 @@ const resultCellRenderer = function (cellElement, rowIndex, columnIndex, value) 
     return wrapperElement
   } else {
     cellElement.style.textAlign = columnType === 'string' ? 'left' : 'right'
+    if (value === null) {
+      cellElement.style.color = '#888'
+    }
     return document.createTextNode(value)
   }
 }
