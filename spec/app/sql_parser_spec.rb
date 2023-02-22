@@ -99,6 +99,15 @@ describe SqlParser do
         it: 'returns the first query',
         expected: "select * from characters limit 1; \t \n \t "
       )
+
+      # Bug fix.
+      test_find_statement_at_cursor(
+        context: 'and cursor is after single line comment containing a quote',
+        sql: "select -- Nick's stuff\n2;\nselect 1;\n",
+        cursor: "select -- Nick's stuff\n2;\nselect 1;\n".length,
+        it: 'returns the second query',
+        expected: "\nselect 1;\n"
+      )
     end
 
     context 'when query ends in -- comment' do

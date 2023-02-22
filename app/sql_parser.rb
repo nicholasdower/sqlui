@@ -40,10 +40,10 @@ class SqlParser
         multi_commented = true
       elsif multi_commented && char == '*' && scanner.peek(1) == '/'
         multi_commented = false
-      elsif multi_commented
+      elsif multi_commented || (single_commented && char != "\n")
         next
       elsif !single_quoted && !double_quoted && !escaped && !multi_commented &&
-            char == '-' && scanner.peek(1).match?(/-[ \n\t]/)
+            char == '-' && scanner.peek(2).match?(/-[ \n\t]/)
         current += scanner.getch
         single_commented = true
       elsif !single_quoted && !double_quoted && !escaped && !multi_commented && char == '#'
@@ -51,7 +51,7 @@ class SqlParser
       elsif single_commented && char == "\n"
         single_commented = false
       elsif single_commented
-        single_quoted = false if char == "\n"
+        single_commented = false if char == "\n"
       elsif char == '\\'
         escaped = true
       elsif char == "'"
