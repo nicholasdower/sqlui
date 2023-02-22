@@ -1,3 +1,11 @@
+## 0.1.67
+
+- Display table info in structure tab.
+- Update list style with more space.
+- Fix bug in SQL parser when quote found in comment.
+- Extend query box resizer left to the cancel button.
+- Escape now focuses the editor.
+
 ## 0.1.66
 
 - Properly handle nulls in results and in popup.
