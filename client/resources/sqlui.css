@@ -8,18 +8,6 @@ body {
     overflow: hidden;
 }
 
-h1 {
-    font-size: 22px;
-}
-
-h2 {
-    font-size: 20px;
-}
-
-p {
-    font-size: 18px;
-}
-
 #loading-box {
     font-family: monospace;
     display: flex;
@@ -48,6 +36,7 @@ p {
     align-items: center;
     justify-content: start;
     color: #333;
+    font-size: 22px;
 }
 
 #header {
@@ -258,6 +247,7 @@ p {
     display: flex;
     flex-direction: column;
 }
+
 table tbody tr td {
   height: 21px;
 }
@@ -384,16 +374,28 @@ thead {
     font-family: Helvetica, sans-serif;
 }
 
-#saved-box h2 {
-    font-weight: bold;
+.links {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
 }
 
-.saved-list-item:last-child {
-    border-top: none !important;
+.link {
+    margin-right: 10px;
+    color: darkblue;
+    font-size: 17px;
+    text-decoration: none;
 }
 
-#saved-box p {
-    margin: 0;
+.name {
+    margin: 0 200px 0 0;
+    font-size: 20px;
+}
+
+.description {
+    margin: 20px 0 0;
+    font-size: 18px;
 }
 
 .saved-list-item {
@@ -402,25 +404,8 @@ thead {
     padding: 10px;
 }
 
-.saved-list-item h2 {
-    margin: 0 10px 0 0;
-}
-
-.saved-list-item p {
-    margin: 10px 0 0;
-}
-
-.name-and-links {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.name-and-links a {
-    margin-right: 5px;
-    color: darkblue;
-    font-size: 16px;
-    text-decoration: none;
+.saved-list-item:last-child {
+    border-bottom: none;
 }
 
 .cm-editor.cm-focused {
@@ -435,10 +420,49 @@ thead {
     height: 100%;
 }
 
+#schemas-and-tables {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+
+#schemas-tables-and-stats {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ddd;
+    min-width: 400px;
+}
+
+#stats {
+    border-top: 1px solid #ddd;
+    padding: 5px 0;
+}
+
+#stats table {
+    width: 100%;
+}
+
+#stats table td {
+    padding: 2px 5px;
+    font-size: 18px;
+    color: #333;
+}
+
+table td:nth-child(1) {
+    text-align: left;
+    font-family: Helvetica, sans-serif;
+}
+
+table td:nth-child(2) {
+    text-align: right;
+    font-family: monospace;
+}
+
 #schemas, #tables {
     border: none;
     display: flex;
-    min-width: 200px;
+    flex: 1;
+    padding: 5px
 }
 
 #table-info {

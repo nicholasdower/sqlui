@@ -15,7 +15,7 @@ describe 'saved' do
 
   it 'displays the list of saved queries' do
     name_elements = wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .name-and-links > h2')
+      elements = driver.find_elements(css: '#saved-box > .saved-list-item > h2')
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
     names = name_elements.map(&:text)
@@ -24,7 +24,7 @@ describe 'saved' do
 
   it 'view links to the query' do
     view_link_elements = wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .name-and-links > .view-link')
+      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .links > .view-link')
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
     view_link_elements.first.click
@@ -33,7 +33,7 @@ describe 'saved' do
 
   it 'run links to the query and results' do
     run_link_elements = wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .name-and-links > .run-link')
+      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .links > .run-link')
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
     run_link_elements.first.click

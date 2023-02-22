@@ -10,6 +10,7 @@ class DatabaseMetadata
     def lookup(client, database_config)
       result = load_columns(client, database_config)
       load_stats(result, client, database_config)
+      load_tables(result, client, database_config)
 
       result
     end
@@ -91,7 +92,7 @@ class DatabaseMetadata
           from information_schema.statistics
           #{where_clause}
           order by table_schema, table_name, if(index_name = "PRIMARY", 0, index_name), seq_in_index;
-      SQL
+        SQL
       )
       stats_result.each do |row|
         table_schema = row.shift
@@ -108,6 +109,82 @@ class DatabaseMetadata
         column[:seq_in_index] = row.shift
         column[:non_unique] = row.shift
         column[:column_name] = column_name
+      end
+    end
+
+    def load_tables(result, client, _database_config)
+      tables_result = client.query(
+        <<~SQL
+          SELECT
+            TABLE_SCHEMA,
+            TABLE_NAME,
+            CREATE_TIME,
+            UPDATE_TIME,
+            ENGINE,
+            TABLE_ROWS,
+            AVG_ROW_LENGTH,
+            DATA_LENGTH,
+            INDEX_LENGTH,
+            TABLE_COLLATION,
+            AUTO_INCREMENT
+          FROM information_schema.TABLES;
+        SQL
+      )
+      tables_hash = {}
+      tables_result.each do |row|
+        table_schema = row.shift
+        table_name = row.shift
+        tables_hash[table_schema] ||= {}
+        tables_hash[table_schema][table_name] = {
+          created_at: row.shift,
+          updated_at: row.shift,
+          engine: row.shift,
+          rows: add_thousands_separator(row.shift),
+          average_row_size: pretty_data_size(row.shift),
+          data_size: pretty_data_size(row.shift),
+          index_size: pretty_data_size(row.shift),
+          encoding: row.shift,
+          auto_increment: add_thousands_separator(row.shift)
+        }
+      end
+      result.each do |table_schema, schema_hash|
+        schema_hash[:tables].each do |table_name, table|
+          table[:info] = tables_hash[table_schema][table_name]
+        end
+      end
+    end
+
+    def pretty_data_size(size)
+      if size.nil?
+        return nil
+      elsif size < 1024
+        unit = "byte#{size == 1 ? '' : 's'}"
+        converted = size
+      elsif size < 1024 * 1024
+        unit = 'KiB'
+        converted = (size.to_f / 1024).round(2)
+      elsif size < 1024 * 1024 * 1024
+        unit = 'MiB'
+        converted = (size.to_f / (1024 * 1024)).round(2)
+      elsif size < 1024 * 1024 * 1024 * 1024
+        unit = 'GiB'
+        converted = (size.to_f / (1024 * 1024 * 1024)).round(2)
+      end
+
+      "#{add_thousands_separator(converted)} #{unit}"
+    end
+
+    def add_thousands_separator(value)
+      return nil if value.nil?
+
+      integer = value.round(1).floor
+      fractional = ((value.round(1) - integer) * 10).floor
+
+      with_commas = integer.to_s.reverse.scan(/.{1,3}/).join(',').reverse
+      if fractional.zero?
+        with_commas
+      else
+        "#{with_commas}.#{fractional}"
       end
     end
   end

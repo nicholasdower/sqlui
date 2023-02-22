@@ -11,18 +11,6 @@
           margin: 0;
       }
 
-      h1 {
-          font-size: 22px;
-      }
-
-      h2 {
-          font-size: 20px;
-      }
-
-      p {
-          font-size: 18px;
-      }
-
       .header-box {
           display: flex;
           flex-direction: row;
@@ -37,6 +25,12 @@
           align-items: center;
           justify-content: start;
           color: #333;
+          font-size: 22px;
+      }
+
+      .header {
+          font-weight: bold;
+          padding-left: 5px;
       }
 
       .server-name {
@@ -45,30 +39,28 @@
           font-weight: normal;
       }
 
-      .name-and-links {
+      .links {
           display: flex;
           flex-direction: row;
           align-items: center;
+          margin-top: 5px;
       }
 
-      .header {
-          font-weight: bold;
-          padding-left: 5px;
-      }
-
-      .database a {
-          margin-right: 5px;
+      .link {
+          margin-right: 10px;
           color: darkblue;
-          font-size: 16px;
+          font-size: 17px;
           text-decoration: none;
       }
 
-      .database h2 {
-          margin: 0 10px 0 0;
+      .name {
+          margin: 0 200px 0 0;
+          font-size: 20px;
       }
 
-      .database p {
-          margin: 10px 0 0;
+      .description {
+          margin: 20px 0 0;
+          font-size: 18px;
       }
 
       .database {
@@ -90,11 +82,11 @@
 </div>
 <% config.database_configs.each do |database_config| %>
   <div class="database">
-    <div class="name-and-links">
-      <h2 class='name'><%= database_config.display_name %></h2>
-      <a class='query-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/query" %>">query</a>
-      <a class='saved-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/saved" %>">saved</a>
-      <a class='structure-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/structure" %>">structure</a>
+    <h2 class='name'><%= database_config.display_name %></h2>
+    <div class="links">
+      <a class='link query-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/query" %>">query</a>
+      <a class='link saved-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/saved" %>">saved</a>
+      <a class='link structure-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/structure" %>">structure</a>
     </div>
     <p class='description'>
       <%= database_config.description %>

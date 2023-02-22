@@ -289,6 +289,23 @@ function route (target = null, event = null, url = null, internal = false) {
   }
 }
 
+function statsHtml (info) {
+  const hidden = info == null
+  info ||= {}
+  return `
+      <table ${hidden ? 'style="visibility: hidden;"' : ''}>
+        <tr><td>created:</td><td>${valueOrNullHtml(info.created_at)}</td></tr>
+        <tr><td>updated:</td><td>${valueOrNullHtml(info.updated_at)}</td></tr>
+        <tr><td>data size:</td><td>${valueOrNullHtml(info.data_size)}</td></tr>
+        <tr><td>index size:</td><td>${valueOrNullHtml(info.index_size)}</td></tr>
+        <tr><td>rows:</td><td>${valueOrNullHtml(info.rows)}</td></tr>
+        <tr><td>row size:</td><td>${valueOrNullHtml(info.average_row_size)}</td></tr>
+        <tr><td>encoding:</td><td>${valueOrNullHtml(info.encoding)}</td></tr>
+        <tr><td>auto increment:</td><td>${valueOrNullHtml(info.auto_increment)}</td></tr>
+      </table>
+    `
+}
+
 function selectStructureTab () {
   Array.prototype.forEach.call(document.getElementsByClassName('structure-element'), function (selected) {
     selected.style.display = 'flex'
@@ -300,6 +317,9 @@ function selectStructureTab () {
 
   const schemasElement = document.getElementById('schemas')
   const tablesElement = document.getElementById('tables')
+  const statsElement = document.getElementById('stats')
+  statsElement.innerHTML = statsHtml(null)
+
   const columnsElement = document.getElementById('columns')
   const indexesElement = document.getElementById('indexes')
 
@@ -328,6 +348,10 @@ function selectStructureTab () {
       schemasElement.appendChild(optionElement)
     })
     schemasElement.addEventListener('change', function () {
+      while (statsElement.firstChild) {
+        statsElement.removeChild(statsElement.firstChild)
+      }
+      statsElement.innerHTML = statsHtml(null)
       while (tablesElement.firstChild) {
         tablesElement.removeChild(tablesElement.firstChild)
       }
@@ -349,6 +373,9 @@ function selectStructureTab () {
     })
   }
   tablesElement.addEventListener('change', function () {
+    while (statsElement.firstChild) {
+      statsElement.removeChild(statsElement.firstChild)
+    }
     while (columnsElement.firstChild) {
       columnsElement.removeChild(columnsElement.firstChild)
     }
@@ -358,7 +385,9 @@ function selectStructureTab () {
     const schemaName = schemaNames.length === 1 ? schemaNames[0] : schemasElement.value
     const tableName = tablesElement.value
     const table = window.metadata.schemas[schemaName].tables[tableName]
+    const info = table.info
 
+    statsElement.innerHTML = statsHtml(info)
     const columnEntries = Object.entries(table.columns)
     if (columnEntries.length > 0) {
       const columns = Object.keys(columnEntries[0][1])
@@ -446,7 +475,7 @@ function selectSavedTab () {
     viewUrl.searchParams.set('file', file.filename)
 
     const viewLinkElement = document.createElement('a')
-    viewLinkElement.classList.add('view-link')
+    viewLinkElement.classList.add('link', 'view-link')
     viewLinkElement.innerText = 'view'
     viewLinkElement.href = viewUrl.pathname + viewUrl.search
     addEventListener(viewLinkElement, 'click', (event) => {
@@ -460,7 +489,7 @@ function selectSavedTab () {
     runUrl.searchParams.set('run', 'true')
 
     const runLinkElement = document.createElement('a')
-    runLinkElement.classList.add('run-link')
+    runLinkElement.classList.add('link', 'run-link')
     runLinkElement.innerText = 'run'
     runLinkElement.href = runUrl.pathname + runUrl.search
     addEventListener(runLinkElement, 'click', (event) => {
@@ -471,23 +500,29 @@ function selectSavedTab () {
 
     const nameElement = document.createElement('h2')
     nameElement.innerText = file.filename
+    nameElement.classList.add('name')
 
-    const nameAndLinksElement = document.createElement('div')
-    nameAndLinksElement.classList.add('name-and-links')
-    nameAndLinksElement.appendChild(nameElement)
-    nameAndLinksElement.appendChild(viewLinkElement)
-    nameAndLinksElement.appendChild(runLinkElement)
+    const linksElement = document.createElement('div')
+    linksElement.classList.add('links')
+    linksElement.appendChild(viewLinkElement)
+    linksElement.appendChild(runLinkElement)
 
     const descriptionElement = document.createElement('p')
     descriptionElement.innerText = file.description
+    descriptionElement.classList.add('description')
 
     const divElement = document.createElement('div')
     divElement.classList.add('saved-list-item')
-    divElement.appendChild(nameAndLinksElement)
+    divElement.appendChild(nameElement)
+    divElement.appendChild(linksElement)
     divElement.appendChild(descriptionElement)
 
     savedElement.appendChild(divElement)
   })
+}
+
+function valueOrNullHtml (value) {
+  return value == null ? '<span style="color: #888">null</span>' : value
 }
 
 function submitAll (target, event) {

@@ -14,17 +14,17 @@ describe 'structure' do
   it 'hides the list of schemas' do
     expected_table_names = %w[characters random_data]
     wait.until do
-      elements = driver.find_elements(css: '#structure-box > * > #tables > option')
+      elements = driver.find_elements(css: '#tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
-    schema_element = wait.until { driver.find_element(css: '#structure-box > * > #schemas') }
+    schema_element = wait.until { driver.find_element(css: '#schemas') }
     expect(schema_element.displayed?).to eq(false)
   end
 
   it 'displays the list of tables' do
     expected_table_names = %w[characters random_data]
     table_elements = wait.until do
-      elements = driver.find_elements(css: '#structure-box > * > #tables > option')
+      elements = driver.find_elements(css: '#tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     table_names = table_elements.map(&:text)
@@ -34,7 +34,7 @@ describe 'structure' do
   it 'displays columns for the selected table' do
     expected_table_names = %w[characters random_data]
     table_elements = wait.until do
-      elements = driver.find_elements(css: '#structure-box > * > #tables > option')
+      elements = driver.find_elements(css: '#tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     table_elements[0].click
@@ -42,7 +42,7 @@ describe 'structure' do
     expected_headers = %w[name data_type length allow_null key default extra]
     header_elements = wait.until do
       elements = driver.find_elements(
-        css: '#structure-box > * > #table-info > #columns > table > thead > tr > th:not(:last-child)'
+        css: '#columns > table > thead > tr > th:not(:last-child)'
       )
       elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
     end
@@ -52,7 +52,7 @@ describe 'structure' do
     expected_column_names = %w[id name description]
     column_name_elements = wait.until do
       elements = driver.find_elements(
-        css: '#structure-box > * > #table-info > #columns > table > tbody > tr > td:first-child'
+        css: '#columns > table > tbody > tr > td:first-child'
       )
       elements if elements.size == expected_column_names.size && elements.all?(&:displayed?)
     end
@@ -63,14 +63,14 @@ describe 'structure' do
   it 'displays headers for the selected table' do
     expected_table_names = %w[characters random_data]
     table_elements = wait.until do
-      elements = driver.find_elements(css: '#structure-box > * > #tables > option')
+      elements = driver.find_elements(css: '#tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
     table_elements[0].click
     expected_headers = %w[name seq_in_index non_unique column_name]
     header_elements = wait.until do
       elements = driver.find_elements(
-        css: '#structure-box > * > #table-info > #indexes > table > thead > tr > th:not(:last-child)'
+        css: '#indexes > table > thead > tr > th:not(:last-child)'
       )
       elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
     end
@@ -80,7 +80,7 @@ describe 'structure' do
     expected_index_names = %w[PRIMARY]
     index_name_elements = wait.until do
       elements = driver.find_elements(
-        css: '#structure-box > * > #table-info > #indexes > table > tbody > tr > td:first-child'
+        css: '#indexes > table > tbody > tr > td:first-child'
       )
       elements if elements.size == expected_index_names.size && elements.all?(&:displayed?)
     end
