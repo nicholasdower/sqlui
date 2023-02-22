@@ -1170,6 +1170,12 @@ window.addEventListener('resize', function (event) {
   }
 })
 
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'Escape') {
+    focus()
+  }
+})
+
 window.onload = function () {
   Promise.all([
     google.charts.load('current', { packages: ['corechart', 'line'] }),

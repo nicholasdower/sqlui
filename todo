@@ -54,4 +54,3 @@ Display number of rows affected if different from rows returned.
 make it possible to focus on table and use arrows to highlight cells
 Add ability to auto-refresh current query
 When auto-refreshing, show browser notification if results change.
-hitting escape while not focused on the editor should focus the editor. Handles case where you just copied a cell value and want to edit the query for instance.
