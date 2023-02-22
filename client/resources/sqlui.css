@@ -115,6 +115,7 @@ body {
     cursor: row-resize;
     flex-direction: column;
     align-items: center;
+    padding-left: 220px; /* To center the resizer icon. Ok, it's a hack. Get over it. */
 }
 
 #cancel-button {
@@ -124,7 +125,7 @@ body {
     border: 1px solid #888;
     height: 32px;
     font-size: 18px;
-    margin: 0 220px 0 0; /* To center the resizer icon. Ok, it's a hack. Get over it. */
+    margin: 0;
 }
 
 #cancel-button-spacer {
