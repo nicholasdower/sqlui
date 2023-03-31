@@ -186,14 +186,24 @@ function setSelection (selection) {
 
 function focus (selection = null) {
   window.editorView.focus()
-  if (selection) setSelection(selection)
+  if (selection) {
+    setSelection(selection)
+  }
 }
 
-function getValue () {
+function getEditorValue () {
   return window.editorView.state.doc.toString()
 }
 
-function setValue (value) {
+function isLastEditorValueSet (value) {
+  return window.lastEditorValueSet === value
+}
+
+function setEditorValue (value) {
+  window.lastEditorValueSet = value
+  if (getEditorValue() === value) {
+    return
+  }
   window.editorView.dispatch({
     changes: {
       from: 0,
@@ -450,9 +460,8 @@ function selectGraphTab (internal) {
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.visibility = 'hidden'
   updateDownloadButtons(window?.sqlFetch)
-  maybeFetchResult(internal)
-
   focus(getSelection())
+  maybeFetchResult(internal)
 }
 
 function selectQueryTab (internal) {
@@ -504,7 +513,6 @@ function selectSavedTab () {
     runLinkElement.href = runUrl.pathname + runUrl.search
     addEventListener(runLinkElement, 'click', (event) => {
       clearResult()
-      route(event.target, event, viewUrl, true)
       route(event.target, event, runUrl, true)
     })
 
@@ -547,15 +555,18 @@ function submit (target, event, selection = null) {
   if (!target || !event) {
     throw new Error('you must specify target and event')
   }
-  clearResult()
+
+  window.lastSetSelectionValueFromUrlParam = null
+  window.lastEditorValueSet = null
+
   const url = new URL(window.location)
-  let sql = getValue().trim()
+  let sql = getEditorValue().trim()
   sql = sql === '' ? null : sql
 
   url.searchParams.set('run', 'true')
 
   if (url.searchParams.has('file')) {
-    if (window.metadata.saved[url.searchParams.get('file')].contents !== getValue()) {
+    if (window.metadata.saved[url.searchParams.get('file')].contents !== getEditorValue()) {
       url.searchParams.delete('file')
       url.searchParams.set('sql', sql)
     }
@@ -735,18 +746,36 @@ function maybeFetchResult (internal) {
   const hasSqluiReferrer = document.referrer && new URL(document.referrer).origin === url.origin
   const variables = parseSqlVariables(params)
 
-  // Only allow auto-run if coming from another SQLUI page. The idea here is to let the app link to URLs with run=true
-  // but not other apps. This allows meta/shift-clicking to run a query.
-  let run = false
-  if (params.has('run')) {
-    run = (internal || hasSqluiReferrer) && ['1', 'true'].includes(params.get('run')?.toLowerCase())
-    url.searchParams.delete('run')
-    window.history.replaceState({}, '', url)
-  }
-
   if (params.has('file') && params.has('sql')) {
     // TODO: show an error.
     throw new Error('You can only specify a file or sql, not both.')
+  }
+
+  // Only allow auto-run if coming from another SQLUI page. The idea here is to let the app link to URLs with run=true
+  // but not other apps. This allows meta/shift-clicking to run a query.
+  if (params.has('run')) {
+    url.searchParams.delete('run')
+    window.history.replaceState({}, '', url)
+    clearResult()
+
+    if (!internal && !hasSqluiReferrer) {
+      throw new Error('run only allowed for internal usage')
+    }
+
+    if (params.has('sql') || params.has('file')) {
+      const sqlFetch = buildSqlFetch(sql, file, variables, selection)
+      setEditorValue(sqlFetch.sql)
+      if (params.has('selection')) {
+        window.lastSetSelectionValueFromUrlParam = selection
+        focus(selection)
+      } else {
+        window.lastSetSelectionValueFromUrlParam = null
+      }
+      fetchSql(sqlFetch)
+      return
+    } else {
+      throw new Error('run param specified without sql or file')
+    }
   }
 
   const existingRequest = window.sqlFetch
@@ -758,7 +787,7 @@ function maybeFetchResult (internal) {
     const queryMatches = sqlMatches || fileMatches
     if (selectionMatches && queryMatches && variablesMatch) {
       displaySqlFetch(existingRequest)
-      if (params.has('selection')) {
+      if (params.has('selection') && window.lastSetSelectionValueFromUrlParam !== selection) {
         focus(selection)
       }
       return
@@ -768,13 +797,12 @@ function maybeFetchResult (internal) {
   clearResult()
 
   const sqlFetch = buildSqlFetch(sql, file, variables, selection)
-  if (params.has('sql') || params.has('file')) {
-    setValue(sqlFetch.sql)
-    if (run) {
-      fetchSql(sqlFetch)
-    }
+  if ((params.has('sql') || params.has('file')) && !isLastEditorValueSet(sqlFetch.sql)) {
+    setEditorValue(sqlFetch.sql)
   }
-  if (params.has('selection')) {
+
+  if (params.has('selection') && window.lastSetSelectionValueFromUrlParam !== selection) {
+    window.lastSetSelectionValueFromUrlParam = selection
     focus(selection)
   }
 }
@@ -956,7 +984,7 @@ function registerTableCellPopup (tableElement) {
           const row = parseInt(node.dataset.row)
           const column = parseInt(node.dataset.column)
           const title = window.sqlFetch.result.columns[column].replaceAll('\n', '¶')
-          if (event.metaKey) {
+          if (event.metaKey || event.ctrlKey) {
             createPopup(title, window.sqlFetch.result.rows[row][column])
           } else if (event.altKey) {
             copyTextToClipboard(window.sqlFetch.result.rows[row][column])

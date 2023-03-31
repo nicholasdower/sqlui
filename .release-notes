@@ -1,1 +1,3 @@
 - Add a help tab.
+- Fix bug where editor contents and cursor position were discarded on tab switch.
+- Update popup shortcut on Windows to be Ctrl+Click.
