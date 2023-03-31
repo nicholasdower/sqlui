@@ -1,0 +1,30 @@
+#help-box h2 {
+    font-size: 22px;
+    margin: 10px 0 20px 0;
+}
+#help-box table#keyboard-shortcuts {
+    border-collapse: collapse;
+}
+
+#help-box table#keyboard-shortcuts tr.keyboard-shortcut-header {
+    font-weight: bold;
+    background: #efefef;
+}
+
+#help-box table#keyboard-shortcuts td, #help-box table#keyboard-shortcuts tr.keyboard-shortcut-header {
+    text-align: left;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+}
+
+#help-box table#keyboard-shortcuts .keyboard-shortcut-section td {
+    border: none;
+    font-weight: bold;
+    padding: 20px 5px 5px 0;
+    font-size: 16px;
+}
+
+#help-box table#keyboard-shortcuts tr.keyboard-shortcut-section:first-child td {
+    padding-top: 0;
+}

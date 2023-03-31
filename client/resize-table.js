@@ -77,6 +77,7 @@ export class ResizeTable extends HTMLTableElement {
     this.headerRenderer = headerRenderer
     this.cellRenderer = cellRenderer
 
+    this.classList.add('resize-table')
     this.style.tableLayout = 'auto'
     this.style.width = '100%'
 

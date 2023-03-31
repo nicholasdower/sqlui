@@ -32,9 +32,10 @@ function getSqlFromUrl (url) {
 
 function init (parent, onSubmit, onShiftSubmit) {
   addEventListener('#query-tab-button', 'click', (event) => selectTab(event, 'query'))
+  addEventListener('#graph-tab-button', 'click', (event) => selectTab(event, 'graph'))
   addEventListener('#saved-tab-button', 'click', (event) => selectTab(event, 'saved'))
   addEventListener('#structure-tab-button', 'click', (event) => selectTab(event, 'structure'))
-  addEventListener('#graph-tab-button', 'click', (event) => selectTab(event, 'graph'))
+  addEventListener('#help-tab-button', 'click', (event) => selectTab(event, 'help'))
   addEventListener('#cancel-button', 'click', () => clearResult())
 
   addEventListener('#query-box', 'click', () => {
@@ -208,7 +209,7 @@ function setActionInUrl (url, action) {
 
 function getTabFromUrl (url) {
   const match = url.pathname.match(/\/([^/]+)$/)
-  if (match && ['query', 'graph', 'structure', 'saved'].includes(match[1])) {
+  if (match && ['query', 'graph', 'saved', 'structure', 'help'].includes(match[1])) {
     return match[1]
   } else {
     throw new Error(`invalid tab: ${url.pathname}`)
@@ -217,14 +218,16 @@ function getTabFromUrl (url) {
 
 function updateTabs () {
   const url = new URL(window.location)
+  setActionInUrl(url, 'query')
+  document.getElementById('query-tab-button').href = url.pathname + url.search
   setActionInUrl(url, 'graph')
   document.getElementById('graph-tab-button').href = url.pathname + url.search
   setActionInUrl(url, 'saved')
   document.getElementById('saved-tab-button').href = url.pathname + url.search
   setActionInUrl(url, 'structure')
   document.getElementById('structure-tab-button').href = url.pathname + url.search
-  setActionInUrl(url, 'query')
-  document.getElementById('query-tab-button').href = url.pathname + url.search
+  setActionInUrl(url, 'help')
+  document.getElementById('help-tab-button').href = url.pathname + url.search
 }
 
 function selectTab (event, tab) {
@@ -283,6 +286,9 @@ function route (target = null, event = null, url = null, internal = false) {
       break
     case 'structure':
       selectStructureTab()
+      break
+    case 'help':
+      selectHelpTab()
       break
     default:
       throw new Error(`Unexpected tab: ${window.tab}`)
@@ -431,6 +437,10 @@ function selectStructureTab () {
     }
   })
   window.structureLoaded = true
+}
+
+function selectHelpTab () {
+  document.getElementById('help-box').style.display = 'block'
 }
 
 function selectGraphTab (internal) {

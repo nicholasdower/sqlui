@@ -242,18 +242,18 @@ body {
     text-overflow: ellipsis;
 }
 
-#result-box, #fetch-sql-box, #saved-box, #graph-box, #structure-box {
+#result-box, #fetch-sql-box, #graph-box, #saved-box, #structure-box, #help-box {
     flex: 1;
     overflow: auto;
     display: flex;
     flex-direction: column;
 }
 
-table tbody tr td {
+.resize-table tbody tr td {
   height: 21px;
 }
 
-#result-table tbody tr td abbr a {
+.resize-table tbody tr td abbr a {
     color: #555;
     cursor: pointer;
     text-decoration: none;
@@ -265,7 +265,7 @@ table tbody tr td {
     user-select: none;
 }
 
-#result-table tbody tr td abbr {
+.resize-table tbody tr td abbr {
     margin: 0 5px 0 0;
     text-decoration: none;
     position: relative;
@@ -281,53 +281,50 @@ table tbody tr td {
     padding: 20px;
 }
 
-table {
+.resize-table {
     font-family: monospace;
     border-spacing: 0;
     color: #333;
     font-size: 18px;
 }
 
-table td:last-child, table th:last-child {
+.resize-table td:last-child, .resize-table th:last-child {
     border-right: none !important;
+    max-width: none;
 }
 
-td, th {
+.resize-table td, .resize-table th {
     font-weight: normal;
     white-space: nowrap;
     max-width: 500px;
 }
 
-td:last-child, th:last-child {
-    max-width: none;
-}
-
-td {
+.resize-table td {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 5px 10px;
     text-align: right;
 }
 
-#result-table tbody tr td .cell-content-wrapper {
+.resize-table tbody tr td .cell-content-wrapper {
     display: flex;
 }
 
-#result-table tbody tr td .cell-value {
+.resize-table tbody tr td .cell-value {
     flex: 1;
 }
 
-th {
+.resize-table th {
     font-weight: bold;
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
 }
 
-th div.col-content-wrapper {
+.resize-table th div.col-content-wrapper {
     display: flex;
 }
 
-th div.col-name {
+.resize-table th div.col-name {
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 1;
@@ -336,14 +333,14 @@ th div.col-name {
     padding: 5px 10px;
 }
 
-th div.col-resizer {
+.resize-table th div.col-resizer {
     width: 7px;
     position: relative;
     left: 5px; /* center over the right border */
     cursor: col-resize;
 }
 
-thead {
+.resize-table thead {
     padding: 0;
     background-color: #fff;
     position: -webkit-sticky;
@@ -449,12 +446,12 @@ thead {
     color: #333;
 }
 
-table td:nth-child(1) {
+#stats table td:nth-child(1) {
     text-align: left;
     font-family: Helvetica, sans-serif;
 }
 
-table td:nth-child(2) {
+#stats table td:nth-child(2) {
     text-align: right;
     font-family: monospace;
 }
@@ -555,4 +552,10 @@ select {
 
 .jump-button {
     font-size: 12px;
+}
+
+#help-box {
+    font-family: Helvetica, sans-serif;
+    padding: 10px;
+    width: 100%;
 }

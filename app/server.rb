@@ -255,7 +255,7 @@ class Server < Sinatra::Base
         end
       end
 
-      get(/#{Regexp.escape("#{config.base_url_path}/#{database.url_path}/")}(query|graph|structure|saved)/) do
+      get(/#{Regexp.escape("#{config.base_url_path}/#{database.url_path}/")}(query|graph|saved|structure|help)/) do
         status 200
         headers 'Cache-Control' => 'no-cache'
         client_config = config.airbrake[:client] || {}

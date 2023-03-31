@@ -28,7 +28,6 @@ test:
  - decimal rendering
  - SqlParser.split.
 maybe add support for tags on database config to easily see production vs staging for instance
-add a help tab
 browser notifications when query completes if on other browser tab or other SQLUI tab
 the editor is too short on a large screen. it should be a percentage
 warn when closing the browser with unsaved changes? what do other sites do?
