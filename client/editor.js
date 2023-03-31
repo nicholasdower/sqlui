@@ -19,7 +19,6 @@ import {
   indentOnInput, LanguageSupport,
   syntaxHighlighting, syntaxTree
 } from '@codemirror/language'
-import { lintKeymap } from '@codemirror/lint'
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 import { EditorState } from '@codemirror/state'
 import {
@@ -128,8 +127,7 @@ export function createEditor (parent, metadata, onSubmit, onShiftSubmit) {
     ...searchKeymap,
     ...historyKeymap,
     ...foldKeymap,
-    ...completionKeymap,
-    ...lintKeymap
+    ...completionKeymap
   ])
   const sqlConfig = {
     dialect: MySQL,

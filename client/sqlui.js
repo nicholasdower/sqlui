@@ -276,7 +276,7 @@ function route (target = null, event = null, url = null, internal = false) {
 
   switch (window.tab) {
     case 'query':
-      selectResultTab(internal)
+      selectQueryTab(internal)
       break
     case 'graph':
       selectGraphTab(internal)
@@ -455,7 +455,7 @@ function selectGraphTab (internal) {
   focus(getSelection())
 }
 
-function selectResultTab (internal) {
+function selectQueryTab (internal) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('result-box').style.display = 'flex'
