@@ -475,7 +475,9 @@ function selectStructureTab () {
 }
 
 function selectHelpTab () {
-  document.getElementById('help-box').style.display = 'block'
+  const helpBoxElement = document.getElementById('help-box')
+  helpBoxElement.style.display = 'block'
+  setTimeout(() => { helpBoxElement.focus() }, 0)
 }
 
 function selectGraphTab (internal) {

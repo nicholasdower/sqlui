@@ -3,6 +3,7 @@
     padding: 10px 10px 0 10px;
     flex: 1;
     overflow: auto;
+    outline: none;
 }
 
 #help-box h2 {
