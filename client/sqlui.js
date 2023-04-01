@@ -507,6 +507,8 @@ function selectSavedTab () {
   })
 
   const savedElement = document.getElementById('saved-box')
+  setTimeout(() => { savedElement.focus() }, 0)
+
   const saved = window.metadata.saved
   const numFiles = Object.keys(saved).length
   setStatus(`${numFiles} file${numFiles === 1 ? '' : 's'}`)

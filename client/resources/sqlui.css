@@ -384,6 +384,7 @@ body {
 
 #saved-box {
     font-family: Helvetica, sans-serif;
+    outline: none;
 }
 
 .links {
