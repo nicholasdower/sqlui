@@ -5,7 +5,7 @@ import { copyTextToClipboard } from './clipboard.js'
 import { toCsv, toTsv } from './csv.js'
 import { createEditor } from './editor.js'
 import { ResizeTable } from './resize-table.js'
-import { createPopup } from './popup.js'
+import { closePopup, createPopup } from './popup.js'
 import { createVerticalResizer } from './resizer.js'
 import { toast } from './toast.js'
 
@@ -247,6 +247,8 @@ function selectTab (event, tab) {
 }
 
 function route (target = null, event = null, url = null, internal = false) {
+  closePopup()
+
   if (url) {
     if (event) {
       event.preventDefault()
@@ -1209,8 +1211,38 @@ window.addEventListener('resize', function (event) {
 })
 
 document.addEventListener('keydown', (event) => {
+  if (event.code === 'ControlLeft' || event.code === 'ControlRight') {
+    Array.prototype.forEach.call(document.getElementsByClassName('keyboard-shortcut-indicator'), function (selected) {
+      selected.style.visibility = 'visible'
+    })
+  }
+
   if (event.code === 'Escape') {
     focus()
+    return
+  }
+
+  const isMac = navigator.userAgent.includes('Mac')
+  if (isMac && event.code === 'Digit0' && event.ctrlKey) {
+    document.getElementById('header-link').click()
+  } else if (isMac && event.code === 'Digit1' && event.ctrlKey) {
+    selectTab(event, 'query')
+  } else if (isMac && event.code === 'Digit2' && event.ctrlKey) {
+    selectTab(event, 'graph')
+  } else if (isMac && event.code === 'Digit3' && event.ctrlKey) {
+    selectTab(event, 'saved')
+  } else if (isMac && event.code === 'Digit4' && event.ctrlKey) {
+    selectTab(event, 'structure')
+  } else if (isMac && event.code === 'Digit5' && event.ctrlKey) {
+    selectTab(event, 'help')
+  }
+})
+
+document.addEventListener('keyup', (event) => {
+  if ((event.code === 'ControlLeft' || event.code === 'ControlRight') && !event.ctrlKey) {
+    Array.prototype.forEach.call(document.getElementsByClassName('keyboard-shortcut-indicator'), function (selected) {
+      selected.style.visibility = 'hidden'
+    })
   }
 })
 

@@ -31,13 +31,13 @@
 
     <div id="main-box" style="display:none">
       <div id="tabs-box">
-        <h1 id="header"><a id="header-link">SQLUI</a></h1>
+        <h1 id="header"><a id="header-link">SQLUI<span class="keyboard-shortcut-indicator">[0]</span></a></h1>
         <h1 id="server-name"></h1>
-        <a id="query-tab-button" class="tab-button">Query</a>
-        <a id="graph-tab-button" class="tab-button">Graph</a>
-        <a id="saved-tab-button" class="tab-button">Saved</a>
-        <a id="structure-tab-button" class="tab-button">Structure</a>
-        <a id="help-tab-button" class="tab-button">Help</a>
+        <a id="query-tab-button" class="tab-button">Query<span class="keyboard-shortcut-indicator">[1]</span></a>
+        <a id="graph-tab-button" class="tab-button">Graph<span class="keyboard-shortcut-indicator">[2]</span></a>
+        <a id="saved-tab-button" class="tab-button">Saved<span class="keyboard-shortcut-indicator">[3]</span></a>
+        <a id="structure-tab-button" class="tab-button">Structure<span class="keyboard-shortcut-indicator">[4]</span></a>
+        <a id="help-tab-button" class="tab-button">Help<span class="keyboard-shortcut-indicator">[5]</span></a>
       </div>
 
       <div id="query-box" class="tab-content-element graph-element query-element" style="display: none;">
@@ -109,113 +109,122 @@
         <h2>Keyboard Shortcuts</h2>
         <table id="keyboard-shortcuts">
           <tbody>
-            <tr class="keyboard-shortcut-section"><td colspan="3">Result Table Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Option+click</td><td>Alt+Click</td><td>Copy clicked cell contents to clipboard</td></tr>
-            <tr><td>Cmd+click</td><td>Ctrl+Click</td><td>Open clicked cell contents in popup</td></tr>
-            <tr><td>Escape</td><td>Escape</td><td>Focus editor, Close popup</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">App Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Ctrl+0</td><td></td><td>Show databases</td></tr>
+          <tr><td>Ctrl+1</td><td></td><td>Select query tab</td></tr>
+          <tr><td>Ctrl+2</td><td></td><td>Select graph tab</td></tr>
+          <tr><td>Ctrl+3</td><td></td><td>Select saved tab</td></tr>
+          <tr><td>Ctrl+4</td><td></td><td>Select structure tab</td></tr>
+          <tr><td>Ctrl+5</td><td></td><td>Select help tab</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor Submit Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Cmd+Enter</td><td>Ctrl+Enter</td><td>Execute query at cursor / selection</td></tr>
-            <tr><td>Cmd+Shift+Enter</td><td>Ctrl+Shift+Enter</td><td>Execute entire editor</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Result Table Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Option+click</td><td>Alt+Click</td><td>Copy clicked cell contents to clipboard</td></tr>
+          <tr><td>Cmd+click</td><td>Ctrl+Click</td><td>Open clicked cell contents in popup</td></tr>
+          <tr><td>Escape</td><td>Escape</td><td>Focus editor, Close popup</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor Standard Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>ArrowLeft</td><td>ArrowLeft</td><td>Move cursor left one character (Shift to select)</td></tr>
-            <tr><td>ArrowRight</td><td>ArrowRight</td><td>Move cursor right one character (Shift to select)</td></tr>
-            <tr><td>Option+ArrowLeft</td><td>Ctrl+ArrowLeft</td><td>Move cursor one group left (Shift to select)</td></tr>
-            <tr><td>Option+ArrowRight</td><td>Ctrl+ArrowRight</td><td>Move cursor one group right (Shift to select)</td></tr>
-            <tr><td>Cmd+ArrowLeft</td><td></td><td>Move cursor to start of line (Shift to select)</td></tr>
-            <tr><td>Cmd+ArrowRight</td><td></td><td>Move cursor to end of line (Shift to select)</td></tr>
-            <tr><td>ArrowUp</td><td>ArrowUp</td><td>Move cursor up one line (Shift to select)</td></tr>
-            <tr><td>ArrowDown</td><td>ArrowDown</td><td>Move cursor down one line (Shift to select)</td></tr>
-            <tr><td>Cmd+ArrowUp</td><td></td><td>Move cursor to start of document (Shift to select)</td></tr>
-            <tr><td>Cmd+ArrowDown</td><td></td><td>Move cursor to end of document (Shift to select)</td></tr>
-            <tr><td>Cmd+End</td><td>Ctrl+End</td><td>Move cursor to start of document (Shift to select)</td></tr>
-            <tr><td>Cmd+Home</td><td>Ctrl+Home</td><td>Move cursor to end of document (Shift to select)</td></tr>
-            <tr><td>PageUp</td><td>PageUp</td><td>Move cursor one page up (Shift to select)</td></tr>
-            <tr><td>PageDown</td><td>PageDown</td><td>Move cursor one page down (Shift to select)</td></tr>
-            <tr><td>Home</td><td>Home</td><td>Move cursor to previous line boundary (Shift to select)</td></tr>
-            <tr><td>End</td><td>End</td><td>Move cursor to next line boundary (Shift to select)</td></tr>
-            <tr><td>Enter</td><td>Enter</td><td>Insert new line and indent</td></tr>
-            <tr><td>Cmd+a</td><td>Ctrl+a</td><td>Select all</td></tr>
-            <tr><td>Backspace</td><td>Backspace</td><td>Delete previous character</td></tr>
-            <tr><td>Delete</td><td>Delete</td><td>Delete next character</td></tr>
-            <tr><td>Option+Backspace</td><td>Ctrl+Backspace</td><td>Delete previous group</td></tr>
-            <tr><td>Option+Delete</td><td>Ctrl+Delete</td><td>Delete next group</td></tr>
-            <tr><td>Cmd+Backspace</td><td></td><td>Delete to start of line</td></tr>
-            <tr><td>Cmd+Delete</td><td></td><td>Delete to end of line</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor Submit Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Cmd+Enter</td><td>Ctrl+Enter</td><td>Execute query at cursor / selection</td></tr>
+          <tr><td>Cmd+Shift+Enter</td><td>Ctrl+Shift+Enter</td><td>Execute entire editor</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor Default Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Ctrl+ArrowLeft</td><td>Alt+ArrowLeft</td><td>Move cursor one element left (Shift to select)</td></tr>
-            <tr><td>Ctrl+ArrowRight</td><td>Alt+ArrowRight</td><td>Move cursor one element right (Shift to select)</td></tr>
-            <tr><td>Option+ArrowUp</td><td>Alt+ArrowUp</td><td>Move line up</td></tr>
-            <tr><td>Option+ArrowDown</td><td>Alt+ArrowDown</td><td>Move line down</td></tr>
-            <tr><td>Shift+Option+ArrowUp</td><td>Shift+Alt+ArrowUp</td><td>Copy line up</td></tr>
-            <tr><td>Shift+Option+ArrowDown</td><td>Shift+Alt+ArrowDown</td><td>Copy line down</td></tr>
-            <tr><td>Escape</td><td>Escape</td><td>Simplify selection</td></tr>
-            <tr><td>Shift+Enter</td><td>Shift+Enter</td><td>Insert blank line</td></tr>
-            <tr><td>Ctrl+l</td><td>Alt+l</td><td>Select line</td></tr>
-            <tr><td>Cmd+i</td><td>Ctrl+i</td><td>Expand current selection</td></tr>
-            <tr><td>Cmd+[</td><td>Ctrl+[</td><td>Decrease indent</td></tr>
-            <tr><td>Cmd+]</td><td>Ctrl+]</td><td>Increase indent</td></tr>
-            <tr><td>Cmd+Option+\</td><td>Ctrl+Alt+\</td><td>Indent selection</td></tr>
-            <tr><td>Shift+Cmd+k</td><td>Shift+Ctrl+k</td><td>Delete line</td></tr>
-            <tr><td>Shift+Cmd+\</td><td>Shift+Ctrl+\</td><td>cursorMatchingBracket</td></tr>
-            <tr><td>Cmd+/</td><td>Ctrl+/</td><td>Toggle comment</td></tr>
-            <tr><td>Shift+Option+a</td><td>Shift+Alt+a</td><td>Toggle comment</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor Standard Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>ArrowLeft</td><td>ArrowLeft</td><td>Move cursor left one character (Shift to select)</td></tr>
+          <tr><td>ArrowRight</td><td>ArrowRight</td><td>Move cursor right one character (Shift to select)</td></tr>
+          <tr><td>Option+ArrowLeft</td><td>Ctrl+ArrowLeft</td><td>Move cursor one group left (Shift to select)</td></tr>
+          <tr><td>Option+ArrowRight</td><td>Ctrl+ArrowRight</td><td>Move cursor one group right (Shift to select)</td></tr>
+          <tr><td>Cmd+ArrowLeft</td><td></td><td>Move cursor to start of line (Shift to select)</td></tr>
+          <tr><td>Cmd+ArrowRight</td><td></td><td>Move cursor to end of line (Shift to select)</td></tr>
+          <tr><td>ArrowUp</td><td>ArrowUp</td><td>Move cursor up one line (Shift to select)</td></tr>
+          <tr><td>ArrowDown</td><td>ArrowDown</td><td>Move cursor down one line (Shift to select)</td></tr>
+          <tr><td>Cmd+ArrowUp</td><td></td><td>Move cursor to start of document (Shift to select)</td></tr>
+          <tr><td>Cmd+ArrowDown</td><td></td><td>Move cursor to end of document (Shift to select)</td></tr>
+          <tr><td>Cmd+End</td><td>Ctrl+End</td><td>Move cursor to start of document (Shift to select)</td></tr>
+          <tr><td>Cmd+Home</td><td>Ctrl+Home</td><td>Move cursor to end of document (Shift to select)</td></tr>
+          <tr><td>PageUp</td><td>PageUp</td><td>Move cursor one page up (Shift to select)</td></tr>
+          <tr><td>PageDown</td><td>PageDown</td><td>Move cursor one page down (Shift to select)</td></tr>
+          <tr><td>Home</td><td>Home</td><td>Move cursor to previous line boundary (Shift to select)</td></tr>
+          <tr><td>End</td><td>End</td><td>Move cursor to next line boundary (Shift to select)</td></tr>
+          <tr><td>Enter</td><td>Enter</td><td>Insert new line and indent</td></tr>
+          <tr><td>Cmd+a</td><td>Ctrl+a</td><td>Select all</td></tr>
+          <tr><td>Backspace</td><td>Backspace</td><td>Delete previous character</td></tr>
+          <tr><td>Delete</td><td>Delete</td><td>Delete next character</td></tr>
+          <tr><td>Option+Backspace</td><td>Ctrl+Backspace</td><td>Delete previous group</td></tr>
+          <tr><td>Option+Delete</td><td>Ctrl+Delete</td><td>Delete next group</td></tr>
+          <tr><td>Cmd+Backspace</td><td></td><td>Delete to start of line</td></tr>
+          <tr><td>Cmd+Delete</td><td></td><td>Delete to end of line</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor Completion Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Ctrl+Space</td><td>Ctrl+Space</td><td>Start completion</td></tr>
-            <tr><td>Escape</td><td>Escape</td><td>Close completion</td></tr>
-            <tr><td>ArrowUp</td><td>ArrowUp</td><td>Move selection up</td></tr>
-            <tr><td>ArrowDown</td><td>ArrowDown</td><td>Move selection down</td></tr>
-            <tr><td>PageUp</td><td>PageUp</td><td>Move selection page up</td></tr>
-            <tr><td>PageDown</td><td>PageDown</td><td>Move selection page down</td></tr>
-            <tr><td>Enter</td><td>Enter</td><td>Accept completion</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor Default Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Ctrl+ArrowLeft</td><td>Alt+ArrowLeft</td><td>Move cursor one element left (Shift to select)</td></tr>
+          <tr><td>Ctrl+ArrowRight</td><td>Alt+ArrowRight</td><td>Move cursor one element right (Shift to select)</td></tr>
+          <tr><td>Option+ArrowUp</td><td>Alt+ArrowUp</td><td>Move line up</td></tr>
+          <tr><td>Option+ArrowDown</td><td>Alt+ArrowDown</td><td>Move line down</td></tr>
+          <tr><td>Shift+Option+ArrowUp</td><td>Shift+Alt+ArrowUp</td><td>Copy line up</td></tr>
+          <tr><td>Shift+Option+ArrowDown</td><td>Shift+Alt+ArrowDown</td><td>Copy line down</td></tr>
+          <tr><td>Escape</td><td>Escape</td><td>Simplify selection</td></tr>
+          <tr><td>Shift+Enter</td><td>Shift+Enter</td><td>Insert blank line</td></tr>
+          <tr><td>Ctrl+l</td><td>Alt+l</td><td>Select line</td></tr>
+          <tr><td>Cmd+i</td><td>Ctrl+i</td><td>Expand current selection</td></tr>
+          <tr><td>Cmd+[</td><td>Ctrl+[</td><td>Decrease indent</td></tr>
+          <tr><td>Cmd+]</td><td>Ctrl+]</td><td>Increase indent</td></tr>
+          <tr><td>Cmd+Option+\</td><td>Ctrl+Alt+\</td><td>Indent selection</td></tr>
+          <tr><td>Shift+Cmd+k</td><td>Shift+Ctrl+k</td><td>Delete line</td></tr>
+          <tr><td>Shift+Cmd+\</td><td>Shift+Ctrl+\</td><td>cursorMatchingBracket</td></tr>
+          <tr><td>Cmd+/</td><td>Ctrl+/</td><td>Toggle comment</td></tr>
+          <tr><td>Shift+Option+a</td><td>Shift+Alt+a</td><td>Toggle comment</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor Fold Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Cmd+Option+[</td><td>Ctrl+Shift+[</td><td>Fold code at cursor</td></tr>
-            <tr><td>Cmd+Option+]</td><td>Ctrl+Shift+]</td><td>Unfold code at cursor</td></tr>
-            <tr><td>Ctrl+Option+[</td><td>Ctrl+Alt+[</td><td>Fold all</td></tr>
-            <tr><td>Ctrl+Option+[</td><td>Ctrl+Alt+[</td><td>Unfold all</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor Completion Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Ctrl+Space</td><td>Ctrl+Space</td><td>Start completion</td></tr>
+          <tr><td>Escape</td><td>Escape</td><td>Close completion</td></tr>
+          <tr><td>ArrowUp</td><td>ArrowUp</td><td>Move selection up</td></tr>
+          <tr><td>ArrowDown</td><td>ArrowDown</td><td>Move selection down</td></tr>
+          <tr><td>PageUp</td><td>PageUp</td><td>Move selection page up</td></tr>
+          <tr><td>PageDown</td><td>PageDown</td><td>Move selection page down</td></tr>
+          <tr><td>Enter</td><td>Enter</td><td>Accept completion</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor History Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Cmd+z</td><td>Ctrl+z</td><td>Undo</td></tr>
-            <tr><td>Cmd+y</td><td>Ctrl+y</td><td>Redo</td></tr>
-            <tr><td>Cmd+u</td><td>Ctrl+u</td><td>Undo selection</td></tr>
-            <tr><td>Cmd+Shift+u</td><td>Alt+u</td><td>Redo selection</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor Fold Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Cmd+Option+[</td><td>Ctrl+Shift+[</td><td>Fold code at cursor</td></tr>
+          <tr><td>Cmd+Option+]</td><td>Ctrl+Shift+]</td><td>Unfold code at cursor</td></tr>
+          <tr><td>Ctrl+Option+[</td><td>Ctrl+Alt+[</td><td>Fold all</td></tr>
+          <tr><td>Ctrl+Option+[</td><td>Ctrl+Alt+[</td><td>Unfold all</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Editor Search Shortcuts</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Cmd+f</td><td>Ctrl+f</td><td>Open search panel</td></tr>
-            <tr><td>Escape</td><td>Escape</td><td>Close search panel</td></tr>
-            <tr><td>Cmd+g, F3</td><td>Ctrl+g, F3</td><td>Find next</td></tr>
-            <tr><td>Shift+Cmd+g, Shift+F3</td><td>Shift+Ctrl+g, Shift+F3</td><td>Find previous</td></tr>
-            <tr><td>Option+g</td><td>Alt+g</td><td>Go to line</td></tr>
-            <tr><td>Cmd+d</td><td>Ctrl+d</td><td>Select next occurrence</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor History Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Cmd+z</td><td>Ctrl+z</td><td>Undo</td></tr>
+          <tr><td>Cmd+y</td><td>Ctrl+y</td><td>Redo</td></tr>
+          <tr><td>Cmd+u</td><td>Ctrl+u</td><td>Undo selection</td></tr>
+          <tr><td>Cmd+Shift+u</td><td>Alt+u</td><td>Redo selection</td></tr>
 
-            <tr class="keyboard-shortcut-section"><td colspan="3">Emacs-Style Shortcuts (Mac Only)</td></tr>
-            <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
-            <tr><td>Ctrl+b</td><td></td><td>Move cursor left one character (Shift to select)</td></tr>
-            <tr><td>Ctrl+f</td><td></td><td>Move cursor right one character (Shift to select)</td></tr>
-            <tr><td>Ctrl+p</td><td></td><td>Move cursor up one line (Shift to select)</td></tr>
-            <tr><td>Ctrl+n</td><td></td><td>Move cursor down one line (Shift to select)</td></tr>
-            <tr><td>Ctrl+a</td><td></td><td>Move cursor to start of line (Shift to select)</td></tr>
-            <tr><td>Ctrl+e</td><td></td><td>Move cursor to end of line (Shift to select)</td></tr>
-            <tr><td>Ctrl+h</td><td></td><td>Delete previous character</td></tr>
-            <tr><td>Ctrl+d</td><td></td><td>Delete next character</td></tr>
-            <tr><td>Ctrl+k</td><td></td><td>Delete to end of line</td></tr>
-            <tr><td>Ctrl+Alt+h</td><td></td><td>Delete previous group</td></tr>
-            <tr><td>Ctrl+o</td><td></td><td>Split line</td></tr>
-            <tr><td>Ctrl+t</td><td></td><td>Flip characters before and after cursor</td></tr>
-            <tr><td>Alt+v</td><td></td><td>Move cursor one page up</td></tr>
-            <tr><td>Ctrl+v</td><td></td><td>Move cursor one page down</td></tr>
+          <tr class="keyboard-shortcut-section"><td colspan="3">Editor Search Shortcuts</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Cmd+f</td><td>Ctrl+f</td><td>Open search panel</td></tr>
+          <tr><td>Escape</td><td>Escape</td><td>Close search panel</td></tr>
+          <tr><td>Cmd+g, F3</td><td>Ctrl+g, F3</td><td>Find next</td></tr>
+          <tr><td>Shift+Cmd+g, Shift+F3</td><td>Shift+Ctrl+g, Shift+F3</td><td>Find previous</td></tr>
+          <tr><td>Option+g</td><td>Alt+g</td><td>Go to line</td></tr>
+          <tr><td>Cmd+d</td><td>Ctrl+d</td><td>Select next occurrence</td></tr>
+
+          <tr class="keyboard-shortcut-section"><td colspan="3">Emacs-Style Shortcuts (Mac Only)</td></tr>
+          <tr class="keyboard-shortcut-header"><td> Mac</td><td>Windows</td><td>Action</td></tr>
+          <tr><td>Ctrl+b</td><td></td><td>Move cursor left one character (Shift to select)</td></tr>
+          <tr><td>Ctrl+f</td><td></td><td>Move cursor right one character (Shift to select)</td></tr>
+          <tr><td>Ctrl+p</td><td></td><td>Move cursor up one line (Shift to select)</td></tr>
+          <tr><td>Ctrl+n</td><td></td><td>Move cursor down one line (Shift to select)</td></tr>
+          <tr><td>Ctrl+a</td><td></td><td>Move cursor to start of line (Shift to select)</td></tr>
+          <tr><td>Ctrl+e</td><td></td><td>Move cursor to end of line (Shift to select)</td></tr>
+          <tr><td>Ctrl+h</td><td></td><td>Delete previous character</td></tr>
+          <tr><td>Ctrl+d</td><td></td><td>Delete next character</td></tr>
+          <tr><td>Ctrl+k</td><td></td><td>Delete to end of line</td></tr>
+          <tr><td>Ctrl+Alt+h</td><td></td><td>Delete previous group</td></tr>
+          <tr><td>Ctrl+o</td><td></td><td>Split line</td></tr>
+          <tr><td>Ctrl+t</td><td></td><td>Flip characters before and after cursor</td></tr>
+          <tr><td>Alt+v</td><td></td><td>Move cursor one page up</td></tr>
+          <tr><td>Ctrl+v</td><td></td><td>Move cursor one page down</td></tr>
           </tbody>
         </table>
       </div>

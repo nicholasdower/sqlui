@@ -49,9 +49,15 @@ body {
     color: #333
 }
 
+#header-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 #server-name {
     flex: 1;
-    padding-left: 15px;
+    padding-left: 5px;
     font-weight: normal;
     overflow: hidden;
     white-space: nowrap;
@@ -78,6 +84,8 @@ body {
     background-color: #fff;
     font-size: 18px;
     align-self: center;
+    flex-direction: row;
+    align-items: center;
 }
 
 .tab-button {
@@ -91,6 +99,12 @@ body {
 .selected-tab-button {
     color: #333;
     font-weight: bold;
+}
+
+.keyboard-shortcut-indicator {
+    font-size: 14px;
+    visibility: hidden;
+    margin: 0 5px;
 }
 
 #query-box {
@@ -242,7 +256,7 @@ body {
     text-overflow: ellipsis;
 }
 
-#result-box, #fetch-sql-box, #graph-box, #saved-box, #structure-box, #help-box {
+#result-box, #fetch-sql-box, #graph-box, #saved-box, #structure-box {
     flex: 1;
     overflow: auto;
     display: flex;
@@ -552,10 +566,4 @@ select {
 
 .jump-button {
     font-size: 12px;
-}
-
-#help-box {
-    font-family: Helvetica, sans-serif;
-    padding: 10px;
-    width: 100%;
 }

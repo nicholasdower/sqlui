@@ -92,12 +92,19 @@ export function createPopup (title, text) {
   closeElement.focus()
 }
 
+export function closePopup () {
+  const wrapperElement = document.getElementById('popup-wrapper')
+  if (wrapperElement) {
+    document.body.removeChild(wrapperElement)
+    return true
+  }
+  return false
+}
+
 document.addEventListener('keydown', (event) => {
   if (event.code === 'Escape') {
-    const wrapperElement = document.getElementById('popup-wrapper')
-    if (wrapperElement) {
+    if (closePopup()) {
       event.preventDefault()
-      document.body.removeChild(wrapperElement)
     }
   } else if (event.code === 'Tab') {
     const wrapperElement = document.getElementById('popup-wrapper')
