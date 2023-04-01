@@ -31,13 +31,29 @@ describe 'structure' do
     expect(table_names).to eq(expected_table_names)
   end
 
+  it 'selects the first table by default' do
+    expected_table_names = %w[characters random_data]
+    wait.until do
+      elements = driver.find_elements(css: '#tables > option')
+      elements if elements.size == expected_table_names.size && elements[0].displayed?
+    end
+
+    expected_headers = %w[name data_type length allow_null key default extra]
+    wait.until do
+      elements = driver.find_elements(
+        css: '#columns > table > thead > tr > th:not(:last-child)'
+      )
+      elements if elements.size == expected_headers.size && elements.all?(&:displayed?)
+    end
+  end
+
   it 'displays columns for the selected table' do
     expected_table_names = %w[characters random_data]
     table_elements = wait.until do
       elements = driver.find_elements(css: '#tables > option')
       elements if elements.size == expected_table_names.size && elements[0].displayed?
     end
-    table_elements[0].click
+    table_elements[1].click
 
     expected_headers = %w[name data_type length allow_null key default extra]
     header_elements = wait.until do
@@ -49,7 +65,7 @@ describe 'structure' do
     headers = header_elements.map(&:text)
     expect(headers).to eq(expected_headers)
 
-    expected_column_names = %w[id name description]
+    expected_column_names = %w[id data]
     column_name_elements = wait.until do
       elements = driver.find_elements(
         css: '#columns > table > tbody > tr > td:first-child'

@@ -329,42 +329,53 @@ function selectStructureTab () {
     selected.style.display = 'flex'
   })
 
+  const schemaNames = Object.keys(window.metadata.schemas)
+  const schemasElement = document.getElementById('schemas')
+  const tablesElement = document.getElementById('tables')
+  if (schemaNames.length === 1) {
+    setTimeout(() => { tablesElement.focus() }, 0)
+  } else {
+    setTimeout(() => { schemasElement.focus() }, 0)
+  }
+
   if (window.structureLoaded) {
     return
   }
 
-  const schemasElement = document.getElementById('schemas')
-  const tablesElement = document.getElementById('tables')
   const statsElement = document.getElementById('stats')
   statsElement.innerHTML = statsHtml(null)
 
   const columnsElement = document.getElementById('columns')
   const indexesElement = document.getElementById('indexes')
 
-  const schemaNames = Object.keys(window.metadata.schemas)
   if (schemaNames.length === 1) {
     schemasElement.style.display = 'none'
     // TODO: duplicate code
-    while (tablesElement.firstChild) {
-      tablesElement.removeChild(tablesElement.firstChild)
-    }
     const schemaName = schemaNames[0]
     const schema = window.metadata.schemas[schemaName]
     const tableNames = Object.keys(schema.tables)
+
     tableNames.forEach(function (tableName) {
       const optionElement = document.createElement('option')
       optionElement.value = tableName
       optionElement.innerText = tableName
       tablesElement.appendChild(optionElement)
     })
+    if (tableNames.length > 0) {
+      tablesElement.value = tableNames[0]
+    }
   } else {
     schemasElement.style.display = 'flex'
+
     schemaNames.forEach(function (schemaName) {
       const optionElement = document.createElement('option')
       optionElement.value = schemaName
       optionElement.innerText = schemaName
       schemasElement.appendChild(optionElement)
     })
+    if (schemaNames.length > 0) {
+      schemasElement.value = schemaNames[0]
+    }
     schemasElement.addEventListener('change', function () {
       while (statsElement.firstChild) {
         statsElement.removeChild(statsElement.firstChild)
@@ -382,12 +393,16 @@ function selectStructureTab () {
       const schemaName = schemasElement.value
       const schema = window.metadata.schemas[schemaName]
       const tableNames = Object.keys(schema.tables)
+
       tableNames.forEach(function (tableName) {
         const optionElement = document.createElement('option')
         optionElement.value = tableName
         optionElement.innerText = tableName
         tablesElement.appendChild(optionElement)
       })
+      if (tableNames.length > 0) {
+        tablesElement.value = tableNames[0]
+      }
     })
   }
   tablesElement.addEventListener('change', function () {
@@ -449,6 +464,14 @@ function selectStructureTab () {
     }
   })
   window.structureLoaded = true
+
+  if (schemaNames.length === 1) {
+    setTimeout(() => { tablesElement.focus() }, 0)
+  } else {
+    setTimeout(() => { schemasElement.focus() }, 0)
+  }
+
+  tablesElement.dispatchEvent(new Event('change'))
 }
 
 function selectHelpTab () {
