@@ -20,7 +20,7 @@ module Github
       check_positive_integer(cache_for: cache_for)
 
       if (cache_entry = @cache[url])
-        return cache_entry.value
+        return cache_entry.value.deep_dup
       end
 
       response = @client.get(url)
