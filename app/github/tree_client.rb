@@ -22,10 +22,7 @@ module Github
     end
 
     DEFAULT_MAX_TREE_CACHE_AGE_SECONDS = 60 * 5 # 5 minutes
-    private_constant :DEFAULT_MAX_TREE_CACHE_AGE_SECONDS
-
     DEFAULT_MAX_FILE_CACHE_AGE_SECONDS = 60 * 60 * 24 * 7 # 1 week
-    private_constant :DEFAULT_MAX_FILE_CACHE_AGE_SECONDS
 
     MAX_TREE_SIZE = 50
     private_constant :MAX_TREE_SIZE
@@ -86,7 +83,6 @@ module Github
       response = @client.get_without_caching(
         "https://api.github.com/repos/#{owner}/#{repo}/contents/#{path}?ref=#{ref}"
       )
-
       Base64.decode64(response['content'])
     end
   end

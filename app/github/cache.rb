@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'logger'
+
 require_relative '../checks'
 
 module Github
@@ -26,8 +28,6 @@ module Github
     end
 
     def [](key)
-      check_non_empty_string(key: key)
-
       @mutex.synchronize do
         evict
         if (value = @hash[key])
@@ -41,7 +41,6 @@ module Github
     end
 
     def []=(key, value)
-      check_non_empty_string(key: key)
       check_is_a(value: [Entry, value])
 
       @mutex.synchronize do

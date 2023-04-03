@@ -38,5 +38,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-mocks',        '~> 3.0'
   spec.add_development_dependency 'rubocop',            '~> 1.0'
   spec.add_development_dependency 'selenium-webdriver', '~> 4.0'
+  spec.add_development_dependency 'timecop',            '~> 0.0'
   spec.add_development_dependency 'webmock',            '~> 3.0'
 end

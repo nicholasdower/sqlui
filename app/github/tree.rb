@@ -9,7 +9,7 @@ module Github
     include Checks
     include Enumerable
 
-    attr_reader :truncated
+    attr_reader :truncated, :files
 
     def initialize(files:, truncated: false)
       @files = check_enumerable_of(files, File)
@@ -35,6 +35,12 @@ module Github
 
     def each(&block)
       @files.each(&block)
+    end
+
+    def ==(other)
+      self.class == other.class &&
+        @files == other.files &&
+        @truncated == other.truncated
     end
   end
 end

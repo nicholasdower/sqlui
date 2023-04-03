@@ -111,6 +111,7 @@ GEM
     spoon (0.0.6)
       ffi
     tilt (2.1.0)
+    timecop (0.9.6)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -138,6 +139,7 @@ DEPENDENCIES
   rubocop (~> 1.0)
   selenium-webdriver (~> 4.0)
   sqlui!
+  timecop (~> 0.0)
   webmock (~> 3.0)
 
 BUNDLED WITH

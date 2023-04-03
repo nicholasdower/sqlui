@@ -15,5 +15,12 @@ module Github
       @display_path = "#{owner}/#{repo}/#{branch}/#{path}"
       @github_url = "https://github.com/#{owner}/#{repo}/blob/#{branch}/#{path}"
     end
+
+    def ==(other)
+      self.class == other.class &&
+        @display_path == other.display_path &&
+        @content == other.content
+      @github_url == other.github_url
+    end
   end
 end
