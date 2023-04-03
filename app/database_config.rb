@@ -5,10 +5,11 @@ require 'mysql2'
 require 'set'
 
 require_relative 'args'
+require_relative 'saved_config'
 
 # Config for a single database.
 class DatabaseConfig
-  attr_reader :display_name, :description, :url_path, :joins, :saved_path, :tables, :columns, :client_params
+  attr_reader :display_name, :description, :url_path, :joins, :saved_config, :tables, :columns, :client_params
 
   def initialize(hash)
     @display_name = Args.fetch_non_empty_string(hash, :display_name).strip
@@ -17,7 +18,8 @@ class DatabaseConfig
     raise ArgumentError, 'url_path should not start with a /' if @url_path.start_with?('/')
     raise ArgumentError, 'url_path should not end with a /' if @url_path.end_with?('/')
 
-    @saved_path = Args.fetch_non_empty_string(hash, :saved_path).strip
+    saved_config_hash = Args.fetch_optional_hash(hash, :saved_config)
+    @saved_config = saved_config_hash.nil? ? nil : SavedConfig.new(saved_config_hash)
 
     # Make joins an array. It is only a map to allow for YAML extension.
     @joins = (Args.fetch_optional_hash(hash, :joins) || {}).values

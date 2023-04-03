@@ -10,7 +10,13 @@ describe DatabaseConfig do
       display_name: 'some display name',
       description: 'some description',
       url_path: 'path',
-      saved_path: 'path/to/sql',
+      saved_config: {
+        token: 'token',
+        owner: 'owner',
+        repo: 'repo',
+        branch: 'branch',
+        regex: '.*'
+      },
       client_params: {
         database: 'some_database',
         username: 'some_username',
@@ -29,7 +35,7 @@ describe DatabaseConfig do
         expect(subject.display_name).to eq('some display name')
         expect(subject.description).to eq('some description')
         expect(subject.url_path).to eq('path')
-        expect(subject.saved_path).to eq('path/to/sql')
+        expect(subject.saved_config.token).to eq('token')
         expect(subject.client_params[:database]).to eq('some_database')
         expect(subject.client_params[:username]).to eq('some_username')
         expect(subject.client_params[:password]).to eq('some_password')
@@ -111,7 +117,10 @@ describe DatabaseConfig do
     include_examples 'a string field', :display_name, 'some display name'
     include_examples 'a string field', :description, 'some description'
     include_examples 'a string field', :url_path, 'some/url/path'
-    include_examples 'a string field', :saved_path, 'some/saved/path'
+
+    context 'saved_config' do
+      # todo
+    end
 
     context 'client_params' do
       context 'when client_params is null' do

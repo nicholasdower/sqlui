@@ -31,7 +31,13 @@ describe SqluiConfig do
           display_name: 'some database name',
           description: 'some description',
           url_path: 'db/path',
-          saved_path: 'path/to/sql',
+          saved_config: {
+            token: 'token',
+            owner: 'owner',
+            repo: 'repo',
+            branch: 'branch',
+            regex: '.*'
+          },
           client_params: {
             database: 'some_database',
             username: 'some_username',
@@ -56,7 +62,7 @@ describe SqluiConfig do
           expect(subject.database_configs.first.display_name).to eq('some database name')
           expect(subject.database_configs.first.description).to eq('some description')
           expect(subject.database_configs.first.url_path).to eq('db/path')
-          expect(subject.database_configs.first.saved_path).to eq('path/to/sql')
+          expect(subject.database_configs.first.saved_config.token).to eq('token')
           expect(subject.database_configs.first.client_params[:database]).to eq('some_database')
           expect(subject.database_configs.first.client_params[:username]).to eq('some_username')
           expect(subject.database_configs.first.client_params[:password]).to eq('some_password')
@@ -209,9 +215,6 @@ describe SqluiConfig do
     include_examples 'a string field',
                      %i[databases database_one url_path],
                      'sqlui/foo', ->(s) { s.database_configs[0].url_path }
-    include_examples 'a string field',
-                     %i[databases database_one saved_path],
-                     'some/path', ->(s) { s.database_configs[0].saved_path }
 
     context 'when config is an erb template' do
       before { config_hash[:base_url_path] = '<%= "/some/template/val" %>' }
@@ -244,6 +247,10 @@ describe SqluiConfig do
         expect { subject }.to raise_error(ArgumentError, 'parameter databases missing')
       end
     end
+
+    context 'when saved_config something' do
+      # todo
+    end
   end
 
   describe '#database_config_for' do
@@ -256,7 +263,7 @@ describe SqluiConfig do
         expect(subject.display_name).to eq('some database name')
         expect(subject.description).to eq('some description')
         expect(subject.url_path).to eq('db/path')
-        expect(subject.saved_path).to eq('path/to/sql')
+        expect(subject.saved_config.token).to eq('token')
         expect(subject.client_params[:database]).to eq('some_database')
         expect(subject.client_params[:username]).to eq('some_username')
         expect(subject.client_params[:password]).to eq('some_password')

@@ -25,8 +25,8 @@ describe 'navigation' do
       wait_until_displayed(wait, id: 'submit-button-current').click
       wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'],
                          ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
-      driver.find_element(id: 'saved-tab-button').click
-      wait_until_status(wait, '2 files')
+      driver.find_element(id: 'help-tab-button').click
+      wait_until_displayed(wait, id: 'keyboard-shortcuts')
       driver.navigate.back
     end
 

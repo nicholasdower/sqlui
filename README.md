@@ -36,7 +36,11 @@ databases:
     environment: development # App environment.
     description: description # User-facing description.
     url_path:    development # Relative URL path used to access this database.
-    saved_path:  path/to/sql # Relative path to the directory containing saved SQL files.
+    saved_config:            # Optional config for finding saved files on GitHub.
+      token: token           # GitHub personal access token with "repo" scope.
+      owner: owner           # Github repo owner.
+      repo:  repo            # GitHub repo name.
+      regex: sql/.*          # Pattern used to match file paths.
     client_params:
       database:    name        # Database name.
       username:    root        # Database username.

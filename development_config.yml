@@ -11,12 +11,27 @@ airbrake:
     enabled:     <%= ['true', '1'].include?(ENV.fetch('AIRBRAKE_CLIENT_ENABLED', 'false')) %>
     project_id:  <%= ENV.fetch('AIRBRAKE_CLIENT_PROJECT_ID', '') %>
     project_key: <%= ENV.fetch('AIRBRAKE_CLIENT_PROJECT_KEY', '') %>
+defaul_saved_config: &default_saved_config
+  token: <%= ENV.fetch('GITHUB_TOKEN', nil) %>
+  owner: nicholasdower
+  repo: sqlui
+  branch: master
 databases:
   shows:
     display_name: Shows
     description:  Some databases about nothing.
     url_path:     shows
-    saved_path:   sql/shows
+    columns:
+      name:
+        links:
+          google:
+            short_name: G
+            long_name:  Google
+            template:   https://www.google.com/search?q={*}
+          wiki:
+            short_name: W
+            long_name:  Wiki
+            template:   https://friends.fandom.com/wiki/Special:Search?query={*}
     tables:
       friends.characters:
         alias: c
@@ -30,7 +45,6 @@ databases:
     display_name: Seinfeld
     description:  A database about nothing.
     url_path:     seinfeld
-    saved_path:   sql/seinfeld
     client_params:
       database: seinfeld
       username: newman
@@ -41,7 +55,11 @@ databases:
     display_name: Friends
     description:  Another database about nothing.
     url_path:     friends
-    saved_path:   sql/friends
+    <% if ENV.key?('GITHUB_TOKEN')%>
+    saved_config:
+      <<: *default_saved_config
+      regex: ^sql/friends/.*[.]sql$
+    <% end %>
     columns:
       name:
         links:

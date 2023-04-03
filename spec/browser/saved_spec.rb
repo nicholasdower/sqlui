@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'base64'
+
 require_relative '../spec_helper'
 require_relative 'spec_helper'
 
@@ -7,11 +9,33 @@ describe 'saved' do
   let(:driver) { start_session }
   let(:wait) { Selenium::WebDriver::Wait.new(timeout: 5) }
 
-  before do
-    driver.get(url('/sqlui/seinfeld/saved'))
+  let(:tree_response) do
+    {
+      sha: 'some_sha',
+      truncated: false,
+      tree: [
+        { path: 'sql/friends/sample_one.sql' },
+        { path: 'sql/friends/sample_two.sql' }
+      ]
+    }
   end
 
-  let(:expected_file_names) { %w[sample_one.sql sample_two.sql] }
+  let(:content_response) { { content: Base64.encode64('select * from characters limit 1;') } }
+
+  before do
+    stub_request(:get, 'https://api.github.com/repos/nicholasdower/sqlui/git/trees/master?recursive=true')
+      .to_return(body: tree_response.to_json, status: 200)
+    stub_request(:get, 'https://api.github.com/repos/nicholasdower/sqlui/contents/sql/friends/sample_one.sql?ref=some_sha')
+      .to_return(body: content_response.to_json, status: 200)
+    stub_request(:get, 'https://api.github.com/repos/nicholasdower/sqlui/contents/sql/friends/sample_two.sql?ref=some_sha')
+      .to_return(body: content_response.to_json, status: 200)
+
+    driver.get(url('/sqlui/friends/saved'))
+  end
+
+  let(:expected_file_names) do
+    %w[nicholasdower/sqlui/master/sql/friends/sample_one.sql nicholasdower/sqlui/master/sql/friends/sample_two.sql]
+  end
 
   it 'displays the list of saved queries' do
     name_elements = wait.until do
@@ -37,6 +61,6 @@ describe 'saved' do
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
     run_link_elements.first.click
-    wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'])
+    wait_until_results(wait, %w[id name description actor_id], ['1', "GW\nMonica", 'A neat freak.', '1'])
   end
 end

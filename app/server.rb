@@ -11,6 +11,11 @@ require 'sinatra/base'
 require 'uri'
 require 'webrick'
 require_relative 'database_metadata'
+require_relative 'github/cache'
+require_relative 'github/caching_client'
+require_relative 'github/client'
+require_relative 'github/tree'
+require_relative 'github/tree_client'
 require_relative 'mysql_types'
 require_relative 'sql_parser'
 require_relative 'sqlui'
@@ -22,7 +27,7 @@ class Server < Sinatra::Base
     @logger ||= WEBrick::Log.new
   end
 
-  def self.init_and_run(config, resources_dir)
+  def self.init_and_run(config, resources_dir, github_cache = Github::Cache.new({}, logger: Server.logger))
     logger.info("Starting SQLUI v#{Version::SQLUI}")
     logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
 
@@ -105,6 +110,13 @@ class Server < Sinatra::Base
       end
 
       post "#{config.base_url_path}/#{database.url_path}/metadata" do
+        tree = Github::Tree.new(files: [], truncated: false)
+        if (saved_config = database.saved_config)
+          tree_client = Github::TreeClient.new(access_token: database.saved_config.token, cache: github_cache,
+                                               logger: Server.logger)
+          tree = tree_client.get_tree(owner: saved_config.owner, repo: saved_config.repo, branch: saved_config.branch,
+                                      regex: saved_config.regex)
+        end
         metadata = database.with_client do |client|
           {
             server: "#{config.name} - #{database.display_name}",
@@ -113,19 +125,18 @@ class Server < Sinatra::Base
             tables: database.tables,
             columns: database.columns,
             joins: database.joins,
-            saved: Dir.glob("#{database.saved_path}/*.sql").to_h do |path|
-              contents = File.read(path)
-              comment_lines = contents.split("\n").take_while do |l|
+            saved: tree.to_h do |file|
+              comment_lines = file.content.split("\n").take_while do |l|
                 l.start_with?('--')
               end
-              filename = File.basename(path)
               description = comment_lines.map { |l| l.sub(/^-- */, '') }.join("\n")
               [
-                filename,
+                file.display_path,
                 {
-                  filename: filename,
+                  filename: file.display_path,
+                  github_url: file.github_url,
                   description: description,
-                  contents: contents.strip
+                  contents: file.content
                 }
               ]
             end

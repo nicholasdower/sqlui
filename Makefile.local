@@ -80,4 +80,4 @@ watch-test-local:
 
 .PHONY: pry-local
 pry-local: build-local
-	bundle exec pry $(if $(ARGS),$(ARGS),)
+	./scripts/run-in-env $(ENV) -- bundle exec pry $(if $(ARGS),$(ARGS),)

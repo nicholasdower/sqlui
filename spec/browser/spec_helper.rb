@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'selenium-webdriver'
+require 'webmock/rspec'
+
 require_relative '../../app/server'
 require_relative '../../app/sqlui_config'
 
@@ -67,10 +69,21 @@ def url(path)
 end
 
 class TestServer
+  @github_cache_hash = {}
+
+  class << self
+    attr_reader :github_cache_hash
+  end
+
+  def self.clear_github_cache
+    @github_cache_hash.clear
+  end
+
   def start
     @thread = Thread.new do
       Server.set :server, 'webrick'
-      Server.init_and_run(CONFIG, 'client/resources')
+      Server.init_and_run(CONFIG, 'client/resources',
+                          Github::Cache.new(TestServer.github_cache_hash, logger: Server.logger))
     end
 
     (1..20).each do |n|
@@ -89,12 +102,17 @@ end
 
 test_server = TestServer.new
 
+WebMock.disable_net_connect!(allow_localhost: true, allow: ['sqlui_hub'])
+
 RSpec.configure do |config|
   config.before(:suite) { test_server.start }
 
   config.after(:suite) { test_server.stop }
 
-  config.after { @driver&.quit }
+  config.after do
+    @driver&.quit
+    TestServer.clear_github_cache
+  end
 
   def start_session
     @driver = if LOCAL

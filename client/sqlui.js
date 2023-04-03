@@ -545,6 +545,12 @@ function selectSavedTab () {
       route(event.target, event, runUrl, true)
     })
 
+    const viewOnGithubLinkElement = document.createElement('a')
+    viewOnGithubLinkElement.classList.add('link', 'view-github-link')
+    viewOnGithubLinkElement.innerText = 'github'
+    viewOnGithubLinkElement.href = file.github_url
+    viewOnGithubLinkElement.target = '_blank'
+
     const nameElement = document.createElement('h2')
     nameElement.innerText = file.filename
     nameElement.classList.add('name')
@@ -553,6 +559,7 @@ function selectSavedTab () {
     linksElement.classList.add('links')
     linksElement.appendChild(viewLinkElement)
     linksElement.appendChild(runLinkElement)
+    linksElement.appendChild(viewOnGithubLinkElement)
 
     const descriptionElement = document.createElement('p')
     descriptionElement.innerText = file.description

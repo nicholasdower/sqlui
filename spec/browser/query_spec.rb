@@ -301,7 +301,7 @@ describe 'query' do
 
   context 'when result includes column with links configured' do
     before do
-      driver.get(url('/sqlui/friends/query?sql=select+id%2C+name+from+characters+limit+1%3B'))
+      driver.get(url('/sqlui/shows/query?sql=select+id%2C+name+from+friends.characters+limit+1%3B'))
       wait_until_displayed(wait, id: 'submit-button-current').click
     end
 
