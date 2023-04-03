@@ -59,4 +59,3 @@ allow keyboard navigation on database list and saved list via j and k and enter
 show spinner on app load
 display an indicator when editing a saved file, display a link to open it in the GitHub editor
 add support for loading a saved yaml file, think sql exporter
-add a margin to the bottom of the help table. 
