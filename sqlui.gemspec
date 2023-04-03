@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
     Dir['client/resources/**/*'] +
     ['.release-version']
 
+  spec.add_dependency 'activesupport',     '~>  7.0'
   spec.add_dependency 'airbrake',          '~> 13.0'
   spec.add_dependency 'mysql2',            '~>  0.0'
   spec.add_dependency 'prometheus-client', '~>  4.0'
