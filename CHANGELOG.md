@@ -1,3 +1,7 @@
+## 0.1.71
+
+- Fix bug where the GitHub cache became corrupted.
+
 ## 0.1.70
 
 - No changes.
