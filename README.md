@@ -1,7 +1,5 @@
 # SQLUI
 
-![image](https://user-images.githubusercontent.com/9117775/196360285-c034ba6a-e4f2-410b-b157-6f567811cfd6.png)
-
 ## Intro
 
 A web app which can be used to query one or more SQL databases.
@@ -9,6 +7,7 @@ A web app which can be used to query one or more SQL databases.
 ## Contents
 
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Usage](#usage)
 - [Development](#development)
   + [Default Setup](#default-setup)
@@ -16,37 +15,81 @@ A web app which can be used to query one or more SQL databases.
 
 ## Features
 
-- Querying.
-- Graphing.
-- Sharing via URL.
-- Saved queries.
-- Seeing DB structure.
+- Query
+  - Execute queries
+  - Autocomplete keywords, table names, columns
+  - Configure autocomplete of frequently used join statements
+  - Configure autocomplete of frequently used table aliases
+  - Save to file/clipboard
+  - Executing saved queries from GitHub
+  - Cell links.
+- Graph results (WIP)
+- Share queries via URL
+- View database details
+  - List databases
+  - List tables
+  - View table stats
+  - View column details
+  - View index details
+- Export metrics to Prometheus (WIP)
+- Report errors to Airbrake
+
+## Screenshots
+
+<img src="https://user-images.githubusercontent.com/9117775/230138745-83d19dc1-c009-4e96-85eb-6278294bff6c.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139079-8a9c72fb-2ead-412b-8cce-d5ab0b9fee4f.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139397-3fe86ce3-d7be-4df9-9084-b78d96f5d540.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139473-1fc45eef-7ffd-42d4-8e62-ce721f4455f3.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139556-1c8a0e17-95bc-4f73-8f0e-c29afa80f750.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139619-2610398a-a6e6-4880-a812-6e7a9bcafbb4.png" width="400">
 
 ## Usage
 
-### Create a config file like the following
+### Create a config file
+
+See [development_config.yml](https://github.com/nicholasdower/sqlui/blob/master/development_config.yml) for an example.
 
 ```yaml
-name: some_name      # Server display name to be used in the UI.
-base_url_path: /path # Absolute URL path used as the base for all app URLs.
-databases:
-  development:
-    name:        some_name   # User-facing name.
-    port:        8080        # App port.
-    environment: development # App environment.
-    description: description # User-facing description.
-    url_path:    development # Relative URL path used to access this database.
-    saved_config:            # Optional config for finding saved files on GitHub.
-      token: token           # GitHub personal access token with "repo" scope.
-      owner: owner           # Github repo owner.
-      repo:  repo            # GitHub repo name.
-      regex: sql/.*          # Pattern used to match file paths.
-    client_params:
-      database:    name        # Database name.
-      username:    root        # Database username.
-      password:    root        # Database password.
-      port:        3306        # Database port.
-      host:        127.0.0.1   # Database host.
+# App Configuration
+name:          SQLUI                            # Server display name to be used in the UI.
+port:          8080                             # App port.
+environment:   development                      # App environment.
+base_url_path: /path                            # URL path used as the base for all app URLs.
+
+# Database Configurations
+databases:                                      # Map of database configurations.
+  seinfeld:                                     # Database configuration name.
+    display_name: Seinfeld                      # User-facing name.
+    description:  A database about nothing.     # User-facing description.
+    url_path:     seinfeld                      # Relative URL path used to access this database.
+
+    # Connection Configuration
+    client_params:                              # Params for the MySQL client.
+      database: seinfeld                        # Optional database name.
+      username: newman                          # Database username.
+      password: drakescoffeecake                # Database password.
+      port:     3306                            # Database port.
+      host:     127.0.0.1                       # Database host.
+
+    # Table Configurations (Optional)
+    tables:                                     # Map of table configurations.
+      characters:                               # Table name.
+        alias: c                                # Default table alias.
+        boost: 1                                # Auto-complete boost.
+      [...]
+
+    # Column Configurations (Optional)
+    columns:                                    # Map of column configurations.
+      name:                                     # Column name.
+        links:                                  # Optional map of cell links.
+          google:                               # Link configuration name.
+            short_name: G                       # Link short name. Displayed within the cell.
+            long_name:  Google                  # Link long name. Displayed on hover.
+            template:   google.com/search?q={*} # Link URL. Use {*} as a placeholder.
+          [...]
+
+    # Join Configurations (Optional)
+    joins:                                      # Map of join configurations.
+      actors_to_charactors:                     # Join configuration name.
+        label: 'actors to characters'           # Join label. Displayed in autocomplete dropdown.
+        apply: 'actors a ON a.id = c.actor_id'  # Join statement.
+      [...]
+  [...]
 ```
 
 ### Install the Gem or add it to your `Gemfile`
@@ -99,7 +142,7 @@ make test
 
 ### Running The Server & Tests Outside of Docker
 
-It is also possible to run the server tests without Docker. Docker is still used for MySQL.
+It is also possible to run the server tests without Docker. Docker is still used for MySQL and browser tests.
 
 #### Install rvm (Ruby Version Manager)
 
