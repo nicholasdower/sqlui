@@ -3,62 +3,95 @@
     outline: none;
 }
 
+#saved-box .saved-list-item {
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    padding: 0 10px 20px 10px;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+#saved-box .saved-list-item:last-child {
+    border-bottom: none;
+}
+
+#saved-box .saved-list-item:last-child {
+    padding-bottom: 10px;
+}
+
+#saved-box .saved-list-item:active {
+    outline: none;
+}
+
 #saved-box .saved-file-header {
     display: flex;
     flex-direction: row;
-    margin: 0 0 10px 0;
+    align-items: center;
+    padding: 5px 0;
 }
 
 #saved-box .saved-name {
     font-size: 20px;
     font-family: monospace;
     flex: 1;
-    padding-right: 10px;
     font-weight: bold;
     text-decoration: none;
     color: #333;
+    margin-right: 5px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+    margin-right: 5px;
 }
 
-#saved-box .saved-name-spacer {
-    flex: 1;
+#saved-box .saved-name:active {
+    outline: none;
+}
+
+#saved-box .saved-name:focus-visible, #saved-box .saved-github-link:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: -2px;
 }
 
 #saved-box .saved-github-link {
     color: darkblue;
     font-size: 17px;
     text-decoration: none;
-    margin: 0;
     display: flex;
     justify-content: center;
     flex-direction: column;
+    height: 35px;
+    width: 35px;
+    align-items: center;
+}
+
+#saved-box .saved-github-link img {
+    height: 25px;
+    width: 25px;
+}
+
+#saved-box .saved-github-link:active {
+    outline: none;
 }
 
 #saved-box .saved-preview {
     display: block;
-    margin: 0 0 10px 0;
     font-size: 18px;
     font-family: monospace;
-    background-color: #efefef;
-    padding: 10px;
-    border: 1px solid #ddd;
+    background-color: #ffffff;
+    border: 1px solid #888;
     min-height: 115px;
     text-decoration: none;
     color: #333;
+    padding: 10px;
+}
+
+#saved-box .saved-preview:active {
+    outline: none;
 }
 
 #saved-box .saved-truncated {
     margin-top: 10px;
     opacity: 30%;
-}
-
-#saved-box .saved-list-item {
-    border-bottom: 1px solid #eeeeee;
-    margin: 0;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-}
-
-#saved-box .saved-list-item:last-child {
-    border-bottom: none;
 }

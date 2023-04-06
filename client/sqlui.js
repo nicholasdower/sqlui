@@ -507,7 +507,6 @@ function selectSavedTab () {
   })
 
   const savedElement = document.getElementById('saved-box')
-  setTimeout(() => { savedElement.focus() }, 0)
 
   const saved = window.metadata.saved
   const numFiles = Object.keys(saved).length
@@ -518,11 +517,23 @@ function selectSavedTab () {
   }
 
   Object.values(saved).forEach(file => {
-    const viewOnGithubLinkElement = document.createElement('a')
-    viewOnGithubLinkElement.classList.add('saved-github-link')
-    viewOnGithubLinkElement.innerText = 'GitHub'
-    viewOnGithubLinkElement.href = file.github_url
-    viewOnGithubLinkElement.target = '_blank'
+    const gitHubElement = document.createElement('a')
+    gitHubElement.classList.add('saved-github-link')
+    gitHubElement.href = file.github_url
+    gitHubElement.target = '_blank'
+    addEventListener(gitHubElement, 'click', (event) => {
+      event.stopPropagation()
+    })
+    addEventListener(gitHubElement, 'keydown', (event) => {
+      if (event.keyCode === 13) {
+        event.stopPropagation()
+      }
+    })
+
+    const gitHubImageElement = document.createElement('img')
+    gitHubImageElement.alt = 'GitHub'
+    gitHubImageElement.src = '/sqlui/github.svg'
+    gitHubElement.appendChild(gitHubImageElement)
 
     const viewUrl = new URL(window.location.origin + window.location.pathname)
     setActionInUrl(viewUrl, 'query')
@@ -532,19 +543,11 @@ function selectSavedTab () {
     nameElement.classList.add('saved-name')
     nameElement.innerText = file.filename
     nameElement.href = viewUrl.pathname + viewUrl.search
-    addEventListener(nameElement, 'click', (event) => {
-      clearResult()
-      route(event.target, event, viewUrl, true)
-    })
-
-    const spacerElement = document.createElement('div')
-    spacerElement.classList.add('saved-name-spacer')
 
     const headerElement = document.createElement('div')
     headerElement.classList.add('saved-file-header')
     headerElement.appendChild(nameElement)
-    headerElement.appendChild(spacerElement)
-    headerElement.appendChild(viewOnGithubLinkElement)
+    headerElement.appendChild(gitHubElement)
 
     const contentLines = file.contents.endsWith('\n') ? file.contents.slice(0, -1).split('\n') : file.contents.split('\n')
     let preview
@@ -555,13 +558,10 @@ function selectSavedTab () {
     }
 
     const previewElement = document.createElement('a')
-    previewElement.innerText = preview
     previewElement.classList.add('saved-preview')
+    previewElement.tabIndex = -1
+    previewElement.innerText = preview
     previewElement.href = viewUrl.pathname + viewUrl.search
-    addEventListener(previewElement, 'click', (event) => {
-      clearResult()
-      route(event.target, event, viewUrl, true)
-    })
 
     if (contentLines.length > 5) {
       const truncatedElement = document.createElement('div')
@@ -574,6 +574,16 @@ function selectSavedTab () {
     itemElement.classList.add('saved-list-item')
     itemElement.appendChild(headerElement)
     itemElement.appendChild(previewElement)
+    addEventListener(itemElement, 'click', (event) => {
+      clearResult()
+      route(event.target, event, viewUrl, true)
+    })
+    addEventListener(itemElement, 'keydown', (event) => {
+      if (event.keyCode === 13) {
+        clearResult()
+        route(event.target, event, viewUrl, true)
+      }
+    })
 
     savedElement.appendChild(itemElement)
   })
@@ -1054,15 +1064,27 @@ function registerTableCellPopup (tableElement) {
   addEventListener(tableElement, 'mousedown', listener)
 }
 function disableDownloadButtons () {
-  document.getElementById('submit-dropdown-button-download-csv').classList.add('disabled')
-  document.getElementById('submit-dropdown-button-copy-csv').classList.add('disabled')
-  document.getElementById('submit-dropdown-button-copy-tsv').classList.add('disabled')
+  const downloadCsvElement = document.getElementById('submit-dropdown-button-download-csv')
+  downloadCsvElement.classList.add('disabled')
+  downloadCsvElement.tabIndex = -1
+  const copyCsvElement = document.getElementById('submit-dropdown-button-copy-csv')
+  copyCsvElement.classList.add('disabled')
+  copyCsvElement.tabIndex = -1
+  const copyTsvElement = document.getElementById('submit-dropdown-button-copy-tsv')
+  copyTsvElement.classList.add('disabled')
+  copyTsvElement.tabIndex = -1
 }
 
 function enableDownloadButtons () {
-  document.getElementById('submit-dropdown-button-download-csv').classList.remove('disabled')
-  document.getElementById('submit-dropdown-button-copy-csv').classList.remove('disabled')
-  document.getElementById('submit-dropdown-button-copy-tsv').classList.remove('disabled')
+  const downloadCsvElement = document.getElementById('submit-dropdown-button-download-csv')
+  downloadCsvElement.classList.remove('disabled')
+  downloadCsvElement.tabIndex = 0
+  const copyCsvElement = document.getElementById('submit-dropdown-button-copy-csv')
+  copyCsvElement.classList.remove('disabled')
+  copyCsvElement.tabIndex = 0
+  const copyTsvElement = document.getElementById('submit-dropdown-button-copy-tsv')
+  copyTsvElement.classList.remove('disabled')
+  copyTsvElement.tabIndex = 0
 }
 
 function updateDownloadButtons (fetch) {

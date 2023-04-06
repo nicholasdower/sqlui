@@ -17,7 +17,7 @@
           border-bottom: 1px solid #ddd;
           height: 36px;
           font-family: Helvetica, sans-serif;
-          padding: 5px;
+          padding: 5px 0;
       }
 
       .header, .server-name {
@@ -30,68 +30,86 @@
 
       .header {
           font-weight: bold;
-          padding-left: 5px;
+          margin-right: 25px;
+          margin-left: 3px;
+      }
+
+      .header img {
+          height: 20px;
+          margin: 0 5px 0 5px;
       }
 
       .server-name {
           flex: 1;
-          padding-left: 15px;
           font-weight: normal;
-      }
-
-      .links {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          margin-top: 5px;
-      }
-
-      .link {
-          margin-right: 30px;
-          color: darkblue;
-          font-size: 17px;
-          text-decoration: none;
+          overflow: hidden;
+          white-space: nowrap;
+          margin: 0;
       }
 
       .name {
-          margin: 0 200px 0 0;
           font-size: 20px;
+          color: #333;
+          font-weight: bold;
+          padding: 5px;
+          display: block;
       }
 
       .description {
-          margin: 20px 0 0;
+          margin: 10px 0 0;
           font-size: 18px;
+          padding: 5px;
       }
 
       .database {
           margin: 0;
-          padding: 10px;
-          border-bottom: 1px solid #eeeeee;
+          padding: 5px 10px;
+          border-bottom: 1px solid #ddd;
+          display: block;
+          color: #333;
+          cursor: pointer;
+          text-decoration: none;
+      }
+
+      .name:focus-visible {
+          outline: 2px solid #333;
+          outline-offset: -2px;
       }
 
       .database:last-child {
           border-bottom: none;
       }
   </style>
+
+  <script type="application/javascript">
+    function route(event, url) {
+      if (event.keyCode === 13) {
+        if (event.shiftKey) {
+          window.open(url).focus()
+        } else if (event.metaKey) {
+          window.open(url, '_blank').focus()
+        } else {
+          window.location = url
+        }
+      }
+    }
+  </script>
 </head>
 
 <body>
 <div class="header-box">
-  <h1 class="header">SQLUI</h1>
-  <h1 class="server-name"><%= config.name %> Databases</h1>
+  <div class="header"><img src="/sqlui/favicon.svg">SQLUI</div>
+  <div class="server-name"><%= config.name %> Databases</div>
 </div>
 <% config.database_configs.each do |database_config| %>
-  <div class="database">
-    <h2 class='name'><%= database_config.display_name %></h2>
-    <div class="links">
-      <a class='link query-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/query" %>">query</a>
-      <a class='link saved-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/saved" %>">saved</a>
-      <a class='link structure-link' href="<%= "#{config.base_url_path}/#{database_config.url_path}/structure" %>">structure</a>
+  <a class='database' href='<%= "#{config.base_url_path}/#{database_config.url_path}/query" %>' tabindex="-1">
+    <div class='name' onkeydown='route(event, "<%= "#{config.base_url_path}/#{database_config.url_path}/query" %>")' tabindex="0">
+      <%= database_config.display_name %>
     </div>
     <p class='description'>
       <%= database_config.description %>
     </p>
-  </div>
+  </a>
 <% end %>
 </body>
 </html>

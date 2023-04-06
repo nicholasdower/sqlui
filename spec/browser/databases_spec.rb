@@ -36,36 +36,9 @@ describe 'databases' do
       elements = driver.find_elements(css: '.database')
       elements if elements&.size == 3 && elements.all?(&:displayed?)
     end
-    query_element = database_elements[0].find_element(css: '.query-link')
-    query_element.click
+    database_elements[0].click
     wait.until do
       element = driver.find_element(css: '#result-box')
-      element if element&.displayed?
-    end
-  end
-
-  it 'links to the saved tab' do
-    database_elements = wait.until do
-      elements = driver.find_elements(css: '.database')
-      elements if elements&.size == 3 && elements.all?(&:displayed?)
-    end
-    saved_element = database_elements[0].find_element(css: '.saved-link')
-    saved_element.click
-    wait.until do
-      element = driver.find_element(css: '#saved-box')
-      element if element&.displayed?
-    end
-  end
-
-  it 'links to the query tab' do
-    database_elements = wait.until do
-      elements = driver.find_elements(css: '.database')
-      elements if elements&.size == 3 && elements.all?(&:displayed?)
-    end
-    structure_element = database_elements[0].find_element(css: '.structure-link')
-    structure_element.click
-    wait.until do
-      element = driver.find_element(css: '#structure-box')
       element if element&.displayed?
     end
   end
