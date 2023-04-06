@@ -36,7 +36,7 @@ A web app which can be used to query one or more SQL databases.
 
 ## Screenshots
 
-<img src="screenshots/databases.png" width="400"><img src="screenshots/query.png" width="400"><img src="screenshots/graph.png" width="400"><img src="screenshots/structure.png" width="400"><img src="screenshots/saved.png" width="400"><img src="screenshots/help.png" width="400">
+<img src="screenshots/databases.png" width="400"> <img src="screenshots/query.png" width="400"> <img src="screenshots/graph.png" width="400"> <img src="screenshots/structure.png" width="400"> <img src="screenshots/saved.png" width="400"> <img src="screenshots/help.png" width="400">
 
 ## Usage
 
