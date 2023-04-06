@@ -9,3 +9,4 @@
 !/envs/development
 !/envs/test
 /logs
+.DS_Store

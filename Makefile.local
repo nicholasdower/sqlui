@@ -81,3 +81,14 @@ watch-test-local:
 .PHONY: pry-local
 pry-local: build-local
 	./scripts/run-in-env $(ENV) -- bundle exec pry $(if $(ARGS),$(ARGS),)
+
+.PHONY: .stale
+.stale: ;
+
+screenshots/%.png: .stale
+	make test-local ARGS=screenshots/$*.rb
+
+.PHONY: screenshots
+screenshots:
+	rm screenshots/*.png
+	make test-local ARGS=screenshots/*.rb

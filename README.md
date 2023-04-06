@@ -36,7 +36,7 @@ A web app which can be used to query one or more SQL databases.
 
 ## Screenshots
 
-<img src="https://user-images.githubusercontent.com/9117775/230138745-83d19dc1-c009-4e96-85eb-6278294bff6c.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139079-8a9c72fb-2ead-412b-8cce-d5ab0b9fee4f.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139397-3fe86ce3-d7be-4df9-9084-b78d96f5d540.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139473-1fc45eef-7ffd-42d4-8e62-ce721f4455f3.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139556-1c8a0e17-95bc-4f73-8f0e-c29afa80f750.png" width="400"><img src="https://user-images.githubusercontent.com/9117775/230139619-2610398a-a6e6-4880-a812-6e7a9bcafbb4.png" width="400">
+<img src="screenshots/databases.png" width="400"><img src="screenshots/query.png" width="400"><img src="screenshots/graph.png" width="400"><img src="screenshots/structure.png" width="400"><img src="screenshots/saved.png" width="400"><img src="screenshots/help.png" width="400">
 
 ## Usage
 

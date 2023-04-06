@@ -8,6 +8,7 @@ on:
       - '**'
       - '!**/*.md'
       - '!/todo'
+      - '!/screenshots/*'
       - '!/.release-notes'
       - '!/scripts/release'
       - '!/scripts/rerun'
