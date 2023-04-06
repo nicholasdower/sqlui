@@ -53,7 +53,7 @@ databases:
       host:     <%= ENV.fetch('DB_HOST', '127.0.0.1') %>
   friends:
     display_name: Friends
-    description:  Another database about nothing.
+    description:  A database about even less.
     url_path:     friends
     <% if ENV.key?('GITHUB_TOKEN')%>
     saved_config:

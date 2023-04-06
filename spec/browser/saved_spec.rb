@@ -37,30 +37,24 @@ describe 'saved' do
     %w[nicholasdower/sqlui/master/sql/friends/sample_one.sql nicholasdower/sqlui/master/sql/friends/sample_two.sql]
   end
 
-  it 'displays the list of saved queries' do
+  it 'name links to query' do
     name_elements = wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > h2')
+      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .saved-file-header > .saved-name')
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
     names = name_elements.map(&:text)
     expect(names).to eq(expected_file_names)
-  end
-
-  it 'view links to the query' do
-    view_link_elements = wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .links > .view-link')
-      elements if elements.size == expected_file_names.size && elements[0].displayed?
-    end
-    view_link_elements.first.click
+    name_elements.first.click
     wait_until_no_results(wait)
   end
 
-  it 'run links to the query and results' do
-    run_link_elements = wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .links > .run-link')
+  it 'github links to the file on github.com' do
+    github_link_elements = wait.until do
+      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .saved-file-header > .saved-github-link')
       elements if elements.size == expected_file_names.size && elements[0].displayed?
     end
-    run_link_elements.first.click
-    wait_until_results(wait, %w[id name description actor_id], ['1', "GW\nMonica", 'A neat freak.', '1'])
+    github_link_elements.first.click
+    driver.switch_to.window(driver.window_handles.last)
+    expect(driver.current_url).to eq('https://github.com/nicholasdower/sqlui/blob/master/sql/friends/sample_one.sql')
   end
 end

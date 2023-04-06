@@ -518,60 +518,64 @@ function selectSavedTab () {
   }
 
   Object.values(saved).forEach(file => {
+    const viewOnGithubLinkElement = document.createElement('a')
+    viewOnGithubLinkElement.classList.add('saved-github-link')
+    viewOnGithubLinkElement.innerText = 'GitHub'
+    viewOnGithubLinkElement.href = file.github_url
+    viewOnGithubLinkElement.target = '_blank'
+
     const viewUrl = new URL(window.location.origin + window.location.pathname)
     setActionInUrl(viewUrl, 'query')
     viewUrl.searchParams.set('file', file.filename)
 
-    const viewLinkElement = document.createElement('a')
-    viewLinkElement.classList.add('link', 'view-link')
-    viewLinkElement.innerText = 'view'
-    viewLinkElement.href = viewUrl.pathname + viewUrl.search
-    addEventListener(viewLinkElement, 'click', (event) => {
+    const nameElement = document.createElement('a')
+    nameElement.classList.add('saved-name')
+    nameElement.innerText = file.filename
+    nameElement.href = viewUrl.pathname + viewUrl.search
+    addEventListener(nameElement, 'click', (event) => {
       clearResult()
       route(event.target, event, viewUrl, true)
     })
 
-    const runUrl = new URL(window.location.origin + window.location.pathname)
-    setActionInUrl(runUrl, 'query')
-    runUrl.searchParams.set('file', file.filename)
-    runUrl.searchParams.set('run', 'true')
+    const spacerElement = document.createElement('div')
+    spacerElement.classList.add('saved-name-spacer')
 
-    const runLinkElement = document.createElement('a')
-    runLinkElement.classList.add('link', 'run-link')
-    runLinkElement.innerText = 'run'
-    runLinkElement.href = runUrl.pathname + runUrl.search
-    addEventListener(runLinkElement, 'click', (event) => {
+    const headerElement = document.createElement('div')
+    headerElement.classList.add('saved-file-header')
+    headerElement.appendChild(nameElement)
+    headerElement.appendChild(spacerElement)
+    headerElement.appendChild(viewOnGithubLinkElement)
+
+    const contentLines = file.contents.endsWith('\n') ? file.contents.slice(0, -1).split('\n') : file.contents.split('\n')
+    let preview
+    if (contentLines.length > 5) {
+      preview = contentLines.slice(0, 4).join('\n')
+    } else {
+      preview = contentLines.join('\n')
+    }
+
+    const previewElement = document.createElement('a')
+    previewElement.innerText = preview
+    previewElement.classList.add('saved-preview')
+    previewElement.href = viewUrl.pathname + viewUrl.search
+    addEventListener(previewElement, 'click', (event) => {
       clearResult()
-      route(event.target, event, runUrl, true)
+      route(event.target, event, viewUrl, true)
     })
 
-    const viewOnGithubLinkElement = document.createElement('a')
-    viewOnGithubLinkElement.classList.add('link', 'view-github-link')
-    viewOnGithubLinkElement.innerText = 'github'
-    viewOnGithubLinkElement.href = file.github_url
-    viewOnGithubLinkElement.target = '_blank'
+    if (contentLines.length > 5) {
+      const truncatedElement = document.createElement('div')
+      truncatedElement.classList.add('saved-truncated')
+      truncatedElement.innerText = `... ${contentLines.length - 4} more lines`
+      previewElement.appendChild(truncatedElement)
+    }
 
-    const nameElement = document.createElement('h2')
-    nameElement.innerText = file.filename
-    nameElement.classList.add('name')
+    const itemElement = document.createElement('div')
+    itemElement.classList.add('saved-list-item')
+    itemElement.appendChild(headerElement)
+    itemElement.appendChild(previewElement)
 
-    const linksElement = document.createElement('div')
-    linksElement.classList.add('links')
-    linksElement.appendChild(viewLinkElement)
-    linksElement.appendChild(runLinkElement)
-    linksElement.appendChild(viewOnGithubLinkElement)
-
-    const descriptionElement = document.createElement('p')
-    descriptionElement.innerText = file.description
-    descriptionElement.classList.add('description')
-
-    const divElement = document.createElement('div')
-    divElement.classList.add('saved-list-item')
-    divElement.appendChild(nameElement)
-    divElement.appendChild(linksElement)
-    divElement.appendChild(descriptionElement)
-
-    savedElement.appendChild(divElement)
+    savedElement.appendChild(itemElement)
   })
 }
 

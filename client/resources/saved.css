@@ -1,0 +1,64 @@
+#saved-box {
+    font-family: Helvetica, sans-serif;
+    outline: none;
+}
+
+#saved-box .saved-file-header {
+    display: flex;
+    flex-direction: row;
+    margin: 0 0 10px 0;
+}
+
+#saved-box .saved-name {
+    font-size: 20px;
+    font-family: monospace;
+    flex: 1;
+    padding-right: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+
+#saved-box .saved-name-spacer {
+    flex: 1;
+}
+
+#saved-box .saved-github-link {
+    color: darkblue;
+    font-size: 17px;
+    text-decoration: none;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#saved-box .saved-preview {
+    display: block;
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-family: monospace;
+    background-color: #efefef;
+    padding: 10px;
+    border: 1px solid #ddd;
+    min-height: 5em;
+    text-decoration: none;
+    color: #333;
+}
+
+#saved-box .saved-truncated {
+    margin-top: 10px;
+    opacity: 30%;
+}
+
+#saved-box .saved-list-item {
+    border-bottom: 1px solid #eeeeee;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+#saved-box .saved-list-item:last-child {
+    border-bottom: none;
+}

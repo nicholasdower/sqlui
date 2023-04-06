@@ -18,11 +18,15 @@ describe 'databases' do
     end
 
     descriptions = database_elements.map { |element| element.find_element(css: '.description').text }
-    expect(descriptions).to eq([
-                                 'Some databases about nothing.',
-                                 'A database about nothing.',
-                                 'Another database about nothing.'
-                               ])
+    expect(descriptions).to(
+      eq(
+        [
+          'Some databases about nothing.',
+          'A database about nothing.',
+          'A database about even less.'
+        ]
+      )
+    )
     names = database_elements.map { |element| element.find_element(css: '.name').text }
     expect(names).to eq(%w[Shows Seinfeld Friends])
   end

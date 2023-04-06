@@ -382,45 +382,6 @@ body {
     color: #999;
 }
 
-#saved-box {
-    font-family: Helvetica, sans-serif;
-    outline: none;
-}
-
-.links {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.link {
-    margin-right: 30px;
-    color: darkblue;
-    font-size: 17px;
-    text-decoration: none;
-}
-
-.name {
-    margin: 0 200px 0 0;
-    font-size: 20px;
-}
-
-.description {
-    margin: 20px 0 0;
-    font-size: 18px;
-}
-
-.saved-list-item {
-    border-bottom: 1px solid #eeeeee;
-    margin: 0;
-    padding: 10px;
-}
-
-.saved-list-item:last-child {
-    border-bottom: none;
-}
-
 .cm-editor.cm-focused {
     outline: none !important;
 }

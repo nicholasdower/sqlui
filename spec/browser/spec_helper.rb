@@ -83,7 +83,7 @@ class TestServer
     @thread = Thread.new do
       Server.set :server, 'webrick'
       Server.init_and_run(CONFIG, 'client/resources',
-                          Github::Cache.new(TestServer.github_cache_hash, logger: Server.logger))
+                          Github::Cache.new(TestServer.github_cache_hash, logger: Sqlui.logger))
     end
 
     (1..20).each do |n|

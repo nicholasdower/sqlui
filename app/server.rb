@@ -23,13 +23,9 @@ require_relative 'version'
 
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
-  def self.logger
-    @logger ||= WEBrick::Log.new
-  end
-
-  def self.init_and_run(config, resources_dir, github_cache = Github::Cache.new({}, logger: Server.logger))
-    logger.info("Starting SQLUI v#{Version::SQLUI}")
-    logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
+  def self.init_and_run(config, resources_dir, github_cache)
+    Sqlui.logger.info("Starting SQLUI v#{Version::SQLUI}")
+    Sqlui.logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
 
     WEBrick::HTTPRequest.const_set('MAX_URI_LENGTH', 2 * 1024 * 1024)
 
@@ -113,7 +109,7 @@ class Server < Sinatra::Base
         tree = Github::Tree.new(files: [], truncated: false)
         if (saved_config = database.saved_config)
           tree_client = Github::TreeClient.new(access_token: database.saved_config.token, cache: github_cache,
-                                               logger: Server.logger)
+                                               logger: Sqlui.logger)
           tree = tree_client.get_tree(owner: saved_config.owner, repo: saved_config.repo, branch: saved_config.branch,
                                       regex: saved_config.regex)
         end
@@ -126,16 +122,11 @@ class Server < Sinatra::Base
             columns: database.columns,
             joins: database.joins,
             saved: tree.to_h do |file|
-              comment_lines = file.content.split("\n").take_while do |l|
-                l.start_with?('--')
-              end
-              description = comment_lines.map { |l| l.sub(/^-- */, '') }.join("\n")
               [
                 file.display_path,
                 {
                   filename: file.display_path,
                   github_url: file.github_url,
-                  description: description,
                   contents: file.content
                 }
               ]
