@@ -9,7 +9,7 @@ describe 'structure' do
 
   it 'is screenshotted' do
     driver.get(url('/sqlui/seinfeld/structure'))
-    driver.manage.window.resize_to(1024, 768)
+    driver.manage.window.resize_to(1200, 900)
     wait_until_displayed(wait, id: 'columns')
     driver.save_screenshot('screenshots/structure.png')
   end

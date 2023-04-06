@@ -31,9 +31,9 @@ describe 'saved' do
 
   it 'is screenshotted' do
     driver.get(url('/sqlui/friends/saved'))
-    driver.manage.window.resize_to(1024, 768)
+    driver.manage.window.resize_to(1200, 900)
     wait.until do
-      elements = driver.find_elements(css: '#saved-box > .saved-list-item > h2')
+      elements = driver.find_elements(css: '#saved-box > .saved-list-item > .saved-file-header > .saved-name')
       elements if elements.size == 2 && elements[0].displayed?
     end
     driver.save_screenshot('screenshots/saved.png')
