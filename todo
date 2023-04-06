@@ -32,7 +32,6 @@ browser notifications when query completes if on other browser tab or other SQLU
 the editor is too short on a large screen. it should be a percentage
 warn when closing the browser with unsaved changes? what do other sites do?
 javascript unit tests
-add images to README
 server unit tests
 run test coverage
 does the server have to be static?
