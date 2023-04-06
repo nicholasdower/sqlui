@@ -9,7 +9,7 @@ describe 'help' do
 
   it 'is screenshotted' do
     driver.get(url('/sqlui/seinfeld/help'))
-    driver.manage.window.resize_to(1200, 900)
+    driver.manage.window.resize_to(1300, 975)
     wait_until_displayed(wait, id: 'help-box')
     driver.save_screenshot('screenshots/help.png')
   end

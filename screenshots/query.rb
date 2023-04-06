@@ -9,7 +9,7 @@ describe 'query' do
 
   it 'is screenshotted' do
     driver.get(url('/sqlui/seinfeld/query'))
-    driver.manage.window.resize_to(1200, 900)
+    driver.manage.window.resize_to(1300, 975)
     wait_until_editor(wait)
     driver.save_screenshot('screenshots/query.png')
   end

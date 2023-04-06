@@ -18,20 +18,35 @@ describe 'saved' do
     }
   end
 
-  let(:content_response) { { content: Base64.encode64('select * from characters limit 1;') } }
+  let(:content_one_response) { { content: Base64.encode64('select * from characters limit 1;') } }
+  let(:content_two_response) do
+    {
+      content: Base64.encode64(
+        <<~SQL
+          -- Selects all characters.
+          select
+            *
+          from characters
+          where true
+            and id > 0
+            and id < 10;
+        SQL
+      )
+    }
+  end
 
   before do
     stub_request(:get, 'https://api.github.com/repos/nicholasdower/sqlui/git/trees/master?recursive=true')
       .to_return(body: tree_response.to_json, status: 200)
     stub_request(:get, 'https://api.github.com/repos/nicholasdower/sqlui/contents/sql/friends/sample_one.sql?ref=some_sha')
-      .to_return(body: content_response.to_json, status: 200)
+      .to_return(body: content_one_response.to_json, status: 200)
     stub_request(:get, 'https://api.github.com/repos/nicholasdower/sqlui/contents/sql/friends/sample_two.sql?ref=some_sha')
-      .to_return(body: content_response.to_json, status: 200)
+      .to_return(body: content_two_response.to_json, status: 200)
   end
 
   it 'is screenshotted' do
     driver.get(url('/sqlui/friends/saved'))
-    driver.manage.window.resize_to(1200, 900)
+    driver.manage.window.resize_to(1300, 975)
     wait.until do
       elements = driver.find_elements(css: '#saved-box > .saved-list-item > .saved-file-header > .saved-name')
       elements if elements.size == 2 && elements[0].displayed?

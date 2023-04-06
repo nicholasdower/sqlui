@@ -9,7 +9,7 @@ describe 'databases' do
 
   it 'is screenshotted' do
     driver.get(url('/sqlui'))
-    driver.manage.window.resize_to(1200, 900)
+    driver.manage.window.resize_to(1300, 975)
     wait.until do
       elements = driver.find_elements(css: '.database')
       elements if elements&.size == 3 && elements.all?(&:displayed?)
