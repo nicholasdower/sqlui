@@ -13,6 +13,8 @@ import { toast } from './toast.js'
 
 const PAGE_SIZE = 100
 
+const TABS = ['query', 'graph', 'saved', 'structure', 'help']
+
 function getSqlFromUrl (url) {
   const params = url.searchParams
   if (params.has('file') && params.has('sql')) {
@@ -507,6 +509,12 @@ function selectSavedTab () {
   })
 
   const savedElement = document.getElementById('saved-box')
+  setTimeout(() => {
+    // Little hack so that hitting tab after loading the saved tab will cause focus to go to the first file.
+    savedElement.tabIndex = 0
+    savedElement.focus()
+    savedElement.tabIndex = -1
+  }, 0)
 
   const saved = window.metadata.saved
   const numFiles = Object.keys(saved).length
@@ -1295,6 +1303,14 @@ document.addEventListener('keydown', (event) => {
     selectTab(event, 'structure')
   } else if (isMac && event.code === 'Digit5' && event.ctrlKey) {
     selectTab(event, 'help')
+  } else if (isMac && event.code === 'BracketLeft' && event.ctrlKey) {
+    const currentTabIndex = TABS.indexOf(window.tab)
+    const previousTabIndex = currentTabIndex === 0 ? TABS.length - 1 : currentTabIndex - 1
+    selectTab(event, TABS[previousTabIndex])
+  } else if (isMac && event.code === 'BracketRight' && event.ctrlKey) {
+    const currentTabIndex = TABS.indexOf(window.tab)
+    const nextTabIndex = (currentTabIndex + 1) % TABS.length
+    selectTab(event, TABS[nextTabIndex])
   }
 })
 

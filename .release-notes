@@ -1,1 +1,6 @@
 - Display previews in saved tab.
+- Add app logo to header.
+- Restyle keyboard focus.
+- Restyle saved tab.
+- Enable keyboard navigation on databases.
+- Enable tab navigation via ctrl+[ and ctrl+] on Mac.
