@@ -1,6 +1,4 @@
-<picture><img src="client/resources/favicon.svg" height="32px"></img></picture>
-
-# SQLUI (/ˈskwiːi/)
+# <picture><img src="client/resources/favicon.svg" height="32px"></img></picture> SQLUI (/ˈskwiːi/)
 
 ## Intro
 
