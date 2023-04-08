@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../../app/github/tree_client'
-require_relative '../spec_helper'
+require_relative '../../../app/github/tree_client'
+require_relative '../../spec_helper'
 
 describe Github::TreeClient do
   let(:tree_client) { Github::TreeClient.new(access_token: access_token, cache: cache) }
@@ -40,9 +40,22 @@ describe Github::TreeClient do
       let(:regex) { /some.*/ }
       let(:files) do
         [
-          Github::File.new(owner: owner, repo: repo, branch: branch, path: 'some_path', content: 'some_content'),
-          Github::File.new(owner: owner, repo: repo, branch: branch, path: 'some_other_path',
-                           content: 'some_other_content')
+          Github::File.new(
+            owner: owner,
+            repo: repo,
+            branch: branch,
+            tree_sha: 'some_sha',
+            path: 'some_path',
+            content: 'some_content'
+          ),
+          Github::File.new(
+            owner: owner,
+            repo: repo,
+            branch: branch,
+            tree_sha: 'some_sha',
+            path: 'some_other_path',
+            content: 'some_other_content'
+          )
         ]
       end
 

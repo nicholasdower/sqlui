@@ -2,8 +2,8 @@
 
 require 'timecop'
 
-require_relative '../../app/github/caching_client'
-require_relative '../spec_helper'
+require_relative '../../../app/github/caching_client'
+require_relative '../../spec_helper'
 
 describe Github::CachingClient do
   before { Timecop.freeze }

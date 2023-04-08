@@ -41,7 +41,7 @@ body {
 
 #header {
     font-weight: bold;
-    margin-left: 3px;
+    margin: 0 5px 0 3px;
 }
 
 #header-link {
@@ -104,6 +104,8 @@ body {
 .selected-tab-button:focus-visible,
 #header-link:focus-visible,
 .submit-button:focus-visible,
+#save-file-button:focus-visible,
+#dismiss-file-button:focus-visible,
 #cancel-button:focus-visible,
 .submit-dropdown-button:focus-visible,
 .submit-dropdown-content-button:focus-visible,
@@ -133,6 +135,31 @@ body {
     font-size: 18px;
 }
 
+#filename-box {
+    border-bottom: 1px solid #ddd;
+    padding: 5px 5px 5px 10px;
+    flex-direction: row;
+    align-items: center;
+}
+
+#dismiss-file-button {
+    margin-right: 10px;
+}
+
+#filename {
+    font-size: 18px;
+    font-family: monospace;
+    flex: 1;
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: #333;
+    padding-left: 5px;
+    height: 35px;
+    margin-right: 10px;
+}
+
 #submit-box {
     display: flex;
     border-top: 1px solid #ddd;
@@ -149,14 +176,13 @@ body {
     padding-left: 220px; /* To center the resizer icon. Ok, it's a hack. Get over it. */
 }
 
-#cancel-button {
+#save-file-button, #dismiss-file-button, #cancel-button {
     cursor: pointer;
     background: none;
     color: #333;
     border: 1px solid #888;
     height: 32px;
     font-size: 18px;
-    margin: 0;
 }
 
 #cancel-button-spacer {
@@ -247,6 +273,8 @@ body {
 .submit-dropdown-content-button:active,
 .submit-button:active,
 #cancel-button:active,
+#save-file-button:active,
+#dismiss-file-button:active,
 .submit-dropdown-button:active {
     background-color: #e6e6e6;
     outline: none

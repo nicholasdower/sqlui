@@ -58,3 +58,10 @@ allow keyboard navigation on database list and saved list via j and k and enter
 show spinner on app load
 display an indicator when editing a saved file, display a link to open it in the GitHub editor
 add support for loading a saved yaml file, think sql exporter
+submitting all multiple times should not add to the history
+handle file not found
+handle empty query when editing file and empty original file
+stop trimming files and queries
+new logo
+don't encode slashes in file param
+enable save only when file differs from editor

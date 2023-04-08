@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../../app/github/client'
-require_relative '../spec_helper'
+require_relative '../../../app/github/client'
+require_relative '../../spec_helper'
 
 class TestResponse < String
   attr_accessor :code

@@ -127,7 +127,8 @@ class Server < Sinatra::Base
                 {
                   filename: file.display_path,
                   github_url: file.github_url,
-                  contents: file.content
+                  contents: file.content.strip,
+                  tree_sha: file.tree_sha
                 }
               ]
             end

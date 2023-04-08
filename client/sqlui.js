@@ -17,17 +17,13 @@ const TABS = ['query', 'graph', 'saved', 'structure', 'help']
 
 function getSqlFromUrl (url) {
   const params = url.searchParams
-  if (params.has('file') && params.has('sql')) {
-    // TODO: show an error.
-    throw new Error('You can only specify a file or sql param, not both.')
-  }
   if (params.has('sql')) {
     return params.get('sql')
   } else if (params.has('file')) {
     const file = params.get('file')
     const fileDetails = window.metadata.saved[file]
     if (!fileDetails) throw new Error(`no such file: ${file}`)
-    return fileDetails.contents
+    return fileDetails.contents.trim()
   }
   throw new Error('You must specify a file or sql param')
 }
@@ -50,6 +46,12 @@ function init (parent, onSubmit, onShiftSubmit) {
   const isMac = navigator.userAgent.includes('Mac')
   const runCurrentLabel = `run selection (${isMac ? '⌘' : 'Ctrl'}-Enter)`
   const runAllLabel = `run all (${isMac ? '⌘' : 'Ctrl'}-Shift-Enter)`
+
+  const dismissFileButton = document.getElementById('dismiss-file-button')
+  addEventListener(dismissFileButton, 'click', (event) => dismissFile())
+
+  const saveFileButton = document.getElementById('save-file-button')
+  addEventListener(saveFileButton, 'click', (event) => saveFile())
 
   const submitButtonCurrent = document.getElementById('submit-button-current')
   submitButtonCurrent.value = runCurrentLabel
@@ -245,10 +247,10 @@ function updateTabs () {
 function selectTab (event, tab) {
   const url = new URL(window.location)
   setActionInUrl(url, tab)
-  route(event.target, event, url, true)
+  route(event.target, event, url)
 }
 
-function route (target = null, event = null, url = null, internal = false) {
+function route (target = null, event = null, url = null, run = false) {
   closePopup()
 
   if (url) {
@@ -290,10 +292,10 @@ function route (target = null, event = null, url = null, internal = false) {
 
   switch (window.tab) {
     case 'query':
-      selectQueryTab(internal)
+      selectQueryTab(run)
       break
     case 'graph':
-      selectGraphTab(internal)
+      selectGraphTab(run)
       break
     case 'saved':
       selectSavedTab()
@@ -482,7 +484,7 @@ function selectHelpTab () {
   setTimeout(() => { helpBoxElement.focus() }, 0)
 }
 
-function selectGraphTab (internal) {
+function selectGraphTab (run) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('graph-box').style.display = 'flex'
@@ -490,17 +492,19 @@ function selectGraphTab (internal) {
   document.getElementById('cancel-button').style.visibility = 'hidden'
   updateDownloadButtons(window?.sqlFetch)
   focus(getSelection())
-  maybeFetchResult(internal)
+  maybeFetchResult(run)
+  updateFileBox()
 }
 
-function selectQueryTab (internal) {
+function selectQueryTab (run) {
   document.getElementById('query-box').style.display = 'flex'
   document.getElementById('submit-box').style.display = 'flex'
   document.getElementById('result-box').style.display = 'flex'
   document.getElementById('fetch-sql-box').style.display = 'none'
   document.getElementById('cancel-button').style.visibility = 'hidden'
   focus(getSelection())
-  maybeFetchResult(internal)
+  maybeFetchResult(run)
+  updateFileBox()
 }
 
 function selectSavedTab () {
@@ -540,7 +544,7 @@ function selectSavedTab () {
 
     const gitHubImageElement = document.createElement('img')
     gitHubImageElement.alt = 'GitHub'
-    gitHubImageElement.src = '/sqlui/github.svg'
+    gitHubImageElement.src = window.resourcePathMap['github.svg']
     gitHubElement.appendChild(gitHubImageElement)
 
     const viewUrl = new URL(window.location.origin + window.location.pathname)
@@ -584,12 +588,12 @@ function selectSavedTab () {
     itemElement.appendChild(previewElement)
     addEventListener(itemElement, 'click', (event) => {
       clearResult()
-      route(event.target, event, viewUrl, true)
+      route(event.target, event, viewUrl)
     })
     addEventListener(itemElement, 'keydown', (event) => {
       if (event.keyCode === 13) {
         clearResult()
-        route(event.target, event, viewUrl, true)
+        route(event.target, event, viewUrl)
       }
     })
 
@@ -621,11 +625,8 @@ function submit (target, event, selection = null) {
   let sql = getEditorValue().trim()
   sql = sql === '' ? null : sql
 
-  url.searchParams.set('run', 'true')
-
   if (url.searchParams.has('file')) {
-    if (window.metadata.saved[url.searchParams.get('file')].contents !== getEditorValue()) {
-      url.searchParams.delete('file')
+    if (window.metadata.saved[url.searchParams.get('file')].contents.trim() !== getEditorValue().trim()) {
       url.searchParams.set('sql', sql)
     }
   } else {
@@ -649,7 +650,6 @@ function submit (target, event, selection = null) {
     url.searchParams.delete('selection')
     url.searchParams.delete('sql')
     url.searchParams.delete('file')
-    url.searchParams.delete('run')
   }
 
   route(target, event, url, true)
@@ -795,30 +795,17 @@ function parseSqlVariables (params) {
   )
 }
 
-function maybeFetchResult (internal) {
+function maybeFetchResult (run) {
   const url = new URL(window.location)
   const params = url.searchParams
   const sql = params.get('sql')
   const file = params.get('file')
   const selection = params.get('selection')
-  const hasSqluiReferrer = document.referrer && new URL(document.referrer).origin === url.origin
   const variables = parseSqlVariables(params)
 
-  if (params.has('file') && params.has('sql')) {
-    // TODO: show an error.
-    throw new Error('You can only specify a file or sql, not both.')
-  }
-
-  // Only allow auto-run if coming from another SQLUI page. The idea here is to let the app link to URLs with run=true
-  // but not other apps. This allows meta/shift-clicking to run a query.
-  if (params.has('run')) {
-    url.searchParams.delete('run')
+  if (run) {
     window.history.replaceState({}, '', url)
     clearResult()
-
-    if (!internal && !hasSqluiReferrer) {
-      throw new Error('run only allowed for internal usage')
-    }
 
     if (params.has('sql') || params.has('file')) {
       const sqlFetch = buildSqlFetch(sql, file, variables, selection)
@@ -839,10 +826,13 @@ function maybeFetchResult (internal) {
   const existingRequest = window.sqlFetch
   if (existingRequest) {
     const selectionMatches = selection === existingRequest.selection
-    const sqlMatches = params.has('sql') && sql === existingRequest.sql
-    const fileMatches = params.has('file') && file === existingRequest.file
+    let queryMatches = false
+    if (params.has('sql')) {
+      queryMatches = sql === existingRequest.sql
+    } else if (params.has('file')) {
+      queryMatches = file === existingRequest.file
+    }
     const variablesMatch = JSON.stringify(variables) === JSON.stringify(existingRequest.variables)
-    const queryMatches = sqlMatches || fileMatches
     if (selectionMatches && queryMatches && variablesMatch) {
       displaySqlFetch(existingRequest)
       if (params.has('selection') && window.lastSetSelectionValueFromUrlParam !== selection) {
@@ -896,15 +886,15 @@ class SqlFetch {
 function buildSqlFetch (sql, file, variables, selection) {
   const sqlFetch = new SqlFetch(sql, file, variables, selection)
 
-  if (file) {
+  if (sql) {
+    sqlFetch.sql = sql
+  } else if (file) {
     const fileDetails = window.metadata.saved[file]
     if (!fileDetails) {
       throw new Error(`no such file: ${file}`)
     }
     sqlFetch.file = file
-    sqlFetch.sql = fileDetails.contents
-  } else if (sql) {
-    sqlFetch.sql = sql
+    sqlFetch.sql = fileDetails.contents.trim()
   }
 
   return sqlFetch
@@ -1101,6 +1091,34 @@ function updateDownloadButtons (fetch) {
   } else {
     disableDownloadButtons()
   }
+}
+
+function updateFileBox () {
+  const url = new URL(window.location)
+  if (url.searchParams.has('file')) {
+    document.getElementById('filename').innerText = url.searchParams.get('file')
+    document.getElementById('filename-box').style.display = 'flex'
+  } else {
+    document.getElementById('filename-box').style.display = 'none'
+  }
+}
+
+function dismissFile () {
+  const url = new URL(window.location)
+  url.searchParams.set('sql', getSqlFromUrl(url))
+  url.searchParams.delete('file')
+  if (url.searchParams.has('selection')) {
+    const selection = url.searchParams.get('selection')
+    // Let's put selection after sql.
+    url.searchParams.delete('selection')
+    url.searchParams.set('selection', selection)
+  }
+  document.getElementById('filename-box').style.display = 'none'
+  window.history.replaceState({}, '', url)
+}
+
+function saveFile () {
+  toast('File saved.')
 }
 
 function displaySqlFetch (fetch) {

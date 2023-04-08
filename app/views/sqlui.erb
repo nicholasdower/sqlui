@@ -18,6 +18,8 @@
       window.notifyAirbrake = function (error) {
         window.airbrake?.notify(error)
       }
+
+      window.resourcePathMap = <%= resource_path_map.to_json %>
     </script>
     <script type="text/javascript" src="<%= resource_path_map['sqlui.js'] %>"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -45,31 +47,37 @@
         <a id="help-tab-button" class="tab-button">Help<span class="keyboard-shortcut-indicator">[5]</span></a>
       </div>
 
+      <div id="filename-box" class="tab-content-element" style="display: none;">
+        <div id="filename"></div>
+        <input id="dismiss-file-button" type="button" value="dismiss">
+        <input id="save-file-button" type="button" value="save">
+      </div>
+
       <div id="query-box" class="tab-content-element graph-element query-element" style="display: none;">
         <div id="query" class="query"></div>
       </div>
 
       <div id="submit-box" class="tab-content-element graph-element query-element" style="display: none;">
-        <input id="cancel-button" type="button" value="cancel"></input>
+        <input id="cancel-button" type="button" value="cancel">
         <div id="editor-resizer">
           <img src="<%= resource_path_map['vertical-resizer.svg'] %>" />
         </div>
         <div style="position: relative;">
           <div id="submit-button-wrapper">
-            <input id="submit-button-all" class="submit-button" type="button"></input>
-            <input id="submit-button-current" class="submit-button submit-button-show" type="button"></input>
-            <input id="submit-dropdown-button" class="submit-dropdown-button" type="button", value="▼"></input>
+            <input id="submit-button-all" class="submit-button" type="button">
+            <input id="submit-button-current" class="submit-button submit-button-show" type="button">
+            <input id="submit-dropdown-button" class="submit-dropdown-button" type="button", value="▼">
           </div>
           <div id="submit-dropdown-content" class="submit-dropdown-content">
             <div class="submit-dropdown-content-section">
-              <input id="submit-dropdown-button-current" class="submit-dropdown-content-button" type="button"></input>
-              <input id="submit-dropdown-button-all" class="submit-dropdown-content-button" type="button"></input>
-              <input id="submit-dropdown-button-toggle" class="submit-dropdown-content-button" type="button" value="toggle default"></input>
+              <input id="submit-dropdown-button-current" class="submit-dropdown-content-button" type="button">
+              <input id="submit-dropdown-button-all" class="submit-dropdown-content-button" type="button">
+              <input id="submit-dropdown-button-toggle" class="submit-dropdown-content-button" type="button" value="toggle default">
             </div>
             <div class="submit-dropdown-content-section">
-              <input id="submit-dropdown-button-copy-csv" class="submit-dropdown-content-button disabled" type="button" value="copy to clipboard (csv)"></input>
-              <input id="submit-dropdown-button-copy-tsv" class="submit-dropdown-content-button disabled" type="button" value="copy to clipboard (tsv)"></input>
-              <input id="submit-dropdown-button-download-csv" class="submit-dropdown-content-button disabled" type="button" value="download (csv)"></input>
+              <input id="submit-dropdown-button-copy-csv" class="submit-dropdown-content-button disabled" type="button" value="copy to clipboard (csv)">
+              <input id="submit-dropdown-button-copy-tsv" class="submit-dropdown-content-button disabled" type="button" value="copy to clipboard (tsv)">
+              <input id="submit-dropdown-button-download-csv" class="submit-dropdown-content-button disabled" type="button" value="download (csv)">
             </div>
           </div>
         </div>

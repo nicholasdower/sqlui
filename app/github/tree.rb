@@ -26,7 +26,14 @@ module Github
         truncated = check_boolean(truncated: tree_response['truncated'])
         tree = check_is_a(tree: [Array, tree_response['tree']])
         files = tree.map do |blob|
-          File.new(owner: owner, repo: repo, branch: branch, path: blob['path'], content: blob['content'])
+          File.new(
+            owner: owner,
+            repo: repo,
+            branch: branch,
+            tree_sha: tree_response['sha'],
+            path: blob['path'],
+            content: blob['content']
+          )
         end
 
         Tree.new(files: files, truncated: truncated)

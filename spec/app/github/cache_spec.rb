@@ -2,8 +2,8 @@
 
 require 'timecop'
 
-require_relative '../../app/github/cache'
-require_relative '../spec_helper'
+require_relative '../../../app/github/cache'
+require_relative '../../spec_helper'
 
 describe Github::Cache do
   before { Timecop.freeze }

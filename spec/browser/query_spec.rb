@@ -235,22 +235,23 @@ describe 'query' do
 
   %w[tab window].each do |tab_or_window|
     context "when running all in a new #{tab_or_window}" do
+      let(:sql) { 'select id, name, description from characters order by id limit 2;' }
+
       before do
         driver.get(url('/sqlui/seinfeld/query'))
         editor = wait_until_editor(wait)
-        editor.send_keys('select id, name, description from characters order by id limit 2;')
+        editor.send_keys(sql)
         wait_until_displayed(wait, id: 'submit-dropdown-button').click
         element = wait_until_displayed(wait, id: 'submit-dropdown-button-all')
+        expect(driver.window_handles.size).to eq(1)
         driver.action.key_down(tab_or_window == 'tab' ? :meta : :shift).click(element).perform
       end
 
-      it "loads results in new window, not in current #{tab_or_window}" do
-        driver.switch_to.window(driver.window_handles.last)
-        wait_until_results(wait, %w[id name description], ['1', 'Jerry', 'A joke maker.'],
-                           ['2', 'George', 'A short, stocky, slow-witted, bald man.'])
-        driver.close
-        driver.switch_to.window(driver.window_handles.first)
+      it "opens query in new window, not in current #{tab_or_window}" do
         wait_until_no_results(wait)
+        expect(driver.window_handles.size).to eq(2)
+        driver.switch_to.window(driver.window_handles.last)
+        wait_until_editor_content(wait, sql)
       end
     end
   end

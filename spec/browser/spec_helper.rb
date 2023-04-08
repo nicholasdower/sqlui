@@ -27,6 +27,13 @@ def wait_until_editor(wait)
   wait_until_displayed(wait, class: 'cm-content')
 end
 
+def wait_until_editor_content(wait, content)
+  wait.until do
+    elements = driver.find_elements(class: 'cm-content')
+    elements[0] if elements.size == 1 && elements[0].displayed? && elements[0].text == content
+  end
+end
+
 def wait_until_spinner(wait)
   wait_until_displayed(wait, id: 'result-loader')
 end
