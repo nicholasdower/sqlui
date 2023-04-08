@@ -40,6 +40,10 @@ module Github
       end
     end
 
+    def [](path)
+      @files.find { |f| f.path == path }
+    end
+
     def each(&block)
       @files.each(&block)
     end
@@ -48,6 +52,12 @@ module Github
       self.class == other.class &&
         @files == other.files &&
         @truncated == other.truncated
+    end
+
+    def <<(file)
+      check_is_a(file: [File, file])
+
+      @files << file unless @files.include?(file)
     end
   end
 end

@@ -6,6 +6,7 @@ require 'json'
 require 'logger'
 
 require_relative 'caching_client'
+require_relative 'paths'
 require_relative 'tree'
 require_relative '../checks'
 require_relative '../count_down_latch'
@@ -63,6 +64,16 @@ module Github
       Tree.for(owner: owner, repo: repo, branch: branch, tree_response: response)
     end
 
+    # Returns the file at the specified fully qualified path.
+    def get_file_for(full_path)
+      check_non_empty_string(full_path: full_path)
+
+      owner, repo, ref, path = Paths.parse_file_path(full_path)
+
+      tree = get_tree(owner: owner, repo: repo, branch: ref, regex: /#{Regexp.escape(path)}/)
+      tree[path]
+    end
+
     private
 
     # Returns the contents of the file at the specified path. Uses the cache.
@@ -72,16 +83,6 @@ module Github
       response = @client.get_with_caching(
         "https://api.github.com/repos/#{owner}/#{repo}/contents/#{path}?ref=#{ref}",
         cache_for: DEFAULT_MAX_FILE_CACHE_AGE_SECONDS
-      )
-      Base64.decode64(response['content'])
-    end
-
-    # Returns the contents of the file at the specified path. Uses the cache.
-    def get_file_content_without_caching(owner:, repo:, path:, ref:)
-      check_non_empty_string(owner: owner, repo: repo, sha: ref, path: path)
-
-      response = @client.get_without_caching(
-        "https://api.github.com/repos/#{owner}/#{repo}/contents/#{path}?ref=#{ref}"
       )
       Base64.decode64(response['content'])
     end
