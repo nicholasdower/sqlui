@@ -4,3 +4,4 @@
 - Restyle saved tab.
 - Enable keyboard navigation on databases.
 - Enable tab navigation via ctrl+[ and ctrl+] on Mac.
+- Display current file in query and graph tab.
