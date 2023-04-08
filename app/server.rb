@@ -110,9 +110,11 @@ class Server < Sinatra::Base
         if (saved_config = database.saved_config)
           tree_client = Github::TreeClient.new(access_token: database.saved_config.token, cache: github_cache,
                                                logger: Sqlui.logger)
-          tree = tree_client.get_tree(owner: saved_config.owner, repo: saved_config.repo, branch: saved_config.branch,
+          tree = tree_client.get_tree(owner: saved_config.owner, repo: saved_config.repo, ref: saved_config.branch,
                                       regex: saved_config.regex)
         end
+        tree << tree_client.get_file_for(params[:file]) if params[:file]
+
         metadata = database.with_client do |client|
           {
             server: "#{config.name} - #{database.display_name}",
@@ -123,9 +125,9 @@ class Server < Sinatra::Base
             joins: database.joins,
             saved: tree.to_h do |file|
               [
-                file.display_path,
+                file.full_path,
                 {
-                  filename: file.display_path,
+                  filename: file.full_path,
                   github_url: file.github_url,
                   contents: file.content.strip,
                   tree_sha: file.tree_sha

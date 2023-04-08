@@ -5,7 +5,6 @@ export function createVerticalResizer (resizerElement, resizableElement, min, ma
   const moveListener = (event) => {
     const y = event.clientY - startY
     const height = Math.min(max, Math.max(min, startHeight + y))
-    console.log(`y: ${y}, height: ${height}`)
     resizableElement.style.height = `${height}px`
   }
 

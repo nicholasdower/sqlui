@@ -268,7 +268,7 @@ function route (target = null, event = null, url = null, run = false) {
       }
     }
     if (url.href !== window.location.href) {
-      window.history.pushState({}, '', url)
+      pushState(url)
     }
   } else {
     url = new URL(window.location)
@@ -804,7 +804,7 @@ function maybeFetchResult (run) {
   const variables = parseSqlVariables(params)
 
   if (run) {
-    window.history.replaceState({}, '', url)
+    replaceState(url)
     clearResult()
 
     if (params.has('sql') || params.has('file')) {
@@ -1114,7 +1114,17 @@ function dismissFile () {
     url.searchParams.set('selection', selection)
   }
   document.getElementById('filename-box').style.display = 'none'
-  window.history.replaceState({}, '', url)
+  replaceState(url)
+}
+
+function replaceState (url) {
+  // Paths look so much better with slashes than with %2F. It seems to work even though it isn't technically valid.
+  window.history.replaceState({}, '', url.href.replaceAll('%2F', '/'))
+}
+
+function pushState (url) {
+  // Paths look so much better with slashes than with %2F. It seems to work even though it isn't technically valid.
+  window.history.pushState({}, '', url.href.replaceAll('%2F', '/'))
 }
 
 function saveFile () {
@@ -1341,9 +1351,14 @@ document.addEventListener('keyup', (event) => {
 })
 
 window.onload = function () {
+  const url = new URL(window.location)
+  let requestUrl = 'metadata'
+  if (url.searchParams.has('file')) {
+    requestUrl += `?file=${url.searchParams.get('file')}`
+  }
   Promise.all([
     google.charts.load('current', { packages: ['corechart', 'line'] }),
-    fetch('metadata', {
+    fetch(requestUrl, {
       headers: {
         Accept: 'application/json'
       },

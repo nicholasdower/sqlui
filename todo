@@ -51,7 +51,6 @@ Display number of rows affected if different from rows returned.
 make it possible to focus on table and use arrows to highlight cells
 Add ability to auto-refresh current query, show browser notification if results change.
 Allow grouping of connections and when switching from one connection to another within the group, maintain editor contents. Think switching from staging to production, or from one zone to another.
-allow any repo + branch + path to be specified in file param as long as it is in a known tree
 tests for github stuff
 add prometheus metric for github ratelimit
 allow keyboard navigation on database list and saved list via j and k and enter

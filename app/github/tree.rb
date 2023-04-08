@@ -19,8 +19,8 @@ module Github
     class << self
       include Checks
 
-      def for(owner:, repo:, branch:, tree_response:)
-        check_non_empty_string(owner: owner, repo: repo, branch: branch)
+      def for(owner:, repo:, ref:, tree_response:)
+        check_non_empty_string(owner: owner, repo: repo, ref: ref)
         check_is_a(tree_response: [Hash, tree_response])
 
         truncated = check_boolean(truncated: tree_response['truncated'])
@@ -29,7 +29,7 @@ module Github
           File.new(
             owner: owner,
             repo: repo,
-            branch: branch,
+            ref: ref,
             tree_sha: tree_response['sha'],
             path: blob['path'],
             content: blob['content']
@@ -40,6 +40,10 @@ module Github
       end
     end
 
+    def [](path)
+      @files.find { |f| f.path == path }
+    end
+
     def each(&block)
       @files.each(&block)
     end
@@ -48,6 +52,12 @@ module Github
       self.class == other.class &&
         @files == other.files &&
         @truncated == other.truncated
+    end
+
+    def <<(file)
+      check_is_a(file: [File, file])
+
+      @files << file unless @files.include?(file)
     end
   end
 end

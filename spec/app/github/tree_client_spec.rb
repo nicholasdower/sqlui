@@ -9,7 +9,7 @@ describe Github::TreeClient do
   let(:cache) { Github::Cache.new({}) }
 
   describe '#get_tree' do
-    subject { tree_client.get_tree(owner: owner, repo: repo, branch: branch, regex: regex) }
+    subject { tree_client.get_tree(owner: owner, repo: repo, ref: branch, regex: regex) }
 
     let(:owner) { 'some_owner' }
     let(:repo) { 'some_repo' }
@@ -43,7 +43,7 @@ describe Github::TreeClient do
           Github::File.new(
             owner: owner,
             repo: repo,
-            branch: branch,
+            ref: branch,
             tree_sha: 'some_sha',
             path: 'some_path',
             content: 'some_content'
@@ -51,7 +51,7 @@ describe Github::TreeClient do
           Github::File.new(
             owner: owner,
             repo: repo,
-            branch: branch,
+            ref: branch,
             tree_sha: 'some_sha',
             path: 'some_other_path',
             content: 'some_other_content'
