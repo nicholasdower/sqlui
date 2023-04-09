@@ -70,20 +70,6 @@ module Github
       Tree.for(owner: owner, repo: repo, ref: ref, tree_response: response)
     end
 
-    # TODO: move the validation logic into the server
-    def add_file(tree, full_path)
-      check_is_a(tree: [Tree, tree])
-      check_non_empty_string(full_path: full_path)
-
-      owner, repo, ref, path = Paths.parse_file_path(full_path)
-      raise ArgumentError, "invalid owner: #{owner}" unless tree.owner == owner
-      raise ArgumentError, "invalid repo: #{repo}" unless tree.repo == repo
-
-      # Only use the cache if we are adding a file for the same branch (ref here).
-      new_tree = get_tree(owner: owner, repo: repo, ref: ref, regex: /#{Regexp.escape(path)}/, cache: ref == tree.ref)
-      tree << check_non_nil(file: new_tree[path])
-    end
-
     def create_commit_with_file(owner:, repo:, base_sha:, branch:, path:, content:, author_name:, author_email:)
       check_non_empty_string(
         owner: owner,
@@ -110,8 +96,6 @@ module Github
           encoding: 'base64'
         }
       )
-      @logger.info("blob: #{blob_response.to_json}")
-
       tree_response = @client.post(
         "https://api.github.com/repos/#{owner}/#{repo}/git/trees",
         {
@@ -126,27 +110,22 @@ module Github
           ]
         }
       )
-      @logger.info("tree: #{tree_response.to_json}")
-
-      commit_request = {
-        message: 'Oh, hi!',
-        author: {
-          name: 'SQLUI',
-          email: 'nicholasdower+sqlui@gmail.com',
-          date: Time.now.iso8601
-        },
-        parents: [
-          base_sha
-        ],
-        tree: check_non_empty_string(sha: tree_response['sha'])
-      }
-      @logger.info("commit request: #{commit_request.to_json}")
+      message = path.size > 43 ? "Update [...]#{path[-38..]}" : "Update #{path}"
       commit_response = @client.post(
         "https://api.github.com/repos/#{owner}/#{repo}/git/commits",
-        commit_request
+        {
+          message: message,
+          author: {
+            name: 'SQLUI',
+            email: 'nicholasdower+sqlui@gmail.com',
+            date: Time.now.iso8601
+          },
+          parents: [
+            base_sha
+          ],
+          tree: check_non_empty_string(sha: tree_response['sha'])
+        }
       )
-      @logger.info("commit: #{commit_response.to_json}")
-
       @client.post(
         "https://api.github.com/repos/#{owner}/#{repo}/git/refs",
         {

@@ -3,27 +3,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title><%= title %></title>
+  <title>SQLUI - Redirecting...</title>
   <link rel="icon" type="image/x-icon" href="<%= resource_path_map['favicon.svg'] %>">
+
+  <script type="application/javascript">
+    window.location = "<%= location %>"
+  </script>
 </head>
 <body style="font-family: monospace; color: #333; font-size: 16px; margin: 0;">
 
 <div style="padding: 10px;">
-<% if defined?(heading) && heading %>
-<h2><%= heading %></h2>
-<% end %>
-
-<% if defined?(message) && message %>
-<h3>Message</h3>
-<p><%= message %></p>
-<% end %>
-
-<% if defined?(stacktrace) && stacktrace %>
-<h3>Stacktrace</h3>
-<pre>
-<%= stacktrace %>
-</pre>
-<% end %>
+  <h2>Redirecting...</h2>
 </div>
 
 </body>

@@ -23,7 +23,7 @@ function getSqlFromUrl (url) {
     const file = params.get('file')
     const fileDetails = window.metadata.saved[file]
     if (!fileDetails) throw new Error(`no such file: ${file}`)
-    return fileDetails.contents.trim()
+    return fileDetails.contents
   }
   throw new Error('You must specify a file or sql param')
 }
@@ -622,16 +622,15 @@ function submit (target, event, selection = null) {
   window.lastEditorValueSet = null
 
   const url = new URL(window.location)
-  let sql = getEditorValue().trim()
-  sql = sql === '' ? null : sql
+  let sql = getEditorValue()
+  sql = sql.trim() === '' ? null : sql
 
   if (url.searchParams.has('file')) {
-    if (window.metadata.saved[url.searchParams.get('file')].contents.trim() !== getEditorValue().trim()) {
+    if (window.metadata.saved[url.searchParams.get('file')].contents !== getEditorValue()) {
       url.searchParams.set('sql', sql)
     }
   } else {
-    let sqlParam = url.searchParams.get('sql')?.trim()
-    sqlParam = sqlParam === '' ? null : sqlParam
+    const sqlParam = url.searchParams.has('sql') ? url.searchParams.get('sql') : null
 
     if (sqlParam !== sql && sql === null) {
       url.searchParams.delete('sql')
@@ -894,7 +893,7 @@ function buildSqlFetch (sql, file, variables, selection) {
       throw new Error(`no such file: ${file}`)
     }
     sqlFetch.file = file
-    sqlFetch.sql = fileDetails.contents.trim()
+    sqlFetch.sql = fileDetails.contents
   }
 
   return sqlFetch
@@ -1128,7 +1127,17 @@ function pushState (url) {
 }
 
 function saveFile () {
-  toast('File saved.')
+  const url = new URL(window.location)
+  if (!url.searchParams.has('file')) throw new Error('missing file param')
+
+  const file = url.searchParams.get('file')
+  const fileDetails = window.metadata.saved[file]
+  if (!fileDetails) throw new Error(`no such file: ${file}`)
+
+  document.getElementById('save-form-base-sha').value = fileDetails.tree_sha
+  document.getElementById('save-form-path').value = fileDetails.path
+  document.getElementById('save-form-content').value = getEditorValue()
+  document.getElementById('save-form').submit()
 }
 
 function displaySqlFetch (fetch) {
@@ -1371,12 +1380,15 @@ window.onload = function () {
       if (contentType && contentType.indexOf('application/json') !== -1) {
         return response.json().then((result) => {
           if (result.error) {
-            let error = '<div style="font-family: monospace; font-size: 16px;">\n'
-            error += `<div>${result.error}</div>\n`
+            let error = '<span style="font-family: monospace; color: #333; font-size: 16px;">\n'
+            error += '<h2>Internal Error</h2>\n'
+            error += '<h3>Message</h3>\n'
+            error += `<p>${result.error}</p>\n`
             if (result.stacktrace) {
+              error += '<h3>Stacktrace</h3>\n'
               error += '<pre>\n' + result.stacktrace + '\n</pre>\n'
             }
-            error += '</div>\n'
+            error += '</span>\n'
             document.getElementById('loading-box').innerHTML = error
           } else if (!result.server) {
             document.getElementById('loading-box').innerHTML = `
