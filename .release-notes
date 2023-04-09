@@ -1,7 +1,8 @@
-- Display previews in saved tab.
-- Add app logo to header.
-- Restyle keyboard focus.
-- Restyle saved tab.
-- Enable keyboard navigation on databases.
-- Enable tab navigation via ctrl+[ and ctrl+] on Mac.
-- Display current file in query and graph tab.
+- Restyle and display previews in saved tab.
+- Add app logo to header, new logo.
+- Improve keyboard navigation.
+  - Restyle focus.
+  - Enable keyboard navigation on databases.
+  - Enable tab navigation via ctrl+[ and ctrl+] on Mac.
+- Display current saved file in query and graph tab.
+- Add ability to save edited saved files.

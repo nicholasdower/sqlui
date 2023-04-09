@@ -78,7 +78,7 @@ describe Github::TreeClient do
       end
 
       it 'returns a tree with the matching paths' do
-        expect(subject).to eq(Github::Tree.new(files: files, truncated: false))
+        expect(subject).to eq(Github::Tree.new(owner: owner, repo: repo, ref: branch, files: files, truncated: false))
       end
     end
   end

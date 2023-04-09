@@ -32,5 +32,9 @@ module Github
       check_non_empty_string(url: url)
       @client.get(url)
     end
+
+    def post(url, request)
+      @client.post(url, request)
+    end
   end
 end

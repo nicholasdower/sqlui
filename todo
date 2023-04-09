@@ -53,14 +53,11 @@ Add ability to auto-refresh current query, show browser notification if results 
 Allow grouping of connections and when switching from one connection to another within the group, maintain editor contents. Think switching from staging to production, or from one zone to another.
 tests for github stuff
 add prometheus metric for github ratelimit
-allow keyboard navigation on database list and saved list via j and k and enter
 show spinner on app load
-display an indicator when editing a saved file, display a link to open it in the GitHub editor
 add support for loading a saved yaml file, think sql exporter
-submitting all multiple times should not add to the history
 handle file not found
 handle empty query when editing file and empty original file
-stop trimming files and queries
-new logo
-don't encode slashes in file param
 enable save only when file differs from editor
+allow multiple saved configs per db connection
+limit github access to listed repos
+add ability to copy graph image to clipboard with keyboard

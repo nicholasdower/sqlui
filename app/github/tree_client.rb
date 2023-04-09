@@ -4,8 +4,10 @@ require 'base64'
 require 'concurrent/executor/fixed_thread_pool'
 require 'json'
 require 'logger'
+require 'rest-client'
 
 require_relative 'caching_client'
+require_relative 'client'
 require_relative 'paths'
 require_relative 'tree'
 require_relative '../checks'
@@ -68,14 +70,90 @@ module Github
       Tree.for(owner: owner, repo: repo, ref: ref, tree_response: response)
     end
 
-    # Returns the file at the specified fully qualified path. Does not use the cache.
-    def get_file_for(full_path)
+    # TODO: move the validation logic into the server
+    def add_file(tree, full_path)
+      check_is_a(tree: [Tree, tree])
       check_non_empty_string(full_path: full_path)
 
       owner, repo, ref, path = Paths.parse_file_path(full_path)
+      raise ArgumentError, "invalid owner: #{owner}" unless tree.owner == owner
+      raise ArgumentError, "invalid repo: #{repo}" unless tree.repo == repo
 
-      tree = get_tree(owner: owner, repo: repo, ref: ref, regex: /#{Regexp.escape(path)}/, cache: false)
-      tree[path]
+      # Only use the cache if we are adding a file for the same branch (ref here).
+      new_tree = get_tree(owner: owner, repo: repo, ref: ref, regex: /#{Regexp.escape(path)}/, cache: ref == tree.ref)
+      tree << check_non_nil(file: new_tree[path])
+    end
+
+    def create_commit_with_file(owner:, repo:, base_sha:, branch:, path:, content:, author_name:, author_email:)
+      check_non_empty_string(
+        owner: owner,
+        repo: repo,
+        base_sha: base_sha,
+        branch: branch,
+        path: path,
+        content: content,
+        author_name: author_name,
+        author_email: author_email
+      )
+
+      begin
+        @client.get_without_caching("https://api.github.com/repos/#{owner}/#{repo}/git/ref/#{branch}")
+        raise "branch already exists: #{owner}/#{repo}/#{branch}"
+      rescue RestClient::NotFound
+        # ignored
+      end
+
+      blob_response = @client.post(
+        "https://api.github.com/repos/#{owner}/#{repo}/git/blobs",
+        {
+          content: Base64.encode64(content),
+          encoding: 'base64'
+        }
+      )
+      @logger.info("blob: #{blob_response.to_json}")
+
+      tree_response = @client.post(
+        "https://api.github.com/repos/#{owner}/#{repo}/git/trees",
+        {
+          base_tree: base_sha,
+          tree: [
+            {
+              path: path,
+              mode: '100644',
+              type: 'blob',
+              sha: check_non_empty_string(sha: blob_response['sha'])
+            }
+          ]
+        }
+      )
+      @logger.info("tree: #{tree_response.to_json}")
+
+      commit_request = {
+        message: 'Oh, hi!',
+        author: {
+          name: 'SQLUI',
+          email: 'nicholasdower+sqlui@gmail.com',
+          date: Time.now.iso8601
+        },
+        parents: [
+          base_sha
+        ],
+        tree: check_non_empty_string(sha: tree_response['sha'])
+      }
+      @logger.info("commit request: #{commit_request.to_json}")
+      commit_response = @client.post(
+        "https://api.github.com/repos/#{owner}/#{repo}/git/commits",
+        commit_request
+      )
+      @logger.info("commit: #{commit_response.to_json}")
+
+      @client.post(
+        "https://api.github.com/repos/#{owner}/#{repo}/git/refs",
+        {
+          ref: "refs/heads/#{branch}",
+          sha: check_non_empty_string(sha: commit_response['sha'])
+        }
+      )
     end
 
     private

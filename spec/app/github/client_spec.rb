@@ -38,7 +38,7 @@ describe Github::Client do
       let(:code) { 500 }
 
       it 'raises' do
-        expect { subject }.to raise_error(StandardError, /get some_url failed/)
+        expect { subject }.to raise_error(StandardError, /GET some_url returned 500, expected 200:/)
       end
     end
 

@@ -66,6 +66,16 @@ databases:                                      # Map of database configurations
       port:     3306                            # Database port.
       host:     127.0.0.1                       # Database host.
 
+    # Saved File Configuration
+    author:                                     # Details used when authoring a commit.
+      name: 'SQLUI'
+      email: sqlui@foo.com
+    token:  ghp_SomEt0k3N                       # GitHub personal access token with "repo" scope.
+    owner:  nicholasdower                       # Repo owner.
+    repo:   sqlui                               # Repo name.
+    branch: master                              # Branch.
+    regex:  ^sql/friends/.*[.]sql$              # Regex used to match files.
+
     # Table Configurations (Optional)
     tables:                                     # Map of table configurations.
       characters:                               # Table name.

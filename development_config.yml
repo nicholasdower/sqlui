@@ -12,6 +12,9 @@ airbrake:
     project_id:  <%= ENV.fetch('AIRBRAKE_CLIENT_PROJECT_ID', '') %>
     project_key: <%= ENV.fetch('AIRBRAKE_CLIENT_PROJECT_KEY', '') %>
 defaul_saved_config: &default_saved_config
+  author:
+    name: 'SQLUI'
+    email: nicholasdower+sqlui@gmail.com
   token: <%= ENV.fetch('GITHUB_TOKEN', nil) %>
   owner: nicholasdower
   repo: sqlui

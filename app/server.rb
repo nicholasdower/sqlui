@@ -106,14 +106,21 @@ class Server < Sinatra::Base
       end
 
       post "#{config.base_url_path}/#{database.url_path}/metadata" do
-        tree = Github::Tree.new(files: [], truncated: false)
+        tree = nil
         if (saved_config = database.saved_config)
-          tree_client = Github::TreeClient.new(access_token: database.saved_config.token, cache: github_cache,
-                                               logger: Sqlui.logger)
-          tree = tree_client.get_tree(owner: saved_config.owner, repo: saved_config.repo, ref: saved_config.branch,
-                                      regex: saved_config.regex)
+          tree_client = Github::TreeClient.new(
+            access_token: database.saved_config.token,
+            cache: github_cache,
+            logger: Sqlui.logger
+          )
+          tree = tree_client.get_tree(
+            owner: saved_config.owner,
+            repo: saved_config.repo,
+            ref: saved_config.branch,
+            regex: saved_config.regex
+          )
+          tree_client.add_file(tree, params[:file]) if params[:file]
         end
-        tree << tree_client.get_file_for(params[:file]) if params[:file]
 
         metadata = database.with_client do |client|
           {
@@ -123,17 +130,21 @@ class Server < Sinatra::Base
             tables: database.tables,
             columns: database.columns,
             joins: database.joins,
-            saved: tree.to_h do |file|
-              [
-                file.full_path,
-                {
-                  filename: file.full_path,
-                  github_url: file.github_url,
-                  contents: file.content.strip,
-                  tree_sha: file.tree_sha
-                }
-              ]
-            end
+            saved: if tree.nil?
+                     {}
+                   else
+                     tree.to_h do |file|
+                       [
+                         file.full_path,
+                         {
+                           filename: file.full_path,
+                           github_url: file.github_url,
+                           contents: file.content.strip,
+                           tree_sha: file.tree_sha
+                         }
+                       ]
+                     end
+                   end
           }
         end
         status 200

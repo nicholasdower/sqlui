@@ -32,6 +32,10 @@ describe SqluiConfig do
           description: 'some description',
           url_path: 'db/path',
           saved_config: {
+            author: {
+              name: 'SQLUI',
+              email: 'sqlui@foo.com'
+            },
             token: 'token',
             owner: 'owner',
             repo: 'repo',

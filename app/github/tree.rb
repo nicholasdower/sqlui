@@ -9,9 +9,12 @@ module Github
     include Checks
     include Enumerable
 
-    attr_reader :truncated, :files
+    attr_reader :owner, :repo, :ref, :truncated, :files
 
-    def initialize(files:, truncated: false)
+    def initialize(owner:, repo:, ref:, files:, truncated: false)
+      @owner = check_non_empty_string(owner: owner)
+      @repo = check_non_empty_string(repo: repo)
+      @ref = check_non_empty_string(ref: ref)
       @files = check_enumerable_of(files, File)
       @truncated = check_boolean(truncated: truncated)
     end
@@ -36,7 +39,7 @@ module Github
           )
         end
 
-        Tree.new(files: files, truncated: truncated)
+        Tree.new(owner: owner, repo: repo, ref: ref, files: files, truncated: truncated)
       end
     end
 
