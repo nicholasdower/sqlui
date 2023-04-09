@@ -51,6 +51,12 @@
         <div id="filename"></div>
         <input id="dismiss-file-button" type="button" value="dismiss">
         <input id="save-file-button" type="button" value="save">
+
+        <form id="save-form" action="save-file" method="post" target="_blank">
+          <input id="save-form-base-sha" name="base_sha" type="hidden">
+          <input id="save-form-path" name="path" type="hidden">
+          <input id="save-form-content" name="content" type="hidden">
+        </form>
       </div>
 
       <div id="query-box" class="tab-content-element graph-element query-element" style="display: none;">

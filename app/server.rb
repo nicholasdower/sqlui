@@ -7,6 +7,7 @@ require 'erb'
 require 'json'
 require 'prometheus/middleware/collector'
 require 'prometheus/middleware/exporter'
+require 'securerandom'
 require 'sinatra/base'
 require 'uri'
 require 'webrick'
@@ -14,6 +15,7 @@ require_relative 'database_metadata'
 require_relative 'github/cache'
 require_relative 'github/caching_client'
 require_relative 'github/client'
+require_relative 'github/paths'
 require_relative 'github/tree'
 require_relative 'github/tree_client'
 require_relative 'mysql_types'
@@ -23,6 +25,19 @@ require_relative 'version'
 
 # SQLUI Sinatra server.
 class Server < Sinatra::Base
+  # An error message and status code.
+  class ClientError < StandardError
+    attr_reader :status
+
+    def initialize(message, status: 400)
+      super(message)
+      @status = status
+    end
+  end
+
+  PIGS = %w[babe misery piglet snowball squealer wilbur napoleon porky miss-piggy petunia betina belinda].freeze
+  private_constant :PIGS
+
   def self.init_and_run(config, resources_dir, github_cache)
     Sqlui.logger.info("Starting SQLUI v#{Version::SQLUI}")
     Sqlui.logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
@@ -119,7 +134,22 @@ class Server < Sinatra::Base
             ref: saved_config.branch,
             regex: saved_config.regex
           )
-          tree_client.add_file(tree, params[:file]) if params[:file]
+          if params[:file]
+            owner, repo, ref, path = Github::Paths.parse_file_path(params[:file])
+            raise ClientError, "invalid owner: #{owner}" unless tree.owner == owner
+            raise ClientError, "invalid repo: #{repo}" unless tree.repo == repo
+
+            requested_tree = tree_client.get_tree(
+              owner: owner,
+              repo: repo,
+              ref: ref,
+              regex: /#{Regexp.escape(path)}/,
+              cache: ref == tree.ref
+            )
+            raise ClientError.new("file not found: #{params[:file]}", status: 404) unless requested_tree[path]
+
+            tree << requested_tree[path]
+          end
         end
 
         metadata = database.with_client do |client|
@@ -130,21 +160,18 @@ class Server < Sinatra::Base
             tables: database.tables,
             columns: database.columns,
             joins: database.joins,
-            saved: if tree.nil?
-                     {}
-                   else
-                     tree.to_h do |file|
-                       [
-                         file.full_path,
-                         {
-                           filename: file.full_path,
-                           github_url: file.github_url,
-                           contents: file.content.strip,
-                           tree_sha: file.tree_sha
-                         }
-                       ]
-                     end
-                   end
+            saved: (tree || {}).to_h do |file|
+              [
+                file.full_path,
+                {
+                  filename: file.full_path,
+                  path: file.path,
+                  github_url: file.github_url,
+                  contents: file.content,
+                  tree_sha: file.tree_sha
+                }
+              ]
+            end
           }
         end
         status 200
@@ -156,7 +183,7 @@ class Server < Sinatra::Base
         data = request.body.read
         request.body.rewind # since Airbrake will read the body on error
         params.merge!(JSON.parse(data, symbolize_names: true))
-        break client_error('missing sql') unless params[:sql]
+        raise ClientError, 'ERROR: missing sql' unless params[:sql]
 
         variables = params[:variables] || {}
         queries = find_selected_queries(params[:sql], params[:selection])
@@ -237,7 +264,7 @@ class Server < Sinatra::Base
       end
 
       get "#{config.base_url_path}/#{database.url_path}/download_csv" do
-        break client_error('missing sql') unless params[:sql]
+        raise ClientError, 'missing sql' unless params[:sql]
 
         sql = Base64.decode64(params[:sql]).force_encoding('UTF-8')
         variables = params.map { |k, v| k[0] == '_' ? [k, v] : nil }.compact.to_h
@@ -283,22 +310,52 @@ class Server < Sinatra::Base
           resource_path_map: resource_path_map
         }
       end
+
+      post("#{config.base_url_path}/#{database.url_path}/save-file") do
+        raise ClientError, 'saved files disabled' unless (saved_config = database.saved_config)
+        raise ClientError, 'missing base_sha' if (params[:base_sha] || '').strip.empty?
+        raise ClientError, 'missing path' if (params[:path] || '').strip.empty?
+        raise ClientError, 'missing content' if params[:path].nil?
+
+        # 12 pig names times 6 hex characters, 12 * 16^6 = 201,326,592 possibilities
+        branch = "#{PIGS.sample}-#{SecureRandom.hex(3)}"
+        tree_client = Github::TreeClient.new(
+          access_token: database.saved_config.token,
+          cache: github_cache,
+          logger: Sqlui.logger
+        )
+        tree_client.create_commit_with_file(
+          owner: saved_config.owner,
+          repo: saved_config.repo,
+          base_sha: params[:base_sha],
+          branch: branch,
+          path: params[:path],
+          content: params[:content].gsub("\r\n", "\n"),
+          author_name: database.saved_config.author_name,
+          author_email: database.saved_config.author_email
+        )
+        status 201
+        erb :redirect, locals: {
+          resource_path_map: resource_path_map,
+          location: "https://github.com/#{saved_config.owner}/#{saved_config.repo}/compare/#{branch}"
+        }
+      end
     end
 
-    error 400..510 do
-      exception = env['sinatra.error']
-      stacktrace = exception&.full_message(highlight: false)
+    error do |exception|
+      status exception.is_a?(ClientError) ? exception.status : 500
+      stacktrace = exception.full_message(highlight: false)
       if request.env['HTTP_ACCEPT'] == 'application/json'
         headers 'Content-Type' => 'application/json; charset=utf-8'
-        message = "error: #{exception&.message&.lines&.first&.strip || 'unexpected error'}"
+        message = exception.message.to_s
         json = { error: message, stacktrace: stacktrace }.compact.to_json
         body json
       else
-        message = "#{status} #{Rack::Utils::HTTP_STATUS_CODES[status]}"
         erb :error, locals: {
           resource_path_map: resource_path_map,
           title: "SQLUI #{message}",
-          message: message,
+          heading: "#{status} #{Rack::Utils::HTTP_STATUS_CODES[status]}",
+          message: exception.message,
           stacktrace: stacktrace
         }
       end
@@ -308,12 +365,6 @@ class Server < Sinatra::Base
   end
 
   private
-
-  def client_error(message, stacktrace: nil)
-    status(400)
-    headers 'Content-Type' => 'application/json; charset=utf-8'
-    body({ error: message, stacktrace: stacktrace }.compact.to_json)
-  end
 
   def find_selected_queries(full_sql, selection)
     if selection

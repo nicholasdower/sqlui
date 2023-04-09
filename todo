@@ -61,3 +61,5 @@ enable save only when file differs from editor
 allow multiple saved configs per db connection
 limit github access to listed repos
 add ability to copy graph image to clipboard with keyboard
+add a not found page
+handle windows newlines in original saved file. Right now we assume they should be replaced. See POST save-file in server.rb.
