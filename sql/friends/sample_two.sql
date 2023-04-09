@@ -1,4 +1,5 @@
 -- Selects all characters.
+-- And more.
 select
   *
 from characters
