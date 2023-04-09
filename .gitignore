@@ -1,12 +1,1 @@
-/.bundle*
-/.idea
-/*.gem
-/node_modules
-/client/resources/sqlui.js
-/vendor
-/.install*
-/envs/*
-!/envs/development
-!/envs/test
-/logs
-.DS_Store
+oh, hi
