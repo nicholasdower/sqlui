@@ -1,3 +1,14 @@
+## 0.1.72
+
+- Restyle and display previews in saved tab.
+- Add app logo to header, use new Squealy logo.
+- Improve keyboard navigation.
+  - Restyle focus.
+  - Enable keyboard navigation on databases.
+  - Enable tab navigation via ctrl+[ and ctrl+] on Mac.
+- Display current saved file in query and graph tab.
+- Add ability to save edited saved files via a commit.
+
 ## 0.1.71
 
 - Fix bug where the GitHub cache became corrupted.
