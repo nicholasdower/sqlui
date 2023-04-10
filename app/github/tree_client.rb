@@ -116,8 +116,8 @@ module Github
         {
           message: message,
           author: {
-            name: 'SQLUI',
-            email: 'nicholasdower+sqlui@gmail.com',
+            name: author_name,
+            email: author_email,
             date: Time.now.iso8601
           },
           parents: [
