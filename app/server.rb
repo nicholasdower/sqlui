@@ -19,6 +19,7 @@ require_relative 'github/paths'
 require_relative 'github/tree'
 require_relative 'github/tree_client'
 require_relative 'mysql_types'
+require_relative 'pigs'
 require_relative 'sql_parser'
 require_relative 'sqlui'
 require_relative 'version'
@@ -34,9 +35,6 @@ class Server < Sinatra::Base
       @status = status
     end
   end
-
-  PIGS = %w[babe misery piglet snowball squealer wilbur napoleon porky miss-piggy petunia betina belinda].freeze
-  private_constant :PIGS
 
   def self.init_and_run(config, resources_dir, github_cache)
     Sqlui.logger.info("Starting SQLUI v#{Version::SQLUI}")
@@ -317,8 +315,7 @@ class Server < Sinatra::Base
         raise ClientError, 'missing path' if (params[:path] || '').strip.empty?
         raise ClientError, 'missing content' if params[:path].nil?
 
-        # 12 pig names times 6 hex characters, 12 * 16^6 = 201,326,592 possibilities
-        branch = "#{PIGS.sample}-#{SecureRandom.hex(3)}"
+        branch = "sqlui-#{Pigs.generate_phrase}"
         tree_client = Github::TreeClient.new(
           access_token: database.saved_config.token,
           cache: github_cache,
