@@ -110,7 +110,8 @@ module Github
           ]
         }
       )
-      message = path.size > 43 ? "Update [...]#{path[-38..]}" : "Update #{path}"
+      basename = File.basename(path)
+      message = basename.size > 45 ? "Edit […]#{basename[-42..]}" : "Edit #{basename}"
       commit_response = @client.post(
         "https://api.github.com/repos/#{owner}/#{repo}/git/commits",
         {
