@@ -1,3 +1,7 @@
+## 0.1.73
+
+- Fix bug where Git commit author was hardcoded.
+
 ## 0.1.72
 
 - Restyle and display previews in saved tab.
