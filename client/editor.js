@@ -295,7 +295,7 @@ export function createEditor (parent, metadata, onSubmit, onShiftSubmit) {
         editorKeymap,
         sqlExtension,
         fixedHeightEditor,
-        placeholder('Let\'s query!')
+        placeholder('Let\'s squeal!')
       ]
     }),
     parent
