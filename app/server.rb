@@ -315,7 +315,7 @@ class Server < Sinatra::Base
         raise ClientError, 'missing path' if (params[:path] || '').strip.empty?
         raise ClientError, 'missing content' if params[:path].nil?
 
-        branch = "sqlui-#{Pigs.generate_phrase}"
+        branch = "sqlui/#{Pigs.generate_phrase}"
         tree_client = Github::TreeClient.new(
           access_token: database.saved_config.token,
           cache: github_cache,
