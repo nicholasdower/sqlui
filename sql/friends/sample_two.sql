@@ -1,4 +1,4 @@
--- Selects all characters.
+-- Selects all characters. yo
 select
   *
 from characters
