@@ -110,12 +110,14 @@ module Github
           ]
         }
       )
-      basename = File.basename(path)
-      message = basename.size > 45 ? "Edit […]#{basename[-42..]}" : "Edit #{basename}"
+      basename = ::File.basename(path)
+      message = basename.size <= 45 ? "Edit #{basename}" : "Edit #{basename[0...44]}…"
+      description = basename.size <= 45 ? nil : "…#{basename[45..]}"
       commit_response = @client.post(
         "https://api.github.com/repos/#{owner}/#{repo}/git/commits",
         {
           message: message,
+          description: description,
           author: {
             name: author_name,
             email: author_email,
