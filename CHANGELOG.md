@@ -1,3 +1,7 @@
+## 0.1.74
+
+- No changes.
+
 ## 0.1.73
 
 - Fix bug where Git commit author was hardcoded.
