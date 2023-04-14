@@ -49,7 +49,7 @@ See [development_config.yml](https://github.com/nicholasdower/sqlui/blob/master/
 name:          SQLUI                            # Server display name to be used in the UI.
 port:          8080                             # App port.
 environment:   development                      # App environment.
-base_url_path: /path                            # URL path used as the base for all app URLs.
+base_url_path: /sqlui                           # URL path used as the base for all app URLs.
 
 # Database Configurations
 databases:                                      # Map of database configurations.
@@ -74,13 +74,13 @@ databases:                                      # Map of database configurations
     owner:  nicholasdower                       # Repo owner.
     repo:   sqlui                               # Repo name.
     branch: master                              # Branch.
-    regex:  ^sql/friends/.*[.]sql$              # Regex used to match files.
+    regex:  ^sql/.*[.]sql$                      # Regex used to match files.
 
     # Table Configurations (Optional)
     tables:                                     # Map of table configurations.
       characters:                               # Table name.
         alias: c                                # Default table alias.
-        boost: 1                                # Auto-complete boost.
+        boost: 1                                # Auto-complete boost. -99 to 99.
       [...]
 
     # Column Configurations (Optional)
@@ -117,13 +117,13 @@ gem 'sqlui'
 ### Run the gem directly or via bundle if using a Gemfile
 
 ```shell
-sqlui config-file
+sqlui <config-file>
 ```
 
 or
 
 ```shell
-bundle exec sqlui config-file
+bundle exec sqlui <config-file>
 ```
 
 ## Development
@@ -152,7 +152,7 @@ make test
 
 ### Running The Server & Tests Outside of Docker
 
-It is also possible to run the server tests without Docker. Docker is still used for MySQL and browser tests.
+It is also possible to run the server and unit tests without Docker. Docker is still used for MySQL and browser tests.
 
 #### Install rvm (Ruby Version Manager)
 
