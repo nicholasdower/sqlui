@@ -27,7 +27,7 @@ module Github
     DEFAULT_MAX_TREE_CACHE_AGE_SECONDS = 60 * 5 # 5 minutes
     DEFAULT_MAX_FILE_CACHE_AGE_SECONDS = 60 * 60 * 24 * 7 # 1 week
 
-    MAX_TREE_SIZE = 50
+    MAX_TREE_SIZE = 100
     private_constant :MAX_TREE_SIZE
 
     def initialize(access_token:, cache:, logger: Logger.new($stdout))
@@ -64,7 +64,7 @@ module Github
         end
       end
 
-      latch.await(timeout: 10)
+      latch.await(timeout: 20)
       raise 'failed to load saved files' unless response['tree'].all? { |blob| blob['content'] }
 
       Tree.for(owner: owner, repo: repo, ref: ref, tree_response: response)
