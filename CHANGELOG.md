@@ -1,3 +1,7 @@
+## 0.1.76
+
+- Allow 100 instead of 50 saved files.
+
 ## 0.1.75
 
 - No changes.
