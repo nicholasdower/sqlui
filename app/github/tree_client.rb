@@ -25,10 +25,7 @@ module Github
     end
 
     DEFAULT_MAX_TREE_CACHE_AGE_SECONDS = 60 * 5 # 5 minutes
-    DEFAULT_MAX_FILE_CACHE_AGE_SECONDS = 60 * 60 * 24 * 7 # 1 week
-
-    MAX_TREE_SIZE = 100
-    private_constant :MAX_TREE_SIZE
+    DEFAULT_MAX_FILE_CACHE_AGE_SECONDS = 60 * 60 * 24 * 365 # 1 year
 
     def initialize(access_token:, cache:, logger: Logger.new($stdout))
       check_non_empty_string(access_token: access_token)
@@ -52,9 +49,8 @@ module Github
                  end
 
       response['tree'] = response['tree'].select { |blob| regex.match?(blob['path']) }
-      raise "trees with more than #{MAX_TREE_SIZE} blobs not supported" if response['tree'].size > MAX_TREE_SIZE
-
-      latch = CountDownLatch.new(response['tree'].size)
+      tree_size = response['tree'].size
+      latch = CountDownLatch.new(tree_size)
       response['tree'].each do |blob|
         TreeClient.thread_pool.post do
           blob['content'] =
@@ -64,7 +60,7 @@ module Github
         end
       end
 
-      latch.await(timeout: 20)
+      latch.await(timeout: [10, tree_size / 2].max)
       raise 'failed to load saved files' unless response['tree'].all? { |blob| blob['content'] }
 
       Tree.for(owner: owner, repo: repo, ref: ref, tree_response: response)

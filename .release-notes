@@ -1,1 +1,2 @@
-- No changes.
+- Prefetch saved files to improve load time.
+- Cache saved file contents indefinitely.

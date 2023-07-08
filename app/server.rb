@@ -114,6 +114,21 @@ class Server < Sinatra::Base
     end
 
     config.database_configs.each do |database|
+      # Prefetch all trees on startup. This should happen before the health endpoint is available.
+      if (saved_config = database.saved_config)
+        tree_client = Github::TreeClient.new(
+          access_token: database.saved_config.token,
+          cache: github_cache,
+          logger: Sqlui.logger
+        )
+        tree_client.get_tree(
+          owner: saved_config.owner,
+          repo: saved_config.repo,
+          ref: saved_config.branch,
+          regex: saved_config.regex
+        )
+      end
+
       get "#{config.base_url_path}/#{database.url_path}/?" do
         redirect "#{database.url_path}/query", 301
       end
@@ -121,11 +136,6 @@ class Server < Sinatra::Base
       post "#{config.base_url_path}/#{database.url_path}/metadata" do
         tree = nil
         if (saved_config = database.saved_config)
-          tree_client = Github::TreeClient.new(
-            access_token: database.saved_config.token,
-            cache: github_cache,
-            logger: Sqlui.logger
-          )
           tree = tree_client.get_tree(
             owner: saved_config.owner,
             repo: saved_config.repo,
