@@ -1,3 +1,8 @@
+## 0.1.77
+
+- Prefetch saved files to improve load time.
+- Cache saved file contents indefinitely.
+
 ## 0.1.76
 
 - Allow 100 instead of 50 saved files.

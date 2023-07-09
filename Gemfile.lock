@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqlui (0.1.76)
+    sqlui (0.1.77)
       activesupport (~> 7.0)
       airbrake (~> 13.0)
       concurrent-ruby (~> 1.0)
