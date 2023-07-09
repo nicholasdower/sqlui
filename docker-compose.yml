@@ -18,6 +18,8 @@ services:
       timeout: 2s
       retries: 10
       start_period: 10s
+    networks:
+      - sqlui
   sqlui_server:
     container_name: sqlui_server
     image: nicholasdower/sqlui:latest
@@ -35,6 +37,8 @@ services:
       timeout: 1s
       retries: 5
       start_period: 10s
+    networks:
+      - sqlui
   sqlui_hub:
     container_name: sqlui_hub
     image: selenium/hub:latest
@@ -45,6 +49,8 @@ services:
       GRID_TIMEOUT: 10000
     ports:
       - "4444:4444"
+    networks:
+      - sqlui
   sqlui_node-chrome:
     container_name: sqlui_node_chrome
     image: selenium/node-chrome:latest
@@ -55,3 +61,8 @@ services:
       SE_VNC_NO_PASSWORD: 1
     volumes:
       - /dev/shm:/dev/shm
+    networks:
+      - sqlui
+networks:
+  sqlui:
+    name: 'sqlui'

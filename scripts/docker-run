@@ -11,4 +11,4 @@ interactive=""
 if [ -t 0 ]; then
   interactive="--tty --interactive"
 fi
-docker run --rm $interactive --network sqlui_default --volume $root_dir:/sqlui --workdir /sqlui $@
+docker run --rm $interactive --network sqlui --volume $root_dir:/sqlui --workdir /sqlui $@

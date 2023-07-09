@@ -152,7 +152,7 @@ watch-test:
 .PHONY: stop
 stop:
 	docker compose down
-	@docker network rm sqlui_default 2> /dev/null || true
+	@docker network rm sqlui 2> /dev/null || true
 
 .PHONY: kill
 kill:
@@ -162,7 +162,7 @@ kill:
 	@docker kill sqlui_hub 2> /dev/null || true
 	@docker kill sqlui_test 2> /dev/null || true
 	@docker compose down 2> /dev/null || true
-	@docker network rm sqlui_default 2> /dev/null || true
+	@docker network rm sqlui 2> /dev/null || true
 
 .PHONY: remvove-containers
 remove-containers:
