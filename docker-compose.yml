@@ -66,3 +66,4 @@ services:
 networks:
   sqlui:
     name: 'sqlui'
+    external: true
