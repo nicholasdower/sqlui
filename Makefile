@@ -90,6 +90,7 @@ start-db: db-logs
 
 .PHONY: start-db-detached
 start-db-detached: db-logs
+	./scripts/create-docker-network
 	./scripts/docker-compose-up-detach sqlui_db
 	./scripts/await-healthy-container sqlui_db
 
