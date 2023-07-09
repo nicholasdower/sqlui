@@ -36,7 +36,7 @@ class Server < Sinatra::Base
     end
   end
 
-  def self.init_and_run(config, resources_dir, github_cache)
+  def self.init_and_run(config, resources_dir)
     Sqlui.logger.info("Starting SQLUI v#{Version::SQLUI}")
     Sqlui.logger.info("Airbrake enabled: #{config.airbrake[:server]&.[](:enabled) || false}")
 
@@ -113,6 +113,7 @@ class Server < Sinatra::Base
       erb :databases, locals: { config: config, resource_path_map: resource_path_map }
     end
 
+    github_cache = create_github_cache
     config.database_configs.each do |database|
       # Prefetch all trees on startup. This should happen before the health endpoint is available.
       if (saved_config = database.saved_config)
@@ -371,7 +372,31 @@ class Server < Sinatra::Base
     run!
   end
 
-  private
+  def self.create_github_cache
+    return Github::Cache.new({}, logger: Sqlui.logger) unless ENV['USE_LOCAL_SAVED_FILES']
+
+    paths = Dir.glob('sql/**/*.sql')
+    blobs = paths.map { |path| { 'path' => path, 'sha' => 'foo' } }
+    github_cache_hash = {
+      'https://api.github.com/repos/nicholasdower/sqlui/git/trees/master?recursive=true' =>
+        Github::Cache::Entry.new(
+          {
+            'sha' => 'foo',
+            'truncated' => false,
+            'tree' => blobs
+          }, 60 * 60 * 24 * 365
+        )
+    }
+    paths.each do |path|
+      github_cache_hash["https://api.github.com/repos/nicholasdower/sqlui/contents/#{path}?ref=foo"] =
+        Github::Cache::Entry.new(
+          {
+            'content' => Base64.encode64(File.read(path))
+          }, 60 * 60 * 24 * 365
+        )
+    end
+    Github::Cache.new(github_cache_hash, logger: Sqlui.logger)
+  end
 
   def find_selected_queries(full_sql, selection)
     if selection

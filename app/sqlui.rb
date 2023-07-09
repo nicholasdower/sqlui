@@ -28,7 +28,7 @@ class Sqlui
   end
 
   def run
-    Server.init_and_run(@config, @resources_dir, github_cache)
+    Server.init_and_run(@config, @resources_dir)
   end
 
   def self.from_command_line(args)
@@ -41,33 +41,5 @@ class Sqlui
     raise 'configuration file does not exist' unless File.exist?(args[0])
 
     Sqlui.new(args[0])
-  end
-
-  private
-
-  def github_cache
-    return Github::Cache.new({}, logger: Sqlui.logger) unless ENV['USE_LOCAL_SAVED_FILES']
-
-    paths = Dir.glob('sql/friends/*.sql')
-    blobs = paths.map { |path| { 'path' => path, 'sha' => 'foo' } }
-    github_cache_hash = {
-      'https://api.github.com/repos/nicholasdower/sqlui/git/trees/master?recursive=true' =>
-        Github::Cache::Entry.new(
-          {
-            'sha' => 'foo',
-            'truncated' => false,
-            'tree' => blobs
-          }, 60 * 60 * 24 * 365
-        )
-    }
-    paths.each do |path|
-      github_cache_hash["https://api.github.com/repos/nicholasdower/sqlui/contents/#{path}?ref=foo"] =
-        Github::Cache::Entry.new(
-          {
-            'content' => Base64.encode64(File.read(path))
-          }, 60 * 60 * 24 * 365
-        )
-    end
-    Github::Cache.new(github_cache_hash, logger: Sqlui.logger)
   end
 end
