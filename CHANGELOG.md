@@ -1,3 +1,8 @@
+## 0.1.79
+
+- Improve saved file prefetching to reduce chances of startup failures.
+- Remove alias autocomplete. Rarely used and no longer works.
+
 ## 0.1.78
 
 - No changes.
