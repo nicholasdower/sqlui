@@ -1,7 +1,11 @@
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import postcss from 'rollup-plugin-postcss';
+'use strict';
 
-export default {
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var pluginNodeResolve = require('@rollup/plugin-node-resolve');
+var postcss = require('rollup-plugin-postcss');
+
+var rollup_config = {
   input: 'client/sqlui.js',
   output: {
     file: 'client/resources/sqlui.js',
@@ -12,9 +16,11 @@ export default {
     }
   },
   plugins: [
-    nodeResolve(),
+    pluginNodeResolve.nodeResolve(),
     postcss({
       modules: true,
     })
   ]
 };
+
+exports.default = rollup_config;
