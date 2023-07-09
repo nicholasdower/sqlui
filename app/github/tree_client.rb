@@ -18,7 +18,7 @@ module Github
   class TreeClient
     include Checks
 
-    @thread_pool = Concurrent::FixedThreadPool.new(5)
+    @thread_pool = Concurrent::FixedThreadPool.new(3)
 
     class << self
       attr_reader :thread_pool
@@ -60,7 +60,7 @@ module Github
         end
       end
 
-      latch.await(timeout: [10, tree_size / 2].max)
+      latch.await(timeout: 10 + tree_size)
       raise 'failed to load saved files' unless response['tree'].all? { |blob| blob['content'] }
 
       Tree.for(owner: owner, repo: repo, ref: ref, tree_response: response)
