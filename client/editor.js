@@ -73,15 +73,6 @@ export function createEditor (parent, metadata, onSubmit, onShiftSubmit) {
           quoted: `${quotedQualifiedTableName} \`${alias}\``,
           unquoted: `${qualifiedTableName} ${alias}`
         })
-        // Add a completion which only inserts the alias for use with "select" or "where" or "on".
-        tables.push({
-          label: `${qualifiedTableName} ${alias}`,
-          boost: boost + 1,
-          type: 'constant',
-          completion_types: ['alias_only'],
-          quoted: '`' + alias + '`',
-          unquoted: alias
-        })
         tables.push({
           label: alias,
           boost: boost + 1,
