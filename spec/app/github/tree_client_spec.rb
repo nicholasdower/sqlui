@@ -31,9 +31,18 @@ describe Github::TreeClient do
           'sha' => 'some_sha',
           'truncated' => false,
           'tree' => [
-            { 'path' => 'some_path' },
-            { 'path' => 'some_other_path' },
-            { 'path' => 'not_a_match' }
+            {
+              'path' => 'some_path',
+              'url' => 'https://api.github.com/repos/some_owner/some_repo/git/blobs/sha_one'
+            },
+            {
+              'path' => 'some_other_path',
+              'url' => 'https://api.github.com/repos/some_owner/some_repo/git/blobs/sha_two'
+            },
+            {
+              'path' => 'not_a_match',
+              'url' => 'https://api.github.com/repos/some_owner/some_repo/git/blobs/sha_three'
+            }
           ]
         }
       end
@@ -63,7 +72,7 @@ describe Github::TreeClient do
         allow(caching_client)
           .to receive(:get_with_caching)
           .with(
-            'https://api.github.com/repos/some_owner/some_repo/contents/some_path?ref=some_sha',
+            'https://api.github.com/repos/some_owner/some_repo/git/blobs/sha_one',
             cache_for: Github::TreeClient::DEFAULT_MAX_FILE_CACHE_AGE_SECONDS
           )
           .and_return({ 'content' => Base64.encode64('some_content') })
@@ -71,7 +80,7 @@ describe Github::TreeClient do
         allow(caching_client)
           .to receive(:get_with_caching)
           .with(
-            'https://api.github.com/repos/some_owner/some_repo/contents/some_other_path?ref=some_sha',
+            'https://api.github.com/repos/some_owner/some_repo/git/blobs/sha_two',
             cache_for: Github::TreeClient::DEFAULT_MAX_FILE_CACHE_AGE_SECONDS
           )
           .and_return({ 'content' => Base64.encode64('some_other_content') })

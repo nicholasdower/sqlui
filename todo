@@ -66,4 +66,3 @@ handle windows newlines in original saved file. Right now we assume they should 
 add base url to config, use to link to branch/query in Git commits.
 sort saved files by directory
 add dashboards support with tables and graphs based on queries
-when on a page other than the first, the popup shows values from the first page. Same for copy to clipboard.

@@ -53,8 +53,8 @@ module Github
       latch = CountDownLatch.new(tree_size)
       response['tree'].each do |blob|
         TreeClient.thread_pool.post do
-          blob['content'] =
-            get_file_content_with_caching(owner: owner, repo: repo, path: blob['path'], ref: response['sha'])
+          blob_response = @client.get_with_caching(blob['url'], cache_for: DEFAULT_MAX_FILE_CACHE_AGE_SECONDS)
+          blob['content'] = Base64.decode64(blob_response['content'])
         ensure
           latch.count_down
         end
@@ -132,19 +132,6 @@ module Github
           sha: check_non_empty_string(sha: commit_response['sha'])
         }
       )
-    end
-
-    private
-
-    # Returns the contents of the file at the specified path. Uses the cache.
-    def get_file_content_with_caching(owner:, repo:, path:, ref:)
-      check_non_empty_string(owner: owner, repo: repo, sha: ref, path: path)
-
-      response = @client.get_with_caching(
-        "https://api.github.com/repos/#{owner}/#{repo}/contents/#{path}?ref=#{ref}",
-        cache_for: DEFAULT_MAX_FILE_CACHE_AGE_SECONDS
-      )
-      Base64.decode64(response['content'])
     end
   end
 end

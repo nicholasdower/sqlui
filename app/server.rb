@@ -123,7 +123,6 @@ class Server < Sinatra::Base
         )
         # Prefetch all trees on startup. This should happen before the health endpoint is available.
         unless ENV.fetch('DISABLE_PREFETCH', '0') == '1'
-          Sqlui.logger.info 'prefetch'
           tree_client.get_tree(
             owner: saved_config.owner,
             repo: saved_config.repo,
@@ -379,7 +378,12 @@ class Server < Sinatra::Base
     return Github::Cache.new({}, logger: Sqlui.logger) unless ENV['USE_LOCAL_SAVED_FILES']
 
     paths = Dir.glob('sql/**/*.sql')
-    blobs = paths.map { |path| { 'path' => path, 'sha' => 'foo' } }
+    blobs = paths.map do |path|
+      {
+        'path' => path,
+        'url' => "https://api.github.com/repos/nicholasdower/sqlui/git/blobs/#{Base64.encode64(path)}"
+      }
+    end
     github_cache_hash = {
       'https://api.github.com/repos/nicholasdower/sqlui/git/trees/master?recursive=true' =>
         Github::Cache::Entry.new(
@@ -391,7 +395,7 @@ class Server < Sinatra::Base
         )
     }
     paths.each do |path|
-      github_cache_hash["https://api.github.com/repos/nicholasdower/sqlui/contents/#{path}?ref=foo"] =
+      github_cache_hash["https://api.github.com/repos/nicholasdower/sqlui/git/blobs/#{Base64.encode64(path)}"] =
         Github::Cache::Entry.new(
           {
             'content' => Base64.encode64(File.read(path))
