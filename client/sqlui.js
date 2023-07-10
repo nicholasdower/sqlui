@@ -1028,7 +1028,8 @@ function registerTableCellPopup (tableElement) {
 
       if (node.tagName.toLowerCase() === 'td') {
         if (event.type === 'mousedown' && node.dataset.row) {
-          const row = parseInt(node.dataset.row)
+          const rowOffset = window.sqlFetch.page * PAGE_SIZE
+          const row = rowOffset + parseInt(node.dataset.row)
           const column = parseInt(node.dataset.column)
           const title = window.sqlFetch.result.columns[column].replaceAll('\n', '¶')
           if (event.metaKey || event.ctrlKey) {
