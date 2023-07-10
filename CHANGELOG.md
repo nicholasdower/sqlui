@@ -1,3 +1,7 @@
+## 0.1.82
+
+- Cache saved files based on file contents not file tree contents.
+
 ## 0.1.81
 
 - Fix bug where first page cell contents were dispayed in popup and copied to clipboard even when not on first page.
