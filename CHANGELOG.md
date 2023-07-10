@@ -1,3 +1,7 @@
+## 0.1.80
+
+- Allow prefetching to be disabled.
+
 ## 0.1.79
 
 - Improve saved file prefetching to reduce chances of startup failures.
