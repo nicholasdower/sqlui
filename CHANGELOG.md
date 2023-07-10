@@ -1,3 +1,7 @@
+## 0.1.81
+
+- Fix bug where first page cell contents were dispayed in popup and copied to clipboard even when not on first page.
+
 ## 0.1.80
 
 - Allow prefetching to be disabled.
