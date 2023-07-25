@@ -78,12 +78,12 @@ function init (parent, onSubmit, onShiftSubmit) {
 
   addEventListener('#submit-dropdown-button-copy-csv', 'click', () => {
     if (window.sqlFetch?.result) {
-      copyTextToClipboard(toCsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
+      copyTextToClipboard(toCsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows) + '\n')
     }
   })
   addEventListener('#submit-dropdown-button-copy-tsv', 'click', () => {
     if (window.sqlFetch?.result) {
-      copyTextToClipboard(toTsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows))
+      copyTextToClipboard(toTsv(window.sqlFetch.result.columns, window.sqlFetch.result.rows) + '\n')
     }
   })
   addEventListener('#first-button', 'click', () => {
