@@ -1,3 +1,7 @@
+## 0.1.83
+
+- Add newline to csv/tsv.
+
 ## 0.1.82
 
 - Cache saved files based on file contents not file tree contents.
