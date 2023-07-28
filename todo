@@ -66,3 +66,5 @@ handle windows newlines in original saved file. Right now we assume they should 
 add base url to config, use to link to branch/query in Git commits.
 sort saved files by directory
 add dashboards support with tables and graphs based on queries
+allow splitting a query out so that a second query can be run and compared.
+allow overriding of api uri. allow cross-domain xhr
