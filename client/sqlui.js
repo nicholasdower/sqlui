@@ -550,6 +550,10 @@ function selectSavedTab () {
     const viewUrl = new URL(window.location.origin + window.location.pathname)
     setActionInUrl(viewUrl, 'query')
     viewUrl.searchParams.set('file', file.filename)
+    const params = new URL(window.location).searchParams
+    if (params.has('title')) {
+      viewUrl.searchParams.set('title', params.get('title'))
+    }
 
     const nameElement = document.createElement('a')
     nameElement.classList.add('saved-name')
@@ -1402,8 +1406,16 @@ window.onload = function () {
             window.metadata = result
             document.getElementById('loading-box').style.display = 'none'
             document.getElementById('main-box').style.display = 'flex'
-            document.getElementById('server-name').innerText = window.metadata.server
-            document.title = `SQLUI ${window.metadata.server}`
+
+            const params = new URL(window.location).searchParams
+            if (params.has('title')) {
+              const title = params.get('title')
+              document.title = `${title}`
+              document.getElementById('server-name').innerText = `${window.metadata.server} - ${title}`
+            } else {
+              document.title = `SQLUI ${window.metadata.server}`
+              document.getElementById('server-name').innerText = window.metadata.server
+            }
             document.getElementById('header-link').href = result.base_url_path
             const queryElement = document.getElementById('query')
 
