@@ -1,3 +1,7 @@
+## 0.1.84
+
+- Allow a custom title to be set via the "title" URL parameter.
+
 ## 0.1.83
 
 - Add newline to csv/tsv.
