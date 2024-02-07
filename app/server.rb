@@ -7,6 +7,7 @@ require 'erb'
 require 'json'
 require 'prometheus/middleware/collector'
 require 'prometheus/middleware/exporter'
+require 'rack'
 require 'securerandom'
 require 'sinatra/base'
 require 'uri'
@@ -63,6 +64,7 @@ class Server < Sinatra::Base
     use Rack::Deflater
     use Prometheus::Middleware::Collector
     use Prometheus::Middleware::Exporter
+    use Rack::RewindableInput::Middleware
 
     Mysql2::Client.default_query_options[:as] = :array
     Mysql2::Client.default_query_options[:cast_booleans] = true

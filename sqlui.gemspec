@@ -28,7 +28,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'concurrent-ruby',   '~>  1.0'
   spec.add_dependency 'mysql2',            '~>  0.0'
   spec.add_dependency 'prometheus-client', '~>  4.0'
+  spec.add_dependency 'rackup',            '~>  2.0'
   spec.add_dependency 'rest-client',       '~>  2.0'
-  spec.add_dependency 'sinatra',           '~>  3.0'
+  spec.add_dependency 'sinatra',           '~>  4.0'
   spec.add_dependency 'webrick',           '~>  1.0'
 end
