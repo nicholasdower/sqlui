@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ruby:3.0
+FROM ruby:3.3
 RUN curl -sL https://deb.nodesource.com/setup_19.x | bash -
 
 RUN apt-get update -qq

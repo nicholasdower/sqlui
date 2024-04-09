@@ -161,7 +161,7 @@ See https://rvm.io/rvm/install
 #### Install Ruby
 
 ```shell
-rvm install ruby-3.0.0
+rvm install ruby-3.3.0
 rvm use
 ```
 

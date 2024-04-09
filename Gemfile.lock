@@ -139,6 +139,7 @@ GEM
     websocket (1.2.10)
 
 PLATFORMS
+  arm64-darwin-23
   x86_64-darwin-20
   x86_64-linux
 
