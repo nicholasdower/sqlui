@@ -52,7 +52,7 @@ class Server < Sinatra::Base
         c.environment = config.environment
         c.logger.level = Logger::DEBUG if config.environment != :production?
         config.airbrake[:server].each do |key, value|
-          c.send("#{key}=".to_sym, value) unless key == :enabled
+          c.send(:"#{key}=", value) unless key == :enabled
         end
       end
       Airbrake.add_filter(Airbrake::Rack::RequestBodyFilter.new)
@@ -112,7 +112,7 @@ class Server < Sinatra::Base
 
     get "#{config.base_url_path}/?" do
       headers 'Cache-Control' => 'no-cache'
-      erb :databases, locals: { config: config, resource_path_map: resource_path_map }
+      erb :databases, locals: { config:, resource_path_map: }
     end
 
     github_cache = create_github_cache
@@ -153,9 +153,9 @@ class Server < Sinatra::Base
             raise ClientError, "invalid repo: #{repo}" unless tree.repo == repo
 
             requested_tree = tree_client.get_tree(
-              owner: owner,
-              repo: repo,
-              ref: ref,
+              owner:,
+              repo:,
+              ref:,
               regex: /#{Regexp.escape(path)}/,
               cache: ref == tree.ref
             )
@@ -211,12 +211,12 @@ class Server < Sinatra::Base
             rescue Mysql2::Error => e
               stacktrace = e.full_message(highlight: false)
               message = "ERROR #{e.error_number} (#{e.sql_state}): #{e.message.lines.first&.strip || 'unknown error'}"
-              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              out << { error: message, stacktrace: }.compact.to_json
               break
             rescue StandardError => e
               stacktrace = e.full_message(highlight: false)
               message = e.message.lines.first&.strip || 'unknown error'
-              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              out << { error: message, stacktrace: }.compact.to_json
               break
             end
 
@@ -295,12 +295,12 @@ class Server < Sinatra::Base
             rescue Mysql2::Error => e
               stacktrace = e.full_message(highlight: false)
               message = "ERROR #{e.error_number} (#{e.sql_state}): #{e.message.lines.first&.strip || 'unknown error'}"
-              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              out << { error: message, stacktrace: }.compact.to_json
               break
             rescue StandardError => e
               stacktrace = e.full_message(highlight: false)
               message = e.message.lines.first&.strip || 'unknown error'
-              out << { error: message, stacktrace: stacktrace }.compact.to_json
+              out << { error: message, stacktrace: }.compact.to_json
               break
             end
             out << CSV::Row.new(query_result.fields, query_result.fields, header_row: true).to_s.strip
@@ -320,7 +320,7 @@ class Server < Sinatra::Base
           airbrake_enabled: client_config[:enabled] || false,
           airbrake_project_id: client_config[:project_id] || '',
           airbrake_project_key: client_config[:project_key] || '',
-          resource_path_map: resource_path_map
+          resource_path_map:
         }
       end
 
@@ -340,7 +340,7 @@ class Server < Sinatra::Base
           owner: saved_config.owner,
           repo: saved_config.repo,
           base_sha: params[:base_sha],
-          branch: branch,
+          branch:,
           path: params[:path],
           content: params[:content].gsub("\r\n", "\n"),
           author_name: database.saved_config.author_name,
@@ -348,7 +348,7 @@ class Server < Sinatra::Base
         )
         status 201
         erb :redirect, locals: {
-          resource_path_map: resource_path_map,
+          resource_path_map:,
           location: "https://github.com/#{saved_config.owner}/#{saved_config.repo}/compare/#{branch}"
         }
       end
@@ -360,15 +360,15 @@ class Server < Sinatra::Base
       if request.env['HTTP_ACCEPT'] == 'application/json'
         headers 'Content-Type' => 'application/json; charset=utf-8'
         message = exception.message.to_s
-        json = { error: message, stacktrace: stacktrace }.compact.to_json
+        json = { error: message, stacktrace: }.compact.to_json
         body json
       else
         erb :error, locals: {
-          resource_path_map: resource_path_map,
+          resource_path_map:,
           title: "SQLUI #{message}",
           heading: "#{status} #{Rack::Utils::HTTP_STATUS_CODES[status]}",
           message: exception.message,
-          stacktrace: stacktrace
+          stacktrace:
         }
       end
     end

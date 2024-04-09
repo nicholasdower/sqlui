@@ -10,7 +10,7 @@ module Github
     attr_reader :full_path, :path, :tree_sha, :content, :github_url
 
     def initialize(owner:, repo:, ref:, tree_sha:, path:, content:)
-      check_non_empty_string(owner: owner, repo: repo, ref: ref, path: path, tree_sha: tree_sha)
+      check_non_empty_string(owner:, repo:, ref:, path:, tree_sha:)
       @full_path = "#{owner}/#{repo}/#{ref}/#{path}"
       @path = path
       @tree_sha = tree_sha

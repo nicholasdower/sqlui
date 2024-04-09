@@ -5,7 +5,7 @@ require_relative '../../app/deep'
 
 describe 'deep' do
   describe '#deep_set' do
-    subject { target.deep_set(*path, value: value) }
+    subject { target.deep_set(*path, value:) }
 
     context 'when the path references a top level key' do
       let(:target) { { a: 1 } }
@@ -53,7 +53,7 @@ describe 'deep' do
     end
 
     context 'when the path is empty' do
-      subject { target.deep_set(value: value) }
+      subject { target.deep_set(value:) }
       let(:target) { { a: 1 } }
       let(:value) { 2 }
 
@@ -72,7 +72,7 @@ describe 'deep' do
     end
 
     context 'when the path is invalid' do
-      subject { target.deep_set(*path, value: value) }
+      subject { target.deep_set(*path, value:) }
       let(:target) { { a: {} } }
       let(:path) { %i[a b c] }
       let(:value) { 2 }
@@ -92,7 +92,7 @@ describe 'deep' do
     end
 
     context 'when the path references a value which is not a hash' do
-      subject { target.deep_set(*path, value: value) }
+      subject { target.deep_set(*path, value:) }
       let(:target) { { a: { b: 1 } } }
       let(:path) { %i[a b c] }
       let(:value) { 2 }

@@ -13,12 +13,12 @@ module Github
     include Checks
 
     def initialize(access_token:, logger: Logger.new($stdout))
-      @access_token = check_non_empty_string(access_token: access_token)
-      @logger = check_non_nil(logger: logger)
+      @access_token = check_non_empty_string(access_token:)
+      @logger = check_non_nil(logger:)
     end
 
     def get(url)
-      check_non_empty_string(url: url)
+      check_non_empty_string(url:)
 
       @logger.info "#{self.class} GET #{url}"
       response = RestClient.get(
@@ -39,7 +39,7 @@ module Github
     end
 
     def post(url, request)
-      check_non_empty_string(url: url)
+      check_non_empty_string(url:)
       check_is_a(request: [Hash, request])
 
       @logger.info "#{self.class} POST #{url}"

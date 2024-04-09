@@ -13,7 +13,7 @@ class TestResponse < String
 end
 
 describe Github::Client do
-  let(:client) { Github::Client.new(access_token: access_token) }
+  let(:client) { Github::Client.new(access_token:) }
   let(:access_token) { 'some token' }
 
   describe '#get' do

@@ -16,8 +16,8 @@ module Github
     end
 
     def get_with_caching(url, cache_for:)
-      check_non_empty_string(url: url)
-      check_positive_integer(cache_for: cache_for)
+      check_non_empty_string(url:)
+      check_positive_integer(cache_for:)
 
       if (cache_entry = @cache[url])
         return cache_entry.value.deep_dup
@@ -29,7 +29,7 @@ module Github
     end
 
     def get_without_caching(url)
-      check_non_empty_string(url: url)
+      check_non_empty_string(url:)
       @client.get(url)
     end
 

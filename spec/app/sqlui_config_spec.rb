@@ -258,7 +258,7 @@ describe SqluiConfig do
   end
 
   describe '#database_config_for' do
-    subject { sqlui_config.database_config_for(url_path: url_path) }
+    subject { sqlui_config.database_config_for(url_path:) }
 
     context 'when path exists' do
       let(:url_path) { 'db/path' }

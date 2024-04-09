@@ -3,7 +3,6 @@
 
 require 'find'
 require 'optparse'
-require 'set'
 
 # Runs the specified command and restarts it when files in the specified directories change.
 class Watcher

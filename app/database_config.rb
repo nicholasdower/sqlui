@@ -2,7 +2,6 @@
 
 require 'json'
 require 'mysql2'
-require 'set'
 
 require_relative 'args'
 require_relative 'saved_config'

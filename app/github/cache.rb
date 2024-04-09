@@ -16,15 +16,15 @@ module Github
       attr_accessor :value, :expires_at
 
       def initialize(value, max_age_seconds)
-        @value = check_non_nil(value: value)
-        @expires_at = Time.now + check_positive_integer(max_age_seconds: max_age_seconds)
+        @value = check_non_nil(value:)
+        @expires_at = Time.now + check_positive_integer(max_age_seconds:)
       end
     end
 
     def initialize(hash, logger: Logger.new($stdout))
       @mutex = Mutex.new
       @hash = check_is_a(hash: [Hash, hash])
-      @logger = check_non_nil(logger: logger)
+      @logger = check_non_nil(logger:)
     end
 
     def [](key)

@@ -28,15 +28,15 @@ module Github
     DEFAULT_MAX_FILE_CACHE_AGE_SECONDS = 60 * 60 * 24 * 365 # 1 year
 
     def initialize(access_token:, cache:, logger: Logger.new($stdout))
-      check_non_empty_string(access_token: access_token)
+      check_non_empty_string(access_token:)
       check_is_a(cache: [Cache, cache])
 
-      @client = Github::CachingClient.new(Github::Client.new(access_token: access_token, logger: logger), cache)
-      @logger = check_non_nil(logger: logger)
+      @client = Github::CachingClient.new(Github::Client.new(access_token:, logger:), cache)
+      @logger = check_non_nil(logger:)
     end
 
     def get_tree(owner:, repo:, ref:, regex:, cache: true)
-      check_non_empty_string(owner: owner, repo: repo, ref: ref)
+      check_non_empty_string(owner:, repo:, ref:)
       check_is_a(regex: [Regexp, regex])
 
       response = if cache
@@ -63,19 +63,19 @@ module Github
       latch.await(timeout: 10 + tree_size)
       raise 'failed to load saved files' unless response['tree'].all? { |blob| blob['content'] }
 
-      Tree.for(owner: owner, repo: repo, ref: ref, tree_response: response)
+      Tree.for(owner:, repo:, ref:, tree_response: response)
     end
 
     def create_commit_with_file(owner:, repo:, base_sha:, branch:, path:, content:, author_name:, author_email:)
       check_non_empty_string(
-        owner: owner,
-        repo: repo,
-        base_sha: base_sha,
-        branch: branch,
-        path: path,
-        content: content,
-        author_name: author_name,
-        author_email: author_email
+        owner:,
+        repo:,
+        base_sha:,
+        branch:,
+        path:,
+        content:,
+        author_name:,
+        author_email:
       )
 
       begin
@@ -98,7 +98,7 @@ module Github
           base_tree: base_sha,
           tree: [
             {
-              path: path,
+              path:,
               mode: '100644',
               type: 'blob',
               sha: check_non_empty_string(sha: blob_response['sha'])
@@ -112,8 +112,8 @@ module Github
       commit_response = @client.post(
         "https://api.github.com/repos/#{owner}/#{repo}/git/commits",
         {
-          message: message,
-          description: description,
+          message:,
+          description:,
           author: {
             name: author_name,
             email: author_email,

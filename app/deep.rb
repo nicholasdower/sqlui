@@ -15,7 +15,7 @@ class Hash
       raise KeyError, "key not found: #{path[0]}" unless key?(path[0])
       raise ArgumentError, "value for key is not a hash: #{path[0]}" unless self.[](path[0]).is_a?(Hash)
 
-      self.[](path[0]).deep_set(*path[1..], value: value)
+      self.[](path[0]).deep_set(*path[1..], value:)
     end
   end
 

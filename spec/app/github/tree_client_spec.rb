@@ -4,12 +4,12 @@ require_relative '../../../app/github/tree_client'
 require_relative '../../spec_helper'
 
 describe Github::TreeClient do
-  let(:tree_client) { Github::TreeClient.new(access_token: access_token, cache: cache) }
+  let(:tree_client) { Github::TreeClient.new(access_token:, cache:) }
   let(:access_token) { 'some token' }
   let(:cache) { Github::Cache.new({}) }
 
   describe '#get_tree' do
-    subject { tree_client.get_tree(owner: owner, repo: repo, ref: branch, regex: regex) }
+    subject { tree_client.get_tree(owner:, repo:, ref: branch, regex:) }
 
     let(:owner) { 'some_owner' }
     let(:repo) { 'some_repo' }
@@ -50,16 +50,16 @@ describe Github::TreeClient do
       let(:files) do
         [
           Github::File.new(
-            owner: owner,
-            repo: repo,
+            owner:,
+            repo:,
             ref: branch,
             tree_sha: 'some_sha',
             path: 'some_path',
             content: 'some_content'
           ),
           Github::File.new(
-            owner: owner,
-            repo: repo,
+            owner:,
+            repo:,
             ref: branch,
             tree_sha: 'some_sha',
             path: 'some_other_path',
@@ -87,7 +87,7 @@ describe Github::TreeClient do
       end
 
       it 'returns a tree with the matching paths' do
-        expect(subject).to eq(Github::Tree.new(owner: owner, repo: repo, ref: branch, files: files, truncated: false))
+        expect(subject).to eq(Github::Tree.new(owner:, repo:, ref: branch, files:, truncated: false))
       end
     end
   end

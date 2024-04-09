@@ -15,7 +15,7 @@ describe Github::CachingClient do
   let(:caching_client) { described_class.new(client, cache) }
 
   describe 'get_with_caching' do
-    subject { caching_client.get_with_caching(url, cache_for: cache_for) }
+    subject { caching_client.get_with_caching(url, cache_for:) }
 
     let(:url) { 'some_url' }
     let(:cache_for) { 10 }
@@ -47,7 +47,7 @@ describe Github::CachingClient do
 
     context 'when the response has already been cached' do
       before do
-        caching_client.get_with_caching(url, cache_for: cache_for)
+        caching_client.get_with_caching(url, cache_for:)
         allow(client).to receive(:get).with(url).once.and_return(next_response)
       end
 
