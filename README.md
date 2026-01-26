@@ -193,3 +193,7 @@ See https://chromedriver.chromium.org/getting-started
 ```shell
 make test-local
 ```
+
+### BrowserStack
+
+This project is tested with BrowserStack.
